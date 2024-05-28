@@ -6,7 +6,7 @@ https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom
 and 
 https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch
 
-more description to come...
+More description to come on thursday with proper history and attribution to allow contributors until now. Sry until then! ;)
 
 # License
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
