@@ -8,8 +8,8 @@
 // Teaching Techs work invloves mixing all of these. The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation.
 // The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.
 // The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening.
-// On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase:
-// https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remixhttps://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix 
+// On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
+// https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
 
 // Spacemouse emulation
 // Teaching Tech followed the instructions here from nebhead: https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a
@@ -24,7 +24,8 @@
 //Additional work from other makers
 // 1. Code to include meassured min and max values for each Joystick by Daniel_1284580 (In Software Version V1 and newer)
 // 2. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
-// 3. Improved Code, improved comments and added written tutorials in comments. Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
+// 3. Improved Code, improved comments and added written tutorials in comments. Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3) https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files
+// 4. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access. By Andun_HH.
 
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
 #include "HID.h"
@@ -56,29 +57,16 @@ int modFunc = 3;  //3
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
 // Switch between true/false as desired.
 // Values got changed from TeachingTechs original software because of the 3DConnexion tutorial in the Spacemouse Home Software not working the right way.
-bool invX = true; // pan left/right
-bool invY = true; // pan up/down
-bool invZ = false; // zoom in/out
-bool invRX = true; // Rotate around X axis (tilt front/back)
-bool invRY = true; // Rotate around Y axis (tilt left/right)
-bool invRZ = false; // Rotate around Z axis (twist left/right)
-//Original Values from TT in original Software 
-/*
 bool invX = false; // pan left/right
 bool invY = false; // pan up/down
-bool invZ = true; // zoom in/out
-bool invRX = true; // Rotate around X axis (tilt front/back)
+bool invZ = false; // zoom in/out
+bool invRX = false; // Rotate around X axis (tilt front/back)
 bool invRY = false; // Rotate around Y axis (tilt left/right)
-bool invRZ = true; // Rotate around Z axis (twist left/right)
-*/
+bool invRZ = false; // Rotate around Z axis (twist left/right)
 
 //Switch Zooming with Up/Down Movement
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
 bool switchYZ = false; //change to true for switching movement 
-
-// Speed - Had to be removed when the V2 shorter range of motion. The logic reduced sensitivity on small movements. Use 3DConnexion slider instead for V2.
-// Modify to change sensitibity/speed. Default and maximum 100. Works like a percentage ie. 50 is half as fast as default. This can also be done per application in the 3DConnexion software.
-//int16_t speed = 100; 
 
 // Min and max values to be populated by you testing the positions in Debug mode 3.
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
@@ -131,8 +119,9 @@ int maxVals[8]={504,502,511,522,503,501,515,516};
 // 8. You finished calibrating. Move on to Indipendent sensitivity multiplier
 
 // Indipendent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
+// eg use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive
 /* Factory Settings:
-float pos_transX_sensetivity = 2; // eg use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive
+float pos_transX_sensetivity = 2; 
 float neg_transX_sensetivity = 2;
 float pos_transY_sensetivity = 2;
 float neg_transY_sensetivity = 2;
@@ -146,17 +135,18 @@ float pos_rotZ_sensetivity = 2;
 float neg_rotZ_sensetivity = 2; */
 // The Values you can change (those Values worked for me, you can or should change them to your preferences):
 float pos_transX_sensetivity = 2;
-float neg_transX_sensetivity = 2;
+//float neg_transX_sensetivity = 2;
 float pos_transY_sensetivity = 2;
-float neg_transY_sensetivity = 2;
-float pos_transZ_sensetivity = 1;
-float neg_transZ_sensetivity = 2;
-float pos_rotX_sensetivity = 1;
-float neg_rotX_sensetivity = 1;
-float pos_rotY_sensetivity = 1;
-float neg_rotY_sensetivity = 1;
+//float neg_transY_sensetivity = 2;
+float pos_transZ_sensetivity = 0.5;
+float neg_transZ_sensetivity = 5; //I want low sensitiviy for down!
+
+float pos_rotX_sensetivity = 1.5;
+//float neg_rotX_sensetivity = 1;
+float pos_rotY_sensetivity = 1.5;
+//float neg_rotY_sensetivity = 1;
 float pos_rotZ_sensetivity = 2;
-float neg_rotZ_sensetivity = 2;
+//float neg_rotZ_sensetivity = 2;
 // Recommended calibration prozedure
 //  1. Make sure modFunc is on level 0!! Change debug to level 4 and upload sketch. Then open Serial Monitor. You will see Values TX, TY, TZ, RX, RY, RZ
 //  2. Start moving your spacemouse. You will notice Values changing. 
@@ -169,7 +159,7 @@ float neg_rotZ_sensetivity = 2;
 
 
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
-int DEADZONE = 2; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
+int DEADZONE = 3; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
 
 // Default Assembly when looking from above:
 //    C           Y+
@@ -392,7 +382,15 @@ void loop() {
   }
 
   // Subtract centre position from measured position to determine movement.
-  for(int i=0; i<8; i++) centered[i] = rawReads[i] - centerPoints[i]; // 
+  for(int i=0; i<8; i++) {
+    centered[i] = rawReads[i] - centerPoints[i]; 
+    if(abs(centered[i])<DEADZONE) {
+      centered[i] = 0;
+    }
+    else{
+      centered[i] = map(centered[i],minVals[i],maxVals[i],-totalSentitivity,totalSentitivity);
+    }
+  } 
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
   if(debug == 2){
@@ -455,131 +453,41 @@ void loop() {
   // Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
   int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
   // Original fdmakara calculations
-  //transX = (-centered[AX] +centered[CX])/1;
-  //transY = (-centered[BX] +centered[DX])/1;
-  //transZ = (-centered[AY] -centered[BY] -centered[CY] -centered[DY])/2;
-  //rotX = (-centered[AY] +centered[CY])/2;
-  //rotY = (+centered[BY] -centered[DY])/2;
-  //rotZ = (+centered[AX] +centered[BX] +centered[CX] +centered[DX])/4;
-  // Teaching Techs altered calculations based on debug output. Final divisor can be changed to alter sensitivity for each axis.
-  /*
-  transX = -(-centered[CY] +centered[AY])/1;  
-  transY = (-centered[BY]+centered[DY])/1;
-  if((abs(centered[AX])>DEADZONE)&&(abs(centered[BX])>DEADZONE)&&(abs(centered[CX])>DEADZONE)&&(abs(centered[DX])>DEADZONE)){
-    transZ = (-centered[AX] -centered[BX] -centered[CX] -centered[DX])/1;
-    transX = 0;
-    transY = 0;
-  } else {
-    transZ = 0;
-  } 
-  rotX = (-centered[AX] +centered[CX])/1;
-  rotY = (+centered[BX] -centered[DX])/1;
-  if((abs(centered[AY])>DEADZONE)&&(abs(centered[BY])>DEADZONE)&&(abs(centered[CY])>DEADZONE)&&(abs(centered[DY])>DEADZONE)){
-    rotZ = (+centered[AY] +centered[BY] +centered[CY] +centered[DY])/2;
-    rotX = 0;
-    rotY = 0;
-  } else {
-    rotZ = 0;
-  }
-  */
-  // More Complex Calculations with min max values by Daniel_1284580.
+    
+  // More Complex Calculations with min max values by Daniel_1284580. Deadzone has been moved to loop(). 
   // transX
-    //positive translation in x
-  if((centered[CY]<-DEADZONE)&&(centered[AY]>DEADZONE)){
-    transX = -(-map(centered[CY],minVals[CY],0,-totalSentitivity,0)+map(centered[AY],0,maxVals[AY],0,totalSentitivity))/pos_transX_sensetivity;
-    transX=modifierFunction(transX); //recalculate with modifier function
-    //negative translation in x
-  }else if((centered[CY]>DEADZONE)&&(centered[AY]<-DEADZONE)){
-    transX = -(-map(centered[CY],minVals[CY],0,-totalSentitivity,0)+map(centered[AY],0,maxVals[AY],0,totalSentitivity))/neg_transX_sensetivity;
-    transX=modifierFunction(transX); //recalculate with modifier function
-  }else{
-    transX=0;
-  }
-  // transY
-    //positive translation in y
-  if((centered[BY]<-DEADZONE)&&(centered[DY]>DEADZONE)){
-    transY = -(-map(centered[BY],minVals[BY],0,-totalSentitivity,0)+map(centered[DY],0,maxVals[DY],0,totalSentitivity))/pos_transY_sensetivity;
-    transY=modifierFunction(transY); //recalculate with modifier function
-    //negative translation in y
-  }else if((centered[BY]>DEADZONE)&&(centered[DY]<-DEADZONE)){
-    transY = -(-map(centered[BY],minVals[BY],0,-totalSentitivity,0)+map(centered[DY],0,maxVals[DY],0,totalSentitivity))/neg_transX_sensetivity;
-    transY=modifierFunction(transY); //recalculate with modifier function
-  }else{
-    transY=0;
-  }
-  // transZ
-    //positive translation in z
-  if((centered[AX]>DEADZONE)&&(centered[BX]>DEADZONE)&&(centered[CX]>DEADZONE)&&(centered[DX]>DEADZONE)){
-    transZ = (-map(centered[AX],0,maxVals[AX],0,totalSentitivity) -map(centered[BX],0,maxVals[BX],0,totalSentitivity) -map(centered[CX],0,maxVals[CX],0,totalSentitivity) -map(centered[DX],0,maxVals[DX],0,totalSentitivity))/pos_transZ_sensetivity;
-    transZ=modifierFunction(transZ); //recalculate with modifier function
-    transX = 0;
-    transY = 0;
-    //negative translation in z
-  } else if((centered[AX]<-DEADZONE)&&(centered[BX]<-DEADZONE)&&(centered[CX]<-DEADZONE)&&(centered[DX]<-DEADZONE)){
-    transZ = (-map(centered[AX],minVals[AX],0,-totalSentitivity,0) -map(centered[BX],minVals[BX],0,-totalSentitivity,0) -map(centered[CX],minVals[CX],0,-totalSentitivity,0) -map(centered[DX],minVals[DX],0,-totalSentitivity,0))/neg_transZ_sensetivity;
-    transZ=modifierFunction(transZ); //recalculate with modifier function
-    transX = 0;
-    transY = 0;
-  }else{
-    transZ = 0;
-  } 
-  // rotX
-    //positive rotation in x
-  if((centered[CX]<-DEADZONE)&&(centered[AX]>DEADZONE)){
-    rotX = -(-map(centered[CX],minVals[CX],0,-totalSentitivity,0)+map(centered[AX],0,maxVals[AX],0,totalSentitivity))/pos_rotX_sensetivity;
-    rotX=modifierFunction(rotX); //recalculate with modifier function
-  }else if((abs(centered[CX])<DEADZONE)&&(centered[AX]>DEADZONE)){
-    // cx is zero, but ax is pushed down -> positive rotation x
-    rotX = -map(centered[AX],0,maxVals[AX],0,totalSentitivity)/pos_rotX_sensetivity;
-    rotX=modifierFunction(rotX); //recalculate with modifier function
-  }else if((centered[CX]>DEADZONE)&&(centered[AX]<-DEADZONE)){
-    //negative rotation in x
-    rotX = -(-map(centered[CX],minVals[CX],0,-totalSentitivity,0)+map(centered[AX],0,maxVals[AX],0,totalSentitivity))/neg_rotX_sensetivity;
-    rotX=modifierFunction(rotX); //recalculate with modifier function
-   }else if((centered[CX]>DEADZONE)&&(abs(centered[AX])<DEADZONE)){
-    // ax is zero, but cx is pushed down -> negative rotation x
-    rotX = map(centered[CX],minVals[CX],0,-totalSentitivity,0)/neg_rotX_sensetivity;
-    rotX=modifierFunction(rotX); //recalculate with modifier function
-  }else{
-    rotX=0;
-  }
-  // rotY
-    //positive rotation in y
-  if((centered[DX]<-DEADZONE)&&(centered[BX]>DEADZONE)){
-    rotY = -(-map(centered[BX],minVals[BX],0,-totalSentitivity,0)+map(centered[DX],0,maxVals[DX],0,totalSentitivity))/pos_rotY_sensetivity;
-    rotY=modifierFunction(rotY); //recalculate with modifier function  
-  }else if((abs(centered[DX])<DEADZONE)&&(centered[BX]>DEADZONE)){
-    // Dx is zero, but Bx is pushed down -> positive rotation y
-    rotY = -(-map(centered[BX],minVals[BX],0,-totalSentitivity,0)+map(centered[DX],0,maxVals[DX],0,totalSentitivity))/pos_rotY_sensetivity;
-    rotY=modifierFunction(rotY); //recalculate with modifier function  
-  }else if((centered[DX]>DEADZONE)&&(centered[BX]<-DEADZONE)){
-    //negative rotation in y
-    rotY = -(-map(centered[BX],minVals[BX],0,-totalSentitivity,0)+map(centered[DX],0,maxVals[DX],0,totalSentitivity))/neg_rotY_sensetivity;
-    rotY=modifierFunction(rotY); //recalculate with modifier function
-   }else if((centered[DX]>DEADZONE)&&(abs(centered[BX])<DEADZONE)){
-    // Bx is zero, but dx is pushed down -> negative rotation y
-    rotY = -(-map(centered[BX],minVals[BX],0,-totalSentitivity,0)+map(centered[DX],0,maxVals[DX],0,totalSentitivity))/neg_rotY_sensetivity;
-    rotY=modifierFunction(rotY); //recalculate with modifier function
-  }else{
-    rotY=0;
-  }
-  // rotZ
-    //positive rotation in z
-  if((centered[AY]>DEADZONE)&&(centered[BY]>DEADZONE)&&(centered[CY]>DEADZONE)&&(centered[DY]>DEADZONE)){
-    rotZ = (+map(centered[AY],0,maxVals[AY],0,totalSentitivity) +map(centered[BY],0,maxVals[BY],0,totalSentitivity) +map(centered[CY],0,maxVals[CY],0,totalSentitivity) +map(centered[DY],0,maxVals[DY],0,totalSentitivity))/pos_rotZ_sensetivity;
-    rotZ=modifierFunction(rotZ); //recalculate with modifier function
-    rotX = 0;
-    rotY = 0;
-    //negative rotation in z
-  }else if((centered[AY]<-DEADZONE)&&(centered[BY]<-DEADZONE)&&(centered[CY]<-DEADZONE)&&(centered[DY]<-DEADZONE)){
-    rotZ = (+map(centered[AY],minVals[AX],0,-totalSentitivity,0) +map(centered[BY],minVals[BY],0,-totalSentitivity,0) +map(centered[CY],minVals[CY],0,-totalSentitivity,0) +map(centered[DY],minVals[DY],0,-totalSentitivity,0))/neg_rotZ_sensetivity;
-    rotZ=modifierFunction(rotZ); //recalculate with modifier function
-    rotX = 0;
-    rotY = 0;
-  }else {
-    rotZ = 0;
-  }
+    transX = (-centered[CY]+centered[AY])/pos_transX_sensetivity;
+    transX =modifierFunction(transX); //recalculate with modifier function
 
+  // transY
+    transY = (-centered[BY]+centered[DY])/pos_transY_sensetivity;
+    transY=modifierFunction(transY); //recalculate with modifier function
+
+  transZ = -centered[AX]-centered[BX]-centered[CX]-centered[DX];
+  if (transZ<0) {
+    transZ = modifierFunction(transZ/neg_transZ_sensetivity); //recalculate with modifier function
+    if(abs(transZ)<15) { transZ = 0;   }
+  } else { // pulling the knob upwards is much heavier... smaller factor
+    transZ = constrain(transZ/pos_transZ_sensetivity,-350,350); // no modifier function, just constrain linear!
+  } 
+    
+  // rotX
+  rotX = (-centered[CX]+centered[AX])/pos_rotX_sensetivity;
+  rotX = modifierFunction(rotX); //recalculate with modifier function
+  if(abs(rotX)<15) { rotX = 0;   }
+    //positive rotation in x
+  
+  // rotY
+  rotY = (-centered[BX]+centered[DX])/pos_rotY_sensetivity;
+  rotY = modifierFunction(rotY); //recalculate with modifier function
+  if(abs(rotY)<15) { rotY = 0;   }
+    
+  // rotZ
+  rotZ = (centered[AY]+centered[BY]+centered[CY]+centered[DY])/pos_rotZ_sensetivity;
+  rotZ = modifierFunction(rotZ); //recalculate with modifier function
+  if(abs(rotZ)<15) { rotZ = 0;   }
+    //positive rotation in z
+  
 //LivingTheDream added
   //Button Evaluation
   for(int i=0; i<numKeys; i++){
@@ -602,13 +510,6 @@ void loop() {
       
     }
   }
-// Alter speed to suit user preference - Use 3DConnexion slider instead for V2.
-  //transX = transX/100*speed;
-  //transY = transY/100*speed;
-  //transZ = transZ/100*speed;
-  //rotX = rotX/100*speed;
-  //rotY = rotY/100*speed;
-  //rotZ = rotZ/100*speed;
 // Invert directions if needed
   if(invX == true){ transX = transX*-1;};
   if(invY == true){ transY = transY*-1;};
