@@ -384,12 +384,6 @@ void loop() {
   // Subtract centre position from measured position to determine movement.
   for(int i=0; i<8; i++) {
     centered[i] = rawReads[i] - centerPoints[i]; 
-    if(abs(centered[i])<DEADZONE) {
-      centered[i] = 0;
-    }
-    else{
-      centered[i] = map(centered[i],minVals[i],maxVals[i],-totalSentitivity,totalSentitivity);
-    }
   } 
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
@@ -420,8 +414,12 @@ void loop() {
   }
   // Filter movement values. Set to zero if movement is below deadzone threshold.
   for(int i=0; i<8; i++){
-    if(centered[i]<DEADZONE && centered[i]>-DEADZONE) centered[i] = 0;
+    if(centered[i]<DEADZONE && centered[i]>-DEADZONE) {centered[i] = 0;}
+    else{
+      centered[i] = map(centered[i],minVals[i],maxVals[i],-totalSentitivity,totalSentitivity);
+    }
   }
+  
   // Report centered joystick values. Filtered for deadzone. Approx -500 to +500, locked to zero at idle
   if(debug == 3){
     Serial.print("AX:");
