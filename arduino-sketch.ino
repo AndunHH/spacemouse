@@ -5,7 +5,7 @@
 // 2. Code to emulate a 3DConnexion Space Mouse by jfedor: https://pastebin.com/gQxUrScV
 // 3. This code was then remixed by BennyBWalker to include the above two sketches: https://pastebin.com/erhTgRBH
 // 4. Four joystick remix code by fdmakara: https://www.thingiverse.com/thing:5817728
-// Teaching Techs work invloves mixing all of these. The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation.
+// 5. Teaching Techs work involves mixing all of these. The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation.
 // The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.
 // The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening.
 // On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
@@ -38,8 +38,8 @@
 // 0: Debugging off. Set to this once everything is working.
 // 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
 // 2: Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
-// 3: Output centered joystick values. Filtered for deadzone. Approx -500 to +500, locked to zero at idle.
-// 4: Output translation and rotation values. Approx -800 to 800 depending on the parameter.
+// 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
+// 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
 int debug = 5;
 
@@ -346,8 +346,13 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   HID().SendReport(3, key, 4);
 }
 
+int rawReads[8], centered[8];
+
+// Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
+int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
+
 void loop() {
-  int rawReads[8], centered[8], keyVals[numKeys];
+  int keyVals[numKeys];
   // Joystick values are read. 0-1023
   readAllFromJoystick(rawReads);
 
@@ -355,63 +360,16 @@ void loop() {
   readAllFromKeys(keyVals);
 
   // Report back 0-1023 raw ADC 10-bit values if enabled
-  if (debug == 1) {
-    Serial.print("AX:");
-    Serial.print(rawReads[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(rawReads[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(rawReads[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(rawReads[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(rawReads[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(rawReads[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(rawReads[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.println(rawReads[7]);
-  }
+  debugOutput1();
 
   // Subtract centre position from measured position to determine movement.
   for (int i = 0; i < 8; i++) {
     centered[i] = rawReads[i] - centerPoints[i];
   }
 
-  // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
-  if (debug == 2) {
-    Serial.print("AX:");
-    Serial.print(centered[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(centered[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(centered[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(centered[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(centered[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(centered[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(centered[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.println(centered[7]);
-  }
+  // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle
+  debugOutput2();
+
   // Filter movement values. Set to zero if movement is below deadzone threshold.
   for (int i = 0; i < 8; i++) {
     if (centered[i] < DEADZONE && centered[i] > -DEADZONE) {
@@ -422,40 +380,9 @@ void loop() {
     }
   }
 
-
   // Report centered joystick values. Filtered for deadzone. Approx -500 to +500, locked to zero at idle
-  if (debug == 3) {
-    Serial.print("AX:");
-    Serial.print(centered[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(centered[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(centered[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(centered[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(centered[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(centered[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(centered[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.println(centered[7]);
-  }
+  debugOutput3();
 
-  // Doing all through arithmetic contribution by fdmakara
-  // Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
-  int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
-  // Original fdmakara calculations
-
-  // More Complex Calculations with min max values by Daniel_1284580. Deadzone has been moved to loop().
   // transX
   transX = (-centered[CY] + centered[AY]) / pos_transX_sensetivity;
   transX = modifierFunction(transX); //recalculate with modifier function
@@ -539,7 +466,113 @@ void loop() {
     rotZ = rotZ * -1;
   };
 
+  debugOutput4();
   // Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
+
+  debugOutput5();
+  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
+
+  // Send data to the 3DConnexion software.
+  // The correct order for TeachingTech was determined after trial and error
+  if (switchYZ == true) {
+    //Original from TT, but 3DConnextion tutorial will not work:
+    send_command(rotX, rotZ, rotY, transX, transZ, transY, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  } else {
+    // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
+    send_command(rotX, rotY, rotZ, transX, transY, transZ, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  }
+}
+
+
+void debugOutput1() {
+  // Report back 0-1023 raw ADC 10-bit values if enabled
+  if (debug == 1) {
+    Serial.print("AX:");
+    Serial.print(rawReads[0]);
+    Serial.print(",");
+    Serial.print("AY:");
+    Serial.print(rawReads[1]);
+    Serial.print(",");
+    Serial.print("BX:");
+    Serial.print(rawReads[2]);
+    Serial.print(",");
+    Serial.print("BY:");
+    Serial.print(rawReads[3]);
+    Serial.print(",");
+    Serial.print("CX:");
+    Serial.print(rawReads[4]);
+    Serial.print(",");
+    Serial.print("CY:");
+    Serial.print(rawReads[5]);
+    Serial.print(",");
+    Serial.print("DX:");
+    Serial.print(rawReads[6]);
+    Serial.print(",");
+    Serial.print("DY:");
+    Serial.println(rawReads[7]);
+  }
+}
+
+void debugOutput2() {
+  // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
+  if (debug == 2) {
+    Serial.print("AX:");
+    Serial.print(centered[0]);
+    Serial.print(",");
+    Serial.print("AY:");
+    Serial.print(centered[1]);
+    Serial.print(",");
+    Serial.print("BX:");
+    Serial.print(centered[2]);
+    Serial.print(",");
+    Serial.print("BY:");
+    Serial.print(centered[3]);
+    Serial.print(",");
+    Serial.print("CX:");
+    Serial.print(centered[4]);
+    Serial.print(",");
+    Serial.print("CY:");
+    Serial.print(centered[5]);
+    Serial.print(",");
+    Serial.print("DX:");
+    Serial.print(centered[6]);
+    Serial.print(",");
+    Serial.print("DY:");
+    Serial.println(centered[7]);
+  }
+}
+
+void debugOutput3() {
+  // Report centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle
+  if (debug == 3) {
+    Serial.print("AX:");
+    Serial.print(centered[0]);
+    Serial.print(",");
+    Serial.print("AY:");
+    Serial.print(centered[1]);
+    Serial.print(",");
+    Serial.print("BX:");
+    Serial.print(centered[2]);
+    Serial.print(",");
+    Serial.print("BY:");
+    Serial.print(centered[3]);
+    Serial.print(",");
+    Serial.print("CX:");
+    Serial.print(centered[4]);
+    Serial.print(",");
+    Serial.print("CY:");
+    Serial.print(centered[5]);
+    Serial.print(",");
+    Serial.print("DX:");
+    Serial.print(centered[6]);
+    Serial.print(",");
+    Serial.print("DY:");
+    Serial.println(centered[7]);
+  }
+}
+
+void debugOutput4() {
+  // Report translation and rotation values if enabled. Approx -350 to +350 depending on the parameter.
   if (debug == 4) {
     Serial.print("TX:");
     Serial.print(transX);
@@ -572,7 +605,10 @@ void loop() {
     Serial.print("Key4:");
     Serial.println(keyOut[3]);
   }
-  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
+}
+
+void debugOutput5() {
+  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmetic above.
   if (debug == 5) {
     Serial.print("AX:");
     Serial.print(centered[0]);
@@ -615,15 +651,5 @@ void loop() {
     Serial.print(",");
     Serial.print("RZ:");
     Serial.println(rotZ);
-  }
-
-  // Send data to the 3DConnexion software.
-  // The correct order for TeachingTech was determined after trial and error
-  if (switchYZ == true) {
-    //Original from TT, but 3DConnextion tutorial will not work:
-    send_command(rotX, rotZ, rotY, transX, transZ, transY, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
-  } else {
-    // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-    send_command(rotX, rotY, rotZ, transX, transY, transZ, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
   }
 }
