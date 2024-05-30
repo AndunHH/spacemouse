@@ -1,31 +1,9 @@
-// This code is the combination of multiple works by others:
-// 1. Original code for the Space Mushroom by Shiura on Thingiverse: https://www.thingiverse.com/thing:5739462
-//    The next two from the comments on the instructables page: https://www.instructables.com/Space-Mushroom-Full-6-DOFs-Controller-for-CAD-Appl/
-//    and the comments of Thingiverse: https://www.thingiverse.com/thing:5739462/comments
-// 2. Code to emulate a 3DConnexion Space Mouse by jfedor: https://pastebin.com/gQxUrScV
-// 3. This code was then remixed by BennyBWalker to include the above two sketches: https://pastebin.com/erhTgRBH
-// 4. Four joystick remix code by fdmakara: https://www.thingiverse.com/thing:5817728
-// 5. Teaching Techs work involves mixing all of these. The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation.
-// The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.
-// The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening.
-// On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
-// https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
+// This is the arduino source code for the open source space mouse with keys.
+// Please read the introduction and history with all contributors here:
+// https://github.com/AndunHH/spacemouse
 
-// Spacemouse emulation
-// Teaching Tech followed the instructions here from nebhead: https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a
-// with two key differences:
-// 1. Teaching Tech changed the word 'DaemonBite' to 'Spacemouse' in all references.
-// 2. Teaching Tech changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
-// 3. Daniel_1284580 recomments changing leonardo.upload.tool=avrdude to leonardo.upload.tool.serial=avrdude to get no error when compiling
-// When compiling and uploading, Teaching Tech select Arduino AVR boards (in Sketchbook) > Spacemouse and then the serial port.
-// You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
-// If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
-
-//Additional work from other makers
-// 1. Code to include meassured min and max values for each Joystick by Daniel_1284580 (In Software Version V1 and newer)
-// 2. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
-// 3. Improved Code, improved comments and added written tutorials in comments. Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3) https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files
-// 4. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access. By Andun_HH.
+// One good starting point is the work and video by TeachingTech: https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
+// Then follow along on github, how we reached this state of the source code.
 
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "HID.h"
@@ -41,7 +19,7 @@
 // 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
 // 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
-int debug = 5;
+int debug = 2;
 
 // Modifier Function
 // Modify resulting behaviour of Joystick input values
@@ -51,12 +29,11 @@ int debug = 5;
 // 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
 // 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
 // 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-int modFunc = 3;  //3
+int modFunc = 3;
 
 // Direction
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
 // Switch between true/false as desired.
-// Values got changed from TeachingTechs original software because of the 3DConnexion tutorial in the Spacemouse Home Software not working the right way.
 bool invX = false; // pan left/right
 bool invY = false; // pan up/down
 bool invZ = false; // zoom in/out
@@ -68,12 +45,12 @@ bool invRZ = false; // Rotate around Z axis (twist left/right)
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
 bool switchYZ = false; //change to true for switching movement
 
-// Min and max values to be populated by you testing the positions in Debug mode 3.
+// Min and max values to be populated by you testing the positions in Debug mode 2.
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
 int minVals[8] = { -519, -521, -512, -501, -520, -522, -508, -507};
 int maxVals[8] = {504, 502, 511, 522, 503, 501, 515, 516};
-//Recommended calibration prozedure
-// 1. Change debug to level 3 and upload sketch. Then open Serial Monitor.
+// Recommended calibration procedure for min/max adc levels
+// 1. Change debug to level 2 and upload sketch. Then open Serial Monitor.
 // 2. Get a piece of paper and write the following chart:
 // Chart:
 //  maxVals      | minVals
@@ -91,72 +68,32 @@ int maxVals[8] = {504, 502, 511, 522, 503, 501, 515, 516};
 //    (b) Start moving the your spacemouse and try increasing the Value of AX till you can't get a higher value out of it.
 //    (c) this is your positive maximum value for AX so write it down for AX
 //4. Do the same for AY,BX,BY,....DY
-// Example:
-//    maxVals      | minVals
-//  --------------------------------
-//    AX+: 504     | AX-:
-//    AY+: 502     | AY-:
-//    BX+: 511     | BY-:
-//    BY+: 522     | BY-:
-//    CX+: 503     | CY-:
-//    CY+: 501     | CY-:
-//    DX+: 515     | DY-:
-//    DY+: 516     | DY-:
-// 5. Do the same for your negative Values
-// Example:
-//    maxVals      | minVals
-//  --------------------------------
-//    AX+:      | AX-: -519
-//    AY+:      | AY-: -521
-//    BX+:      | BX-: -512
-//    BY+:      | BY-: -501
-//    CX+:      | CX-: -520
-//    CY+:      | CY-: -522
-//    DX+:      | DX-: -508
-//    DY+:      | DY-: -507
+// 5. Do the same for your negative Values to populate the minVals
 // 6. Write all the positive Values starting from the top into the Array maxValues
 // 7. Write all the negative Values starting from the top into the Array minValues
-// 8. You finished calibrating. Move on to Indipendent sensitivity multiplier
+// 8. You finished calibrating. Move on to independent sensitivity multiplier
 
-// Indipendent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
+// Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
 // eg use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive
-/* Factory Settings:
-  float pos_transX_sensetivity = 2;
-  float neg_transX_sensetivity = 2;
-  float pos_transY_sensetivity = 2;
-  float neg_transY_sensetivity = 2;
-  float pos_transZ_sensetivity = 4;
-  float neg_transZ_sensetivity = 4;
-  float pos_rotX_sensetivity = 1;
-  float neg_rotX_sensetivity = 1;
-  float pos_rotY_sensetivity = 1;
-  float neg_rotY_sensetivity = 1;
-  float pos_rotZ_sensetivity = 2;
-  float neg_rotZ_sensetivity = 2; */
+
 // The Values you can change (those Values worked for me, you can or should change them to your preferences):
-float pos_transX_sensetivity = 2;
-//float neg_transX_sensetivity = 2;
-float pos_transY_sensetivity = 2;
-//float neg_transY_sensetivity = 2;
-float pos_transZ_sensetivity = 0.5;
-float neg_transZ_sensetivity = 5; //I want low sensitiviy for down!
+float pos_transX_sensitivity = 2;
+float pos_transY_sensitivity = 2;
+float pos_transZ_sensitivity = 0.5;
+float neg_transZ_sensitivity = 5; //I want low sensitiviy for down, therefore a high value.
 
-float pos_rotX_sensetivity = 1.5;
-//float neg_rotX_sensetivity = 1;
-float pos_rotY_sensetivity = 1.5;
-//float neg_rotY_sensetivity = 1;
-float pos_rotZ_sensetivity = 2;
-//float neg_rotZ_sensetivity = 2;
-// Recommended calibration prozedure
+float pos_rotX_sensitivity = 1.5;
+float pos_rotY_sensitivity = 1.5;
+float pos_rotZ_sensitivity = 2;
+
+// Recommended calibration procedure for sensitivity
 //  1. Make sure modFunc is on level 0!! Change debug to level 4 and upload sketch. Then open Serial Monitor. You will see Values TX, TY, TZ, RX, RY, RZ
-//  2. Start moving your spacemouse. You will notice Values changing.
+//  2. Start moving your spacemouse. You will notice values changing.
 //  3. Starting with TX try increasing this value as much as possible by moving your spacemouse around. If you get around 350 thats great. If not change pos_transX_sensitivy and reupload sketch. Repeat until it is around 350 for maximum motion.
-//  4. Now try decreasing TX as much as possible. If you get around -350 thats great. If not change neg_transX_sensitivity until it is around -350 for maximum motion.
-//  5. Repeat steps 3 and 4 for TY,TZ,RX,RY,RZ
-//  6. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350.
-//  7. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
-//  8. Aftermath: You notice the movements are hard to control. Try using Modification Functions (have a look at the beginning of the sketch) [I like level 3 the most. Experiment to find your favorite function]
-
+//  4. Repeat steps 3 for TY,TZ,RX,RY,RZ
+//  5. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350.
+//  6. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
+//  7. Aftermath: You notice the movements are hard to control. Try using Modification Functions (have a look at the beginning of the sketch) [I like level 3 the most. Experiment to find your favorite function]
 
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 int DEADZONE = 3; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
@@ -239,7 +176,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
   0xC0
 };
 
-// Axes are matched to pin order.
+// Axes are matched to pin order. Don't change this, this is just for accessing the arrays from 0 to 7.
 #define AX 0
 #define AY 1
 #define BX 2
@@ -257,7 +194,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 #define KEY_LEFT_FIT 5
 
 //Please do not change this anymore. Use indipendent sensitivity multiplier.
-int totalSentitivity = 350;
+int totalSensitivity = 350;
 // Centerpoint variable to be populated during setup routine.
 int centerPoints[8];
 
@@ -376,7 +313,7 @@ void loop() {
       centered[i] = 0;
     }
     else {
-      centered[i] = map(centered[i], minVals[i], maxVals[i], -totalSentitivity, totalSentitivity);
+      centered[i] = map(centered[i], minVals[i], maxVals[i], -totalSensitivity, totalSensitivity);
     }
   }
 
@@ -384,25 +321,25 @@ void loop() {
   debugOutput3();
 
   // transX
-  transX = (-centered[CY] + centered[AY]) / pos_transX_sensetivity;
+  transX = (-centered[CY] + centered[AY]) / pos_transX_sensitivity;
   transX = modifierFunction(transX); //recalculate with modifier function
 
   // transY
-  transY = (-centered[BY] + centered[DY]) / pos_transY_sensetivity;
+  transY = (-centered[BY] + centered[DY]) / pos_transY_sensitivity;
   transY = modifierFunction(transY); //recalculate with modifier function
 
   transZ = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
   if (transZ < 0) {
-    transZ = modifierFunction(transZ / neg_transZ_sensetivity); //recalculate with modifier function
+    transZ = modifierFunction(transZ / neg_transZ_sensitivity); //recalculate with modifier function
     if (abs(transZ) < 15) {
       transZ = 0;
     }
   } else { // pulling the knob upwards is much heavier... smaller factor
-    transZ = constrain(transZ / pos_transZ_sensetivity, -350, 350); // no modifier function, just constrain linear!
+    transZ = constrain(transZ / pos_transZ_sensitivity, -350, 350); // no modifier function, just constrain linear!
   }
 
   // rotX
-  rotX = (-centered[CX] + centered[AX]) / pos_rotX_sensetivity;
+  rotX = (-centered[CX] + centered[AX]) / pos_rotX_sensitivity;
   rotX = modifierFunction(rotX); //recalculate with modifier function
   if (abs(rotX) < 15) {
     rotX = 0;
@@ -410,14 +347,14 @@ void loop() {
   //positive rotation in x
 
   // rotY
-  rotY = (-centered[BX] + centered[DX]) / pos_rotY_sensetivity;
+  rotY = (-centered[BX] + centered[DX]) / pos_rotY_sensitivity;
   rotY = modifierFunction(rotY); //recalculate with modifier function
   if (abs(rotY) < 15) {
     rotY = 0;
   }
 
   // rotZ
-  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / pos_rotZ_sensetivity;
+  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / pos_rotZ_sensitivity;
   rotZ = modifierFunction(rotZ); //recalculate with modifier function
   if (abs(rotZ) < 15) {
     rotZ = 0;
