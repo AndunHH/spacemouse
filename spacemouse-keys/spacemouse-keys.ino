@@ -109,14 +109,14 @@ int DEADZONE = 3; // Recommended to have this as small as possible for V2 to all
 
 // Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4)
 int PINLIST[8] = { // The positions of the reads
-  A0, // X-axis A
-  A1, // Y-axis A
-  A2, // X-axis B
-  A3, // Y-axis B
-  A6, // X-axis C
-  A7, // Y-axis C
-  A8, // X-axis D
-  A9  // Y-axis D
+  A1, // X-axis A
+  A0, // Y-axis A
+  A3, // X-axis B
+  A2, // Y-axis B
+  A7, // X-axis C
+  A6, // Y-axis C
+  A9, // X-axis D
+  A8  // Y-axis D
 };
 
 //LivingTheDream added
