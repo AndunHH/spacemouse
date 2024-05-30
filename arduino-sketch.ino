@@ -27,7 +27,7 @@
 // 3. Improved Code, improved comments and added written tutorials in comments. Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3) https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files
 // 4. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access. By Andun_HH.
 
-// Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
+// Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "HID.h"
 //Include math operators for doing better calculation algorithms. Arduino math is a standard library already included.
 #include <math.h>
@@ -43,7 +43,7 @@
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
 int debug = 5;
 
-// Modifier Function 
+// Modifier Function
 // Modify resulting behaviour of Joystick input values
 // DISCLAIMER: This should be at level 0 when calibrating "Independent Sensitivity Multiplier".
 // 0: linear y = x [Standard behaviour: No modification]
@@ -51,7 +51,7 @@ int debug = 5;
 // 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
 // 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
 // 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-int modFunc = 3;  //3 
+int modFunc = 3;  //3
 
 // Direction
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
@@ -66,14 +66,14 @@ bool invRZ = false; // Rotate around Z axis (twist left/right)
 
 //Switch Zooming with Up/Down Movement
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
-bool switchYZ = false; //change to true for switching movement 
+bool switchYZ = false; //change to true for switching movement
 
 // Min and max values to be populated by you testing the positions in Debug mode 3.
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-int minVals[8]={-519,-521,-512,-501,-520,-522,-508,-507};
-int maxVals[8]={504,502,511,522,503,501,515,516};
-//Recommended calibration prozedure 
-// 1. Change debug to level 3 and upload sketch. Then open Serial Monitor. 
+int minVals[8] = { -519, -521, -512, -501, -520, -522, -508, -507};
+int maxVals[8] = {504, 502, 511, 522, 503, 501, 515, 516};
+//Recommended calibration prozedure
+// 1. Change debug to level 3 and upload sketch. Then open Serial Monitor.
 // 2. Get a piece of paper and write the following chart:
 // Chart:
 //  maxVals      | minVals
@@ -86,12 +86,12 @@ int maxVals[8]={504,502,511,522,503,501,515,516};
 //  CY+:         | CY-:
 //  DX+:         | DY-:
 //  DY+:         | DY-:
-// 
-// 3. (a) Start out with AX (positive Values) 
-//    (b) Start moving the your spacemouse and try increasing the Value of AX till you can't get a higher value out of it. 
+//
+// 3. (a) Start out with AX (positive Values)
+//    (b) Start moving the your spacemouse and try increasing the Value of AX till you can't get a higher value out of it.
 //    (c) this is your positive maximum value for AX so write it down for AX
 //4. Do the same for AY,BX,BY,....DY
-// Example: 
+// Example:
 //    maxVals      | minVals
 //  --------------------------------
 //    AX+: 504     | AX-:
@@ -102,11 +102,11 @@ int maxVals[8]={504,502,511,522,503,501,515,516};
 //    CY+: 501     | CY-:
 //    DX+: 515     | DY-:
 //    DY+: 516     | DY-:
-// 5. Do the same for your negative Values 
-// Example: 
+// 5. Do the same for your negative Values
+// Example:
 //    maxVals      | minVals
 //  --------------------------------
-//    AX+:      | AX-: -519  
+//    AX+:      | AX-: -519
 //    AY+:      | AY-: -521
 //    BX+:      | BX-: -512
 //    BY+:      | BY-: -501
@@ -121,18 +121,18 @@ int maxVals[8]={504,502,511,522,503,501,515,516};
 // Indipendent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
 // eg use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive
 /* Factory Settings:
-float pos_transX_sensetivity = 2; 
-float neg_transX_sensetivity = 2;
-float pos_transY_sensetivity = 2;
-float neg_transY_sensetivity = 2;
-float pos_transZ_sensetivity = 4;
-float neg_transZ_sensetivity = 4;
-float pos_rotX_sensetivity = 1;
-float neg_rotX_sensetivity = 1;
-float pos_rotY_sensetivity = 1;
-float neg_rotY_sensetivity = 1;
-float pos_rotZ_sensetivity = 2;
-float neg_rotZ_sensetivity = 2; */
+  float pos_transX_sensetivity = 2;
+  float neg_transX_sensetivity = 2;
+  float pos_transY_sensetivity = 2;
+  float neg_transY_sensetivity = 2;
+  float pos_transZ_sensetivity = 4;
+  float neg_transZ_sensetivity = 4;
+  float pos_rotX_sensetivity = 1;
+  float neg_rotX_sensetivity = 1;
+  float pos_rotY_sensetivity = 1;
+  float neg_rotY_sensetivity = 1;
+  float pos_rotZ_sensetivity = 2;
+  float neg_rotZ_sensetivity = 2; */
 // The Values you can change (those Values worked for me, you can or should change them to your preferences):
 float pos_transX_sensetivity = 2;
 //float neg_transX_sensetivity = 2;
@@ -149,11 +149,11 @@ float pos_rotZ_sensetivity = 2;
 //float neg_rotZ_sensetivity = 2;
 // Recommended calibration prozedure
 //  1. Make sure modFunc is on level 0!! Change debug to level 4 and upload sketch. Then open Serial Monitor. You will see Values TX, TY, TZ, RX, RY, RZ
-//  2. Start moving your spacemouse. You will notice Values changing. 
-//  3. Starting with TX try increasing this value as much as possible by moving your spacemouse around. If you get around 350 thats great. If not change pos_transX_sensitivy and reupload sketch. Repeat until it is around 350 for maximum motion. 
+//  2. Start moving your spacemouse. You will notice Values changing.
+//  3. Starting with TX try increasing this value as much as possible by moving your spacemouse around. If you get around 350 thats great. If not change pos_transX_sensitivy and reupload sketch. Repeat until it is around 350 for maximum motion.
 //  4. Now try decreasing TX as much as possible. If you get around -350 thats great. If not change neg_transX_sensitivity until it is around -350 for maximum motion.
-//  5. Repeat steps 3 and 4 for TY,TZ,RX,RY,RZ 
-//  6. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350. 
+//  5. Repeat steps 3 and 4 for TY,TZ,RX,RY,RZ
+//  6. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350.
 //  7. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
 //  8. Aftermath: You notice the movements are hard to control. Try using Modification Functions (have a look at the beginning of the sketch) [I like level 3 the most. Experiment to find your favorite function]
 
@@ -186,14 +186,14 @@ int PINLIST[8] = { // The positions of the reads
 // Define the keycodes for each key
 int numKeys = 4;
 int KEYLIST[4] = {
-  14, 
-  15, 
-  10, 
+  14,
+  15,
+  10,
   5
 };
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
-// hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/ 
+// hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
 // Altered physical, logical range to ranges the 3DConnexion software expects by Daniel_1284580.
 static const uint8_t _hidReportDescriptor[] PROGMEM = {
   0x05, 0x01,           // Usage Page (Generic Desktop)
@@ -257,7 +257,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 #define KEY_LEFT_FIT 5
 
 //Please do not change this anymore. Use indipendent sensitivity multiplier.
-int totalSentitivity=350;
+int totalSentitivity = 350;
 // Centerpoint variable to be populated during setup routine.
 int centerPoints[8];
 
@@ -271,29 +271,29 @@ float timestamp[4];
 //Modifier Functions
 int modifierFunction(int x) {
   //making sure function input never exedes range of -350 to 350
-  x = constrain(x,-350,350);
+  x = constrain(x, -350, 350);
   double result;
-  if(modFunc==0){
+  if (modFunc == 0) {
     //no modification
-    result=x;
+    result = x;
   }
-  if(modFunc==1){
-  // using squared function y = x^2*sign(x)
-    result = 350*pow(x/350.0,2)*sign(x); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
+  if (modFunc == 1) {
+    // using squared function y = x^2*sign(x)
+    result = 350 * pow(x / 350.0, 2) * sign(x); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
   }
-  if(modFunc==2){
-  // unsing tan function: tan(x)
-    result = 350*tan(x/350.0);
+  if (modFunc == 2) {
+    // unsing tan function: tan(x)
+    result = 350 * tan(x / 350.0);
   }
-  if(modFunc==3){
-  // unsing squared tan function: tan(x^2*sign(x))
-    result = 350*tan(pow(x/350.0,2)*sign(x)); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
+  if (modFunc == 3) {
+    // unsing squared tan function: tan(x^2*sign(x))
+    result = 350 * tan(pow(x / 350.0, 2) * sign(x)); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
   }
-  if(modFunc==4){
-    //unsing cubed tan function: tan(x^3) 
-    result = 350*tan(pow(x/350.0,3));
+  if (modFunc == 4) {
+    //unsing cubed tan function: tan(x^3)
+    result = 350 * tan(pow(x / 350.0, 3));
   }
-  
+
   //make sure values between-350 and 350 are allowed
   result = constrain(result, -350, 350);
   //converting doubles to int again
@@ -301,24 +301,24 @@ int modifierFunction(int x) {
 }
 
 // Function to read and store analogue voltages for each joystick axis.
-void readAllFromJoystick(int *rawReads){
-  for(int i=0; i<8; i++){
+void readAllFromJoystick(int *rawReads) {
+  for (int i = 0; i < 8; i++) {
     rawReads[i] = analogRead(PINLIST[i]);
   }
 }
 
 // LivingTheDream added Daniel_1284580 modified into a forloop
 // Function to read and store the digital states for each of the keys
-void readAllFromKeys(int *keyVals){
-  for(int i=0; i<numKeys; i++){
+void readAllFromKeys(int *keyVals) {
+  for (int i = 0; i < numKeys; i++) {
     keyVals[i] = digitalRead(KEYLIST[i]);
   }
 }
 
 void setup() {
-//LivingTheDream added
-  /* Setting up the switches */ 
-  for (int i = 0; i < numKeys; i++) { 
+  //LivingTheDream added
+  /* Setting up the switches */
+  for (int i = 0; i < numKeys; i++) {
     pinMode(KEYLIST[i], INPUT_PULLUP);
   }
 
@@ -343,7 +343,7 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 
   // LivingTheDream added
   uint8_t key[4] = {keyOut[0], keyOut[1], keyOut[2], keyOut[3]};
-  HID().SendReport(3, key, 4);  
+  HID().SendReport(3, key, 4);
 }
 
 void loop() {
@@ -351,11 +351,11 @@ void loop() {
   // Joystick values are read. 0-1023
   readAllFromJoystick(rawReads);
 
-    // LivingTheDream added reading of key presses
+  // LivingTheDream added reading of key presses
   readAllFromKeys(keyVals);
 
   // Report back 0-1023 raw ADC 10-bit values if enabled
-  if(debug == 1){ 
+  if (debug == 1) {
     Serial.print("AX:");
     Serial.print(rawReads[0]);
     Serial.print(",");
@@ -382,12 +382,12 @@ void loop() {
   }
 
   // Subtract centre position from measured position to determine movement.
-  for(int i=0; i<8; i++) {
-    centered[i] = rawReads[i] - centerPoints[i]; 
-  } 
+  for (int i = 0; i < 8; i++) {
+    centered[i] = rawReads[i] - centerPoints[i];
+  }
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
-  if(debug == 2){
+  if (debug == 2) {
     Serial.print("AX:");
     Serial.print(centered[0]);
     Serial.print(",");
@@ -413,15 +413,18 @@ void loop() {
     Serial.println(centered[7]);
   }
   // Filter movement values. Set to zero if movement is below deadzone threshold.
-  for(int i=0; i<8; i++){
-    if(centered[i]<DEADZONE && centered[i]>-DEADZONE) {centered[i] = 0;}
-    else{
-      centered[i] = map(centered[i],minVals[i],maxVals[i],-totalSentitivity,totalSentitivity);
+  for (int i = 0; i < 8; i++) {
+    if (centered[i] < DEADZONE && centered[i] > -DEADZONE) {
+      centered[i] = 0;
+    }
+    else {
+      centered[i] = map(centered[i], minVals[i], maxVals[i], -totalSentitivity, totalSentitivity);
     }
   }
-  
+
+
   // Report centered joystick values. Filtered for deadzone. Approx -500 to +500, locked to zero at idle
-  if(debug == 3){
+  if (debug == 3) {
     Serial.print("AX:");
     Serial.print(centered[0]);
     Serial.print(",");
@@ -451,73 +454,93 @@ void loop() {
   // Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
   int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
   // Original fdmakara calculations
-    
-  // More Complex Calculations with min max values by Daniel_1284580. Deadzone has been moved to loop(). 
+
+  // More Complex Calculations with min max values by Daniel_1284580. Deadzone has been moved to loop().
   // transX
-    transX = (-centered[CY]+centered[AY])/pos_transX_sensetivity;
-    transX =modifierFunction(transX); //recalculate with modifier function
+  transX = (-centered[CY] + centered[AY]) / pos_transX_sensetivity;
+  transX = modifierFunction(transX); //recalculate with modifier function
 
   // transY
-    transY = (-centered[BY]+centered[DY])/pos_transY_sensetivity;
-    transY=modifierFunction(transY); //recalculate with modifier function
+  transY = (-centered[BY] + centered[DY]) / pos_transY_sensetivity;
+  transY = modifierFunction(transY); //recalculate with modifier function
 
-  transZ = -centered[AX]-centered[BX]-centered[CX]-centered[DX];
-  if (transZ<0) {
-    transZ = modifierFunction(transZ/neg_transZ_sensetivity); //recalculate with modifier function
-    if(abs(transZ)<15) { transZ = 0;   }
+  transZ = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
+  if (transZ < 0) {
+    transZ = modifierFunction(transZ / neg_transZ_sensetivity); //recalculate with modifier function
+    if (abs(transZ) < 15) {
+      transZ = 0;
+    }
   } else { // pulling the knob upwards is much heavier... smaller factor
-    transZ = constrain(transZ/pos_transZ_sensetivity,-350,350); // no modifier function, just constrain linear!
-  } 
-    
+    transZ = constrain(transZ / pos_transZ_sensetivity, -350, 350); // no modifier function, just constrain linear!
+  }
+
   // rotX
-  rotX = (-centered[CX]+centered[AX])/pos_rotX_sensetivity;
+  rotX = (-centered[CX] + centered[AX]) / pos_rotX_sensetivity;
   rotX = modifierFunction(rotX); //recalculate with modifier function
-  if(abs(rotX)<15) { rotX = 0;   }
-    //positive rotation in x
-  
+  if (abs(rotX) < 15) {
+    rotX = 0;
+  }
+  //positive rotation in x
+
   // rotY
-  rotY = (-centered[BX]+centered[DX])/pos_rotY_sensetivity;
+  rotY = (-centered[BX] + centered[DX]) / pos_rotY_sensetivity;
   rotY = modifierFunction(rotY); //recalculate with modifier function
-  if(abs(rotY)<15) { rotY = 0;   }
-    
+  if (abs(rotY) < 15) {
+    rotY = 0;
+  }
+
   // rotZ
-  rotZ = (centered[AY]+centered[BY]+centered[CY]+centered[DY])/pos_rotZ_sensetivity;
+  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / pos_rotZ_sensetivity;
   rotZ = modifierFunction(rotZ); //recalculate with modifier function
-  if(abs(rotZ)<15) { rotZ = 0;   }
-    //positive rotation in z
-  
-//LivingTheDream added
+  if (abs(rotZ) < 15) {
+    rotZ = 0;
+  }
+  //positive rotation in z
+
+  //LivingTheDream added
   //Button Evaluation
-  for(int i=0; i<numKeys; i++){
-    if(keyVals[i]!=keyState[i]){
+  for (int i = 0; i < numKeys; i++) {
+    if (keyVals[i] != keyState[i]) {
       // Making sure button cannot trigger multiple times which would result in overloading HID.
-      if(key_waspressed[i]==0){
-        keyOut[i]=1;
-        key_waspressed[i]=1;
-        timestamp[i]=millis();
-      }else{
-        keyOut[i]=0;
+      if (key_waspressed[i] == 0) {
+        keyOut[i] = 1;
+        key_waspressed[i] = 1;
+        timestamp[i] = millis();
+      } else {
+        keyOut[i] = 0;
       }
-    }else{
-      if(key_waspressed[i]==1){
+    } else {
+      if (key_waspressed[i] == 1) {
         //Debouncing
-        if(millis()-timestamp[i]>1000){
-          key_waspressed[i]=0;
+        if (millis() - timestamp[i] > 1000) {
+          key_waspressed[i] = 0;
         }
       }
-      
+
     }
   }
-// Invert directions if needed
-  if(invX == true){ transX = transX*-1;};
-  if(invY == true){ transY = transY*-1;};
-  if(invZ == true){ transZ = transZ*-1;};
-  if(invRX == true){ rotX = rotX*-1;};
-  if(invRY == true){ rotY = rotY*-1;};
-  if(invRZ == true){ rotZ = rotZ*-1;};
+  // Invert directions if needed
+  if (invX == true) {
+    transX = transX * -1;
+  };
+  if (invY == true) {
+    transY = transY * -1;
+  };
+  if (invZ == true) {
+    transZ = transZ * -1;
+  };
+  if (invRX == true) {
+    rotX = rotX * -1;
+  };
+  if (invRY == true) {
+    rotY = rotY * -1;
+  };
+  if (invRZ == true) {
+    rotZ = rotZ * -1;
+  };
 
-// Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
-  if(debug == 4){
+  // Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
+  if (debug == 4) {
     Serial.print("TX:");
     Serial.print(transX);
     Serial.print(",");
@@ -535,7 +558,7 @@ void loop() {
     Serial.print(",");
     Serial.print("RZ:");
     Serial.print(rotZ);
-      // LivingTheDream added printing the key pressed values
+    // LivingTheDream added printing the key pressed values
     Serial.print(",");
     Serial.print("Key1:");
     Serial.print(keyOut[0]);
@@ -547,10 +570,10 @@ void loop() {
     Serial.print(keyOut[2]);
     Serial.print(",");
     Serial.print("Key4:");
-    Serial.println(keyOut[3]);  
+    Serial.println(keyOut[3]);
   }
-// Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
-  if(debug == 5){
+  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
+  if (debug == 5) {
     Serial.print("AX:");
     Serial.print(centered[0]);
     Serial.print(",");
@@ -594,13 +617,13 @@ void loop() {
     Serial.println(rotZ);
   }
 
-// Send data to the 3DConnexion software.
-// The correct order for TeachingTech was determined after trial and error
-  if (switchYZ==true){
-    //Original from TT, but 3DConnextion tutorial will not work: 
-    send_command(rotX, rotZ, rotY, transX, transZ, transY,keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
-  }else{
-    // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed 
-    send_command(rotX, rotY, rotZ, transX, transY, transZ,keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  // Send data to the 3DConnexion software.
+  // The correct order for TeachingTech was determined after trial and error
+  if (switchYZ == true) {
+    //Original from TT, but 3DConnextion tutorial will not work:
+    send_command(rotX, rotZ, rotY, transX, transZ, transY, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  } else {
+    // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
+    send_command(rotX, rotY, rotZ, transX, transY, transZ, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
   }
 }
