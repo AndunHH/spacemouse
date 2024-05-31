@@ -7,10 +7,20 @@ This repository for the necessary arduino sources is mainly based on
 the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and the additional code for keys by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) and is intended as basis for further development, because proper source code management is needed.
 
 # Calibration
-First, you need to calibrate your space-mouse. This is described in the config_sample.h which is copied and renamed to config.h
+First, you need to calibrate your space-mouse. This is described in the config_sample.h which is copied and renamed to config.h.
+
+## Short calibration overview
+
+1. Check and correct your pin out
+2. Tune dead zone to avoid jittering
+3. Getting min and max values for your joysticks
+4. Adjust sensitivity
+
+This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
+
 
 # Software Main Idea 
-1. The software reads the ADC values of the eight joy sticks
+1. The software reads the eight ADC values of the four joy sticks
 2. During start-up the zero-position of the joystick is measured and subtracted from the adc-value. -> The values now range from e.g. -500 to +500
 3. A dead zone in the middle is applied to avoid small noisy movements. (E.g. every value between +/- 3 is fixed to zero)
 4. The movement of the joysticks is mapped from the original about ca. +/- 500 digits to exactly +/- 350. (Therefore the real min and max values will be calibrated) Now all further calculations can be done with this normalized values between +/-350.

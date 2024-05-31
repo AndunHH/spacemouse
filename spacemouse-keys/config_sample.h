@@ -25,8 +25,9 @@ int PINLIST[8] = {
 };
 // Check the correct wiring with the debug output=1
 
-// Debugging
-// 0: Debugging off. Set to this once everything is working.
+// Debugging (You can send the number over the serial interface, you whish)
+// -1: Debugging off. Set to this once everything is working.
+// 0: Debugging level doesn't change
 // 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
 // 2: Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
 // 20: semi-automatic min-max calibration

@@ -151,10 +151,12 @@ void setup() {
   // Begin Seral for debugging
   Serial.begin(250000);
   delay(100);
+  Serial.setTimeout(2); // the serial interface will look for new debug values and it will only wait 2ms
   // Read idle/centre positions for joysticks.
   readAllFromJoystick(centerPoints);
   readAllFromJoystick(centerPoints);
   delay(100);
+  Serial.println("Please enter the debug mode now or while the script is reporting. -1 to shut off.");
 }
 
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
@@ -174,8 +176,21 @@ int rawReads[8], centered[8];
 
 // Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
 int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
+int tmpInput; // store the value, the user might input over the serial
 
 void loop() {
+  //check if the user entered a debug mode via serial interface
+  if (Serial.available()) {
+    tmpInput = Serial.parseInt(); // Read from serial interface, if a new debug value has been sent. Serial timeout has been set in setup()
+    if (tmpInput != 0) {
+      debug = tmpInput;
+      if (tmpInput == -1) {
+        Serial.println("Please enter the debug mode now or while the script is reporting.");
+      }
+    }
+
+  }
+
   int keyVals[numKeys];
   // Joystick values are read. 0-1023
   readAllFromJoystick(rawReads);
