@@ -11,123 +11,11 @@
 #include <math.h>
 #define sign(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0)) //Define Signum Function
 
+// The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
+// Please open config_sample.h, adjust your settings and save it as config.h
+#include "config.h"
 // ---------------------------------------------------------Values you can change--------------------------------------------------------------------------
-// Debugging
-// 0: Debugging off. Set to this once everything is working.
-// 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
-// 2: Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
-// 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
-// 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
-// 5: Output debug 4 and 5 side by side for direct cause and effect reference.
-int debug = 2;
 
-// Modifier Function
-// Modify resulting behaviour of Joystick input values
-// DISCLAIMER: This should be at level 0 when calibrating "Independent Sensitivity Multiplier".
-// 0: linear y = x [Standard behaviour: No modification]
-// 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
-// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
-// 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
-// 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-int modFunc = 3;
-
-// Direction
-// Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
-// Switch between true/false as desired.
-bool invX = false; // pan left/right
-bool invY = false; // pan up/down
-bool invZ = false; // zoom in/out
-bool invRX = false; // Rotate around X axis (tilt front/back)
-bool invRY = false; // Rotate around Y axis (tilt left/right)
-bool invRZ = false; // Rotate around Z axis (twist left/right)
-
-//Switch Zooming with Up/Down Movement
-//DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
-bool switchYZ = false; //change to true for switching movement
-
-// Min and max values to be populated by you testing the positions in Debug mode 2.
-// Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-int minVals[8] = { -519, -521, -512, -501, -520, -522, -508, -507};
-int maxVals[8] = {504, 502, 511, 522, 503, 501, 515, 516};
-// Recommended calibration procedure for min/max adc levels
-// 1. Change debug to level 2 and upload sketch. Then open Serial Monitor.
-// 2. Get a piece of paper and write the following chart:
-// Chart:
-//  maxVals      | minVals
-//--------------------------------
-//  AX+:         | AX-:
-//  AY+:         | AY-:
-//  BX+:         | BY-:
-//  BY+:         | BY-:
-//  CX+:         | CY-:
-//  CY+:         | CY-:
-//  DX+:         | DY-:
-//  DY+:         | DY-:
-//
-// 3. (a) Start out with AX (positive Values)
-//    (b) Start moving the your spacemouse and try increasing the Value of AX till you can't get a higher value out of it.
-//    (c) this is your positive maximum value for AX so write it down for AX
-//4. Do the same for AY,BX,BY,....DY
-// 5. Do the same for your negative Values to populate the minVals
-// 6. Write all the positive Values starting from the top into the Array maxValues
-// 7. Write all the negative Values starting from the top into the Array minValues
-// 8. You finished calibrating. Move on to independent sensitivity multiplier
-
-// Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
-// eg use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive
-
-// The Values you can change (those Values worked for me, you can or should change them to your preferences):
-float pos_transX_sensitivity = 2;
-float pos_transY_sensitivity = 2;
-float pos_transZ_sensitivity = 0.5;
-float neg_transZ_sensitivity = 5; //I want low sensitiviy for down, therefore a high value.
-
-float pos_rotX_sensitivity = 1.5;
-float pos_rotY_sensitivity = 1.5;
-float pos_rotZ_sensitivity = 2;
-
-// Recommended calibration procedure for sensitivity
-//  1. Make sure modFunc is on level 0!! Change debug to level 4 and upload sketch. Then open Serial Monitor. You will see Values TX, TY, TZ, RX, RY, RZ
-//  2. Start moving your spacemouse. You will notice values changing.
-//  3. Starting with TX try increasing this value as much as possible by moving your spacemouse around. If you get around 350 thats great. If not change pos_transX_sensitivy and reupload sketch. Repeat until it is around 350 for maximum motion.
-//  4. Repeat steps 3 for TY,TZ,RX,RY,RZ
-//  5. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350.
-//  6. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
-//  7. Aftermath: You notice the movements are hard to control. Try using Modification Functions (have a look at the beginning of the sketch) [I like level 3 the most. Experiment to find your favorite function]
-
-// Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
-int DEADZONE = 3; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
-
-// Default Assembly when looking from above:
-//    C           Y+
-//    |           .
-// B--+--D   X-...Z+...X+
-//    |           .
-//    A           Y-
-//
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-// Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4)
-int PINLIST[8] = { // The positions of the reads
-  A0, // X-axis A
-  A1, // Y-axis A
-  A2, // X-axis B
-  A3, // Y-axis B
-  A6, // X-axis C
-  A7, // Y-axis C
-  A8, // X-axis D
-  A9  // Y-axis D
-};
-
-//LivingTheDream added
-// Define the keycodes for each key
-int numKeys = 4;
-int KEYLIST[4] = {
-  14,
-  15,
-  10,
-  5
-};
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
 // hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
@@ -321,17 +209,17 @@ void loop() {
   debugOutput3();
 
   // transX
-  transX = (-centered[CY] + centered[AY]) / pos_transX_sensitivity;
+  transX = (-centered[CY] + centered[AY]) / transX_sensitivity;
   transX = modifierFunction(transX); //recalculate with modifier function
 
   // transY
-  transY = (-centered[BY] + centered[DY]) / pos_transY_sensitivity;
+  transY = (-centered[BY] + centered[DY]) / transY_sensitivity;
   transY = modifierFunction(transY); //recalculate with modifier function
 
   transZ = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
   if (transZ < 0) {
     transZ = modifierFunction(transZ / neg_transZ_sensitivity); //recalculate with modifier function
-    if (abs(transZ) < 15) {
+    if (abs(transZ) < gate_neg_transZ) {
       transZ = 0;
     }
   } else { // pulling the knob upwards is much heavier... smaller factor
@@ -339,7 +227,7 @@ void loop() {
   }
 
   // rotX
-  rotX = (-centered[CX] + centered[AX]) / pos_rotX_sensitivity;
+  rotX = (-centered[CX] + centered[AX]) / rotX_sensitivity;
   rotX = modifierFunction(rotX); //recalculate with modifier function
   if (abs(rotX) < 15) {
     rotX = 0;
@@ -347,14 +235,14 @@ void loop() {
   //positive rotation in x
 
   // rotY
-  rotY = (-centered[BX] + centered[DX]) / pos_rotY_sensitivity;
+  rotY = (-centered[BX] + centered[DX]) / rotY_sensitivity;
   rotY = modifierFunction(rotY); //recalculate with modifier function
   if (abs(rotY) < 15) {
     rotY = 0;
   }
 
   // rotZ
-  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / pos_rotZ_sensitivity;
+  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / rotZ_sensitivity;
   rotZ = modifierFunction(rotZ); //recalculate with modifier function
   if (abs(rotZ) < 15) {
     rotZ = 0;
