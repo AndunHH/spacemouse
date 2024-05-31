@@ -14,8 +14,6 @@
 // The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
 // Please open config_sample.h, adjust your settings and save it as config.h
 #include "config.h"
-// ---------------------------------------------------------Values you can change--------------------------------------------------------------------------
-
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
 // hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
@@ -204,11 +202,18 @@ void loop() {
       centered[i] = 0;
     }
     else {
-      centered[i] = map(centered[i], minVals[i], maxVals[i], -totalSensitivity, totalSensitivity);
+      if (centered[i] < 0) { //if the value is smaller 0 ...
+        // ... map the value from the [min,0] to [-350,0]
+        centered[i] = map(centered[i], minVals[i], 0, -totalSensitivity, 0);
+      }
+      else { // if the value is > 0 ...
+        // ... map the values from the [0,max] to [0,+350]
+        centered[i] = map(centered[i], 0, maxVals[i], 0, totalSensitivity);
+      }
     }
   }
 
-  // Report centered joystick values. Filtered for deadzone. Approx -500 to +500, locked to zero at idle
+  // Report centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle
   debugOutput3();
 
   // transX
@@ -519,7 +524,7 @@ void calcMinMax() {
       }
       else {
         // 15s are over. go to next state and report via console
-        Serial.println("Stop moving the spacemouse. These are the result");
+        Serial.println("Stop moving the spacemouse. These are the result:");
         minMaxCalcState = 2;
       }
     }
@@ -528,6 +533,20 @@ void calcMinMax() {
       printArray(minValue, 8);
       Serial.print("int maxVals[");
       printArray(maxValue, 8);
+      for (int i = 0; i < 8; i++) {
+        if (abs(minValue[i]) < 250) {
+          Serial.print("Warning: minValue[");
+          Serial.print(i);
+          Serial.print("] is small: ");
+          Serial.println(minValue[i]);
+        }
+        if (abs(maxValue[i]) < 250) {
+          Serial.print("Warning: maxValue[");
+          Serial.print(i);
+          Serial.print("] is small: ");
+          Serial.println(maxValue[i]);
+        }
+      }
       minMaxCalcState = 3; // no further reporting
     }
   }

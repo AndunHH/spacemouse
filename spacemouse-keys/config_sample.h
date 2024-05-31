@@ -14,7 +14,7 @@
 // First step: Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4)
 int PINLIST[8] = {
   // The positions of the reads
-  A1, // X-axis A (A is in fron of you: X is the horizontal axis)
+  A1, // X-axis A (A is in front of you: X is the horizontal axis)
   A0, // Y-axis A (A: vertical axis Y)
   A3, // X-axis B (B: on the left side, when viewed from top)
   A2, // Y-axis B
