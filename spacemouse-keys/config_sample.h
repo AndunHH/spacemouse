@@ -29,6 +29,7 @@ int PINLIST[8] = {
 // 0: Debugging off. Set to this once everything is working.
 // 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
 // 2: Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
+// 20: semi-automatic min-max calibration
 // 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
 // 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
@@ -46,12 +47,20 @@ int modFunc = 0;
 
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
-// Set debug=2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
+// Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
 int DEADZONE = 3; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
 
 // Third calibration: getting min and max values
-// Min and max values to be populated by you testing the positions in Debug mode 2.
+// Can be done manual (debug = 2) or semi-automatic (debug = 20)
+// Semi-automatic (debug=20)
+// 1. Set debug = 20
+// 2. Compile the sketch, upload it and wait for confirmation in the serial console.
+// 3. Move the spacemouse around for 15s to get a min and max value.
+// 4. Verify, that the minimums are around -400 to -520 and the maxVals around +400 to +520.
+// (repeat or check again, if you have small values!)
+// 5. Copy the output from the console into your config.h (below the manual instructions)
 
+// Manual min/max calibration (debug = 2)
 // Recommended calibration procedure for min/max adc levels
 // 1. Change debug to level 2 and upload sketch. Then open Serial Monitor.
 // 2. Get a piece of paper and write the following chart:

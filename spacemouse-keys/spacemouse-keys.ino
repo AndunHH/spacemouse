@@ -156,6 +156,7 @@ void setup() {
   // Read idle/centre positions for joysticks.
   readAllFromJoystick(centerPoints);
   readAllFromJoystick(centerPoints);
+  delay(100);
 }
 
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
@@ -191,6 +192,8 @@ void loop() {
   for (int i = 0; i < 8; i++) {
     centered[i] = rawReads[i] - centerPoints[i];
   }
+
+  calcMinMax(); // debug=20 to calibrate MinMax values
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle
   debugOutput2();
@@ -477,4 +480,68 @@ void debugOutput5() {
     Serial.print("RZ:");
     Serial.println(rotZ);
   }
+}
+
+// Variables and function to get the min and maximum value of the centered values
+int minMaxCalcState = 0; // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
+int minValue[8]; // Array to store the minimum values
+int maxValue[8]; // Array to store the maximum values
+unsigned long startTime; // Start time for the measurement
+
+void calcMinMax() {
+  // Set debug = 20
+  // compile the sketch, upload it and wait for confirmation in the serial console.
+  // Move the spacemouse around for 15s to get a min and max value.
+  // copy the output from the console into your config.h
+  if (debug == 20) {
+    if (minMaxCalcState == 0) {
+      delay(2000);
+      // Initialize the arrays
+      for (int i = 0; i < 8; i++) {
+        minValue[i] = 1023; // Set the min value to the maximum possible value
+        maxValue[i] = 0; // Set the max value to the minimum possible value
+      }
+      startTime = millis(); // Record the current time
+      minMaxCalcState = 1; // next State: measure!
+      Serial.println("Please start moving the spacemouse around!");
+    }
+    else if (minMaxCalcState == 1) {
+      if (millis() - startTime < 15000) {
+        for (int i = 0; i < 8; i++) {
+          // Update the minimum and maximum values
+          if (centered[i] < minValue[i]) {
+            minValue[i] = centered[i];
+          }
+          if (centered[i] > maxValue[i]) {
+            maxValue[i] = centered[i];
+          }
+        }
+      }
+      else {
+        // 15s are over. go to next state and report via console
+        Serial.println("Stop moving the spacemouse. These are the result");
+        minMaxCalcState = 2;
+      }
+    }
+    else if (minMaxCalcState == 2) {
+      Serial.print("int minVals[");
+      printArray(minValue, 8);
+      Serial.print("int maxVals[");
+      printArray(maxValue, 8);
+      minMaxCalcState = 3; // no further reporting
+    }
+  }
+}
+
+void printArray(int arr[], int size) {
+  //Serial.print("int m..Values[");
+  Serial.print(size);
+  Serial.print("] = {");
+  for (int i = 0; i < size; i++) {
+    Serial.print(arr[i]);
+    if (i < size - 1) {
+      Serial.print(", ");
+    }
+  }
+  Serial.println("};");
 }
