@@ -35,12 +35,11 @@ This calibration is supported by various debug outputs which can toggle on or of
 
 # Electronics
 
-The spacemouse is connected to an arduino pro micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/):
-![image](https://github.com/AndunHH/spacemouse/assets/76771247/bfbef34b-16b4-4a95-95c1-dc1dcceacfab)
-
+The spacemouse is connected to an arduino pro micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys:
+![WiringSpaceMouse](https://github.com/AndunHH/spacemouse/assets/76771247/e013d9e8-8c01-40e2-9800-abb08bb271dd)
 
 As a reference: the pins and values the joysticks create on the analoge pins of the arduino, when the pin mapping is A0 to A7 straight. The original version from teaching tech has pin-out A1, A0, A3, A2 etc. 
-This is not jet visible in this picture... nevertheless: you can assign the pin out as necessary during calibration.
+All the different joysticks name there x and y axis differently. Just connect every axis to an ADC and sort them afterwards in your config.h.
 ![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7948f8bc-7c1c-4189-9ef6-1216a6b8f164)
 
 ## Spacemouse emulation
