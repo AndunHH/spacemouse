@@ -74,17 +74,19 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 
 //LivingThe Dream added
 // Keys matched to pins (thouse corresponde to the 3D Connection Software names of the keys)
-#define KEY_LEFT_MENU 14
-#define KEY_LEFT_ROTATEVIEW 15
-#define KEY_LEFT_UNKNOWN 10
-#define KEY_LEFT_FIT 5
+// not used?
+//define KEY_LEFT_MENU 14
+//define KEY_LEFT_ROTATEVIEW 15
+//define KEY_LEFT_UNKNOWN 10
+//define KEY_LEFT_FIT 5
 
 //Please do not change this anymore. Use indipendent sensitivity multiplier.
 int totalSensitivity = 350;
 // Centerpoint variable to be populated during setup routine.
 int centerPoints[8];
 
-//LivingThe Dream added
+// Variables to read of the keys
+int keyVals[4]; //store raw value of the keys, without debouncing
 int keyState[4];
 //Needed for key evaluation
 int8_t keyOut[4];
@@ -178,6 +180,7 @@ int rawReads[8], centered[8];
 int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
 int tmpInput; // store the value, the user might input over the serial
 
+
 void loop() {
   //check if the user entered a debug mode via serial interface
   if (Serial.available()) {
@@ -191,7 +194,6 @@ void loop() {
 
   }
 
-  int keyVals[numKeys];
   // Joystick values are read. 0-1023
   readAllFromJoystick(rawReads);
 
@@ -287,7 +289,7 @@ void loop() {
     } else {
       if (key_waspressed[i] == 1) {
         //Debouncing
-        if (millis() - timestamp[i] > 1000) {
+        if (millis() - timestamp[i] > 200) {
           key_waspressed[i] = 0;
         }
       }
@@ -357,7 +359,19 @@ void debugOutput1() {
     Serial.print(rawReads[6]);
     Serial.print(",");
     Serial.print("DY:");
-    Serial.println(rawReads[7]);
+    Serial.print(rawReads[7]);
+    Serial.print(",");
+    Serial.print("Key1:");
+    Serial.print(keyVals[0]);
+    Serial.print(",");
+    Serial.print("Key2:");
+    Serial.print(keyVals[1]);
+    Serial.print(",");
+    Serial.print("Key3:");
+    Serial.print(keyVals[2]);
+    Serial.print(",");
+    Serial.print("Key4:");
+    Serial.println(keyVals[3]);
   }
 }
 
