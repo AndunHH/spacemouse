@@ -283,6 +283,8 @@ void loop() {
         keyOut[i] = 1;
         key_waspressed[i] = 1;
         timestamp[i] = millis();
+        Serial.print("Key: "); // this is always sent, and not only in debug
+        Serial.println(i);
       } else {
         keyOut[i] = 0;
       }
