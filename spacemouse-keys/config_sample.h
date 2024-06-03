@@ -104,28 +104,30 @@ int maxVals[8] = { +512, +512, +512, +512, +512, +512, +512, +512};
 //  6. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
 //  7. Aftermath: You notice the movements are hard to control. Try using Modification Functions (have a look at the beginning of the sketch) [I like level 3 the most. Experiment to find your favorite function]
 
-float transX_sensitivity = 2;
-float transY_sensitivity = 2;
-float pos_transZ_sensitivity = 0.5;
-float neg_transZ_sensitivity = 5; //I want low sensitiviy for down, therefore a high value.
-float gate_neg_transZ = 15; // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
+#define TRANSX_SENSITIVITY 2
+#define TRANSY_SENSITIVITY 2
+#define POS_TRANSZ_SENSITIVITY 0.5
+#define NEG_TRANSZ_SENSITIVITY 5 //I want low sensitiviy for down, therefore a high value.
+#define GATE_NEG_TRANSZ 15 // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
 
-float rotX_sensitivity = 1.5;
-float rotY_sensitivity = 1.5;
-float rotZ_sensitivity = 2;
+#define ROTX_SENSITIVITY 1.5
+#define ROTY_SENSITIVITY 1.5
+#define ROTZ_SENSITIVITY 2
 
 // Direction
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software afterwards
 // Switch between true/false as desired.
-bool invX = false; // pan left/right
-bool invY = false; // pan up/down
-bool invZ = false; // zoom in/out
-bool invRX = false; // Rotate around X axis (tilt front/back)
-bool invRY = false; // Rotate around Y axis (tilt left/right)
-bool invRZ = false; // Rotate around Z axis (twist left/right)
+// Switch between true/false as desired.
+#define INVX  0 // pan left/right
+#define INVY  0 // pan up/down
+#define INVZ  0 // zoom in/out
+#define INVRX  0 // Rotate around X axis (tilt front/back)
+#define INVRY  0 // Rotate around Y axis (tilt left/right)
+#define INVRZ  0 // Rotate around Z axis (twist left/right)
+
 //Switch Zooming with Up/Down Movement
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
-bool switchYZ = false; //change to true for switching movement
+#define SWITCHYZ 0 //change to true for switching movement
 
 //
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------

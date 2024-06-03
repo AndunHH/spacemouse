@@ -204,7 +204,9 @@ void loop() {
     centered[i] = rawReads[i] - centerPoints[i];
   }
 
-  calcMinMax(); // debug=20 to calibrate MinMax values
+  if (debug == 20) {
+    calcMinMax(centered); // debug=20 to calibrate MinMax values
+  }
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle
   if (debug == 2) {
@@ -234,45 +236,43 @@ void loop() {
   }
 
   // transX
-  velocity[TRANSX] = (-centered[CY] + centered[AY]) / transX_sensitivity;
+  velocity[TRANSX] = (-centered[CY] + centered[AY]) / ((float) TRANSX_SENSITIVITY);
   velocity[TRANSX] = modifierFunction(velocity[TRANSX]); //recalculate with modifier function
 
   // transY
-  velocity[TRANSY] = (-centered[BY] + centered[DY]) / transY_sensitivity;
+  velocity[TRANSY] = (-centered[BY] + centered[DY]) / ((float) TRANSY_SENSITIVITY);
   velocity[TRANSY] = modifierFunction(velocity[TRANSY]); //recalculate with modifier function
 
   velocity[TRANSZ] = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
   if (velocity[TRANSZ] < 0) {
-    velocity[TRANSZ] = modifierFunction(velocity[TRANSZ] / neg_transZ_sensitivity); //recalculate with modifier function
-    if (abs(velocity[TRANSZ]) < gate_neg_transZ) {
+    velocity[TRANSZ] = modifierFunction(velocity[TRANSZ] / ((float) NEG_TRANSZ_SENSITIVITY)); //recalculate with modifier function
+    if (abs(velocity[TRANSZ]) < GATE_NEG_TRANSZ) {
       velocity[TRANSZ] = 0;
     }
   } else { // pulling the knob upwards is much heavier... smaller factor
-    velocity[TRANSZ] = constrain(velocity[TRANSZ] / pos_transZ_sensitivity, -350, 350); // no modifier function, just constrain linear!
+    velocity[TRANSZ] = constrain(velocity[TRANSZ] / ((float) POS_TRANSZ_SENSITIVITY), -350, 350); // no modifier function, just constrain linear!
   }
 
   // rotX
-  velocity[ROTX] = (-centered[CX] + centered[AX]) / rotX_sensitivity;
+  velocity[ROTX] = (-centered[CX] + centered[AX]) / ((float)ROTX_SENSITIVITY);
   velocity[ROTX] = modifierFunction(velocity[ROTX]); //recalculate with modifier function
   if (abs(velocity[ROTX]) < 15) {
     velocity[ROTX] = 0;
   }
-  //positive rotation in x
 
   // rotY
-  velocity[ROTY] = (-centered[BX] + centered[DX]) / rotY_sensitivity;
+  velocity[ROTY] = (-centered[BX] + centered[DX]) / ((float)ROTY_SENSITIVITY);
   velocity[ROTY] = modifierFunction(velocity[ROTY]); //recalculate with modifier function
   if (abs(velocity[ROTY]) < 15) {
     velocity[ROTY] = 0;
   }
 
   // rotZ
-  velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / rotZ_sensitivity;
+  velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / ((float)ROTZ_SENSITIVITY);
   velocity[ROTZ] = modifierFunction(velocity[ROTZ]); //recalculate with modifier function
   if (abs(velocity[ROTZ]) < 15) {
     velocity[ROTZ] = 0;
   }
-  //positive rotation in z
 
   //Button Evaluation
   for (int i = 0; i < numKeys; i++) {
@@ -298,152 +298,41 @@ void loop() {
     }
   }
   // Invert directions if needed
-  if (invX == true) {
-    velocity[TRANSX] = velocity[TRANSX] * -1;
-  };
-  if (invY == true) {
-    velocity[TRANSY] = velocity[TRANSY] * -1;
-  };
-  if (invZ == true) {
-    velocity[TRANSZ] = velocity[TRANSZ] * -1;
-  };
-  if (invRX == true) {
-    velocity[ROTX] = velocity[ROTX] * -1;
-  };
-  if (invRY == true) {
-    velocity[ROTY] = velocity[ROTY] * -1;
-  };
-  if (invRZ == true) {
-    velocity[ROTZ] = velocity[ROTZ] * -1;
-  };
+#if INVX > 0
+  velocity[TRANSX] = velocity[TRANSX] * -1;
+#endif
+#if INVY > 0
+  velocity[TRANSY] = velocity[TRANSY] * -1;
+#endif
+#if INVZ > 0
+  velocity[TRANSZ] = velocity[TRANSZ] * -1;
+#endif
+#if INVRX > 0
+  velocity[ROTX] = velocity[ROTX] * -1;
+#endif
+#if INVRY > 0
+  velocity[ROTY] = velocity[ROTY] * -1;
+#endif
+#if INVRZ > 0
+  velocity[ROTZ] = velocity[ROTZ] * -1;
+#endif
 
   if (debug == 4) {
     debugOutput4(velocity, keyOut);
     // Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
   }
-
-  debugOutput5();
+  if (debug == 5) {
+    debugOutput5(centered, velocity);
+  }
   // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
 
   // Send data to the 3DConnexion software.
   // The correct order for TeachingTech was determined after trial and error
-  if (switchYZ == true) {
-    //Original from TT, but 3DConnextion tutorial will not work:
-    send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
-  } else {
-    // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-    send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
-  }
-}
-
-void debugOutput5() {
-  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmetic above.
-  if (debug == 5) {
-    Serial.print("AX:");
-    Serial.print(centered[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(centered[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(centered[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(centered[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(centered[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(centered[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(centered[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.print(centered[7]);
-    Serial.print("||");
-    Serial.print("TX:");
-    Serial.print(velocity[TRANSX]);
-    Serial.print(",");
-    Serial.print("TY:");
-    Serial.print(velocity[TRANSY]);
-    Serial.print(",");
-    Serial.print("TZ:");
-    Serial.print(velocity[TRANSZ]);
-    Serial.print(",");
-    Serial.print("RX:");
-    Serial.print(velocity[ROTX]);
-    Serial.print(",");
-    Serial.print("RY:");
-    Serial.print(velocity[ROTY]);
-    Serial.print(",");
-    Serial.print("RZ:");
-    Serial.println(velocity[ROTZ]);
-  }
-}
-
-// Variables and function to get the min and maximum value of the centered values
-int minMaxCalcState = 0; // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
-int minValue[8]; // Array to store the minimum values
-int maxValue[8]; // Array to store the maximum values
-unsigned long startTime; // Start time for the measurement
-
-void calcMinMax() {
-  // Set debug = 20
-  // compile the sketch, upload it and wait for confirmation in the serial console.
-  // Move the spacemouse around for 15s to get a min and max value.
-  // copy the output from the console into your config.h
-  if (debug == 20) {
-    if (minMaxCalcState == 0) {
-      delay(2000);
-      // Initialize the arrays
-      for (int i = 0; i < 8; i++) {
-        minValue[i] = 1023; // Set the min value to the maximum possible value
-        maxValue[i] = 0; // Set the max value to the minimum possible value
-      }
-      startTime = millis(); // Record the current time
-      minMaxCalcState = 1; // next State: measure!
-      Serial.println("Please start moving the spacemouse around!");
-    }
-    else if (minMaxCalcState == 1) {
-      if (millis() - startTime < 15000) {
-        for (int i = 0; i < 8; i++) {
-          // Update the minimum and maximum values
-          if (centered[i] < minValue[i]) {
-            minValue[i] = centered[i];
-          }
-          if (centered[i] > maxValue[i]) {
-            maxValue[i] = centered[i];
-          }
-        }
-      }
-      else {
-        // 15s are over. go to next state and report via console
-        Serial.println("Stop moving the spacemouse. These are the result:");
-        minMaxCalcState = 2;
-      }
-    }
-    else if (minMaxCalcState == 2) {
-      Serial.print("int minVals[");
-      printArray(minValue, 8);
-      Serial.print("int maxVals[");
-      printArray(maxValue, 8);
-      for (int i = 0; i < 8; i++) {
-        if (abs(minValue[i]) < 250) {
-          Serial.print("Warning: minValue[");
-          Serial.print(i);
-          Serial.print("] is small: ");
-          Serial.println(minValue[i]);
-        }
-        if (abs(maxValue[i]) < 250) {
-          Serial.print("Warning: maxValue[");
-          Serial.print(i);
-          Serial.print("] is small: ");
-          Serial.println(maxValue[i]);
-        }
-      }
-      minMaxCalcState = 3; // no further reporting
-    }
-  }
+#if SWITCHYZ > 0
+  //Original from TT, but 3DConnextion tutorial will not work:
+  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+#else
+  // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
+  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+#endif
 }

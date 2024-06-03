@@ -3,8 +3,10 @@
 void debugOutput1(int* rawReads, int* keyVals);
 void debugOutput2(int* centered);
 void debugOutput4(int16_t* velocity, int8_t* keyOut);
+void debugOutput5(int* centered, int16_t* velocity);
 
 void printArray(int arr[], int size);
+void calcMinMax(int* centered);
 
 // The following constants are here for more readable access to the arrays. You don't need to change this values!
 // Axes in centered or rawValues array
