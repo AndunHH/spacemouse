@@ -11,6 +11,8 @@
 #include <math.h>
 #define sign(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0)) //Define Signum Function
 
+#include "calibration.h"
+
 // The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
 // Please open config_sample.h, adjust your settings and save it as config.h
 #include "config.h"
@@ -62,15 +64,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
   0xC0
 };
 
-// Axes are matched to pin order. Don't change this, this is just for accessing the arrays from 0 to 7.
-#define AX 0
-#define AY 1
-#define BX 2
-#define BY 3
-#define CX 4
-#define CY 5
-#define DX 6
-#define DY 7
+
 
 //LivingThe Dream added
 // Keys matched to pins (thouse corresponde to the 3D Connection Software names of the keys)
@@ -175,11 +169,11 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 }
 
 int rawReads[8], centered[8];
+// Declare movement variables as 16 bit integers
+// int16_t to match what the HID protocol expects.
+int16_t velocity[8];
 
-// Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
-int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
 int tmpInput; // store the value, the user might input over the serial
-
 
 void loop() {
   //check if the user entered a debug mode via serial interface
@@ -201,7 +195,9 @@ void loop() {
   readAllFromKeys(keyVals);
 
   // Report back 0-1023 raw ADC 10-bit values if enabled
-  debugOutput1();
+  if (debug == 1) {
+    debugOutput1(rawReads, keyVals);
+  }
 
   // Subtract centre position from measured position to determine movement.
   for (int i = 0; i < 8; i++) {
@@ -211,7 +207,9 @@ void loop() {
   calcMinMax(); // debug=20 to calibrate MinMax values
 
   // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle
-  debugOutput2();
+  if (debug == 2) {
+    debugOutput2(centered);
+  }
 
   // Filter movement values. Set to zero if movement is below deadzone threshold.
   for (int i = 0; i < 8; i++) {
@@ -231,50 +229,51 @@ void loop() {
   }
 
   // Report centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle
-  debugOutput3();
+  if (debug == 3) {
+    debugOutput2(centered);
+  }
 
   // transX
-  transX = (-centered[CY] + centered[AY]) / transX_sensitivity;
-  transX = modifierFunction(transX); //recalculate with modifier function
+  velocity[TRANSX] = (-centered[CY] + centered[AY]) / transX_sensitivity;
+  velocity[TRANSX] = modifierFunction(velocity[TRANSX]); //recalculate with modifier function
 
   // transY
-  transY = (-centered[BY] + centered[DY]) / transY_sensitivity;
-  transY = modifierFunction(transY); //recalculate with modifier function
+  velocity[TRANSY] = (-centered[BY] + centered[DY]) / transY_sensitivity;
+  velocity[TRANSY] = modifierFunction(velocity[TRANSY]); //recalculate with modifier function
 
-  transZ = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
-  if (transZ < 0) {
-    transZ = modifierFunction(transZ / neg_transZ_sensitivity); //recalculate with modifier function
-    if (abs(transZ) < gate_neg_transZ) {
-      transZ = 0;
+  velocity[TRANSZ] = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
+  if (velocity[TRANSZ] < 0) {
+    velocity[TRANSZ] = modifierFunction(velocity[TRANSZ] / neg_transZ_sensitivity); //recalculate with modifier function
+    if (abs(velocity[TRANSZ]) < gate_neg_transZ) {
+      velocity[TRANSZ] = 0;
     }
   } else { // pulling the knob upwards is much heavier... smaller factor
-    transZ = constrain(transZ / pos_transZ_sensitivity, -350, 350); // no modifier function, just constrain linear!
+    velocity[TRANSZ] = constrain(velocity[TRANSZ] / pos_transZ_sensitivity, -350, 350); // no modifier function, just constrain linear!
   }
 
   // rotX
-  rotX = (-centered[CX] + centered[AX]) / rotX_sensitivity;
-  rotX = modifierFunction(rotX); //recalculate with modifier function
-  if (abs(rotX) < 15) {
-    rotX = 0;
+  velocity[ROTX] = (-centered[CX] + centered[AX]) / rotX_sensitivity;
+  velocity[ROTX] = modifierFunction(velocity[ROTX]); //recalculate with modifier function
+  if (abs(velocity[ROTX]) < 15) {
+    velocity[ROTX] = 0;
   }
   //positive rotation in x
 
   // rotY
-  rotY = (-centered[BX] + centered[DX]) / rotY_sensitivity;
-  rotY = modifierFunction(rotY); //recalculate with modifier function
-  if (abs(rotY) < 15) {
-    rotY = 0;
+  velocity[ROTY] = (-centered[BX] + centered[DX]) / rotY_sensitivity;
+  velocity[ROTY] = modifierFunction(velocity[ROTY]); //recalculate with modifier function
+  if (abs(velocity[ROTY]) < 15) {
+    velocity[ROTY] = 0;
   }
 
   // rotZ
-  rotZ = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / rotZ_sensitivity;
-  rotZ = modifierFunction(rotZ); //recalculate with modifier function
-  if (abs(rotZ) < 15) {
-    rotZ = 0;
+  velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / rotZ_sensitivity;
+  velocity[ROTZ] = modifierFunction(velocity[ROTZ]); //recalculate with modifier function
+  if (abs(velocity[ROTZ]) < 15) {
+    velocity[ROTZ] = 0;
   }
   //positive rotation in z
 
-  //LivingTheDream added
   //Button Evaluation
   for (int i = 0; i < numKeys; i++) {
     if (keyVals[i] != keyState[i]) {
@@ -300,26 +299,28 @@ void loop() {
   }
   // Invert directions if needed
   if (invX == true) {
-    transX = transX * -1;
+    velocity[TRANSX] = velocity[TRANSX] * -1;
   };
   if (invY == true) {
-    transY = transY * -1;
+    velocity[TRANSY] = velocity[TRANSY] * -1;
   };
   if (invZ == true) {
-    transZ = transZ * -1;
+    velocity[TRANSZ] = velocity[TRANSZ] * -1;
   };
   if (invRX == true) {
-    rotX = rotX * -1;
+    velocity[ROTX] = velocity[ROTX] * -1;
   };
   if (invRY == true) {
-    rotY = rotY * -1;
+    velocity[ROTY] = velocity[ROTY] * -1;
   };
   if (invRZ == true) {
-    rotZ = rotZ * -1;
+    velocity[ROTZ] = velocity[ROTZ] * -1;
   };
 
-  debugOutput4();
-  // Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
+  if (debug == 4) {
+    debugOutput4(velocity, keyOut);
+    // Report translation and rotation values if enabled. Approx -800 to 800 depending on the parameter.
+  }
 
   debugOutput5();
   // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
@@ -328,146 +329,10 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
   if (switchYZ == true) {
     //Original from TT, but 3DConnextion tutorial will not work:
-    send_command(rotX, rotZ, rotY, transX, transZ, transY, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+    send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
   } else {
     // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-    send_command(rotX, rotY, rotZ, transX, transY, transZ, keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
-  }
-}
-
-
-void debugOutput1() {
-  // Report back 0-1023 raw ADC 10-bit values if enabled
-  if (debug == 1) {
-    Serial.print("AX:");
-    Serial.print(rawReads[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(rawReads[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(rawReads[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(rawReads[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(rawReads[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(rawReads[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(rawReads[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.print(rawReads[7]);
-    Serial.print(",");
-    Serial.print("Key1:");
-    Serial.print(keyVals[0]);
-    Serial.print(",");
-    Serial.print("Key2:");
-    Serial.print(keyVals[1]);
-    Serial.print(",");
-    Serial.print("Key3:");
-    Serial.print(keyVals[2]);
-    Serial.print(",");
-    Serial.print("Key4:");
-    Serial.println(keyVals[3]);
-  }
-}
-
-void debugOutput2() {
-  // Report centered joystick values if enabled. Values should be approx -500 to +500, jitter around 0 at idle.
-  if (debug == 2) {
-    Serial.print("AX:");
-    Serial.print(centered[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(centered[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(centered[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(centered[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(centered[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(centered[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(centered[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.println(centered[7]);
-  }
-}
-
-void debugOutput3() {
-  // Report centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle
-  if (debug == 3) {
-    Serial.print("AX:");
-    Serial.print(centered[0]);
-    Serial.print(",");
-    Serial.print("AY:");
-    Serial.print(centered[1]);
-    Serial.print(",");
-    Serial.print("BX:");
-    Serial.print(centered[2]);
-    Serial.print(",");
-    Serial.print("BY:");
-    Serial.print(centered[3]);
-    Serial.print(",");
-    Serial.print("CX:");
-    Serial.print(centered[4]);
-    Serial.print(",");
-    Serial.print("CY:");
-    Serial.print(centered[5]);
-    Serial.print(",");
-    Serial.print("DX:");
-    Serial.print(centered[6]);
-    Serial.print(",");
-    Serial.print("DY:");
-    Serial.println(centered[7]);
-  }
-}
-
-void debugOutput4() {
-  // Report translation and rotation values if enabled. Approx -350 to +350 depending on the parameter.
-  if (debug == 4) {
-    Serial.print("TX:");
-    Serial.print(transX);
-    Serial.print(",");
-    Serial.print("TY:");
-    Serial.print(transY);
-    Serial.print(",");
-    Serial.print("TZ:");
-    Serial.print(transZ);
-    Serial.print(",");
-    Serial.print("RX:");
-    Serial.print(rotX);
-    Serial.print(",");
-    Serial.print("RY:");
-    Serial.print(rotY);
-    Serial.print(",");
-    Serial.print("RZ:");
-    Serial.print(rotZ);
-    // LivingTheDream added printing the key pressed values
-    Serial.print(",");
-    Serial.print("Key1:");
-    Serial.print(keyOut[0]);
-    Serial.print(",");
-    Serial.print("Key2:");
-    Serial.print(keyOut[1]);
-    Serial.print(",");
-    Serial.print("Key3:");
-    Serial.print(keyOut[2]);
-    Serial.print(",");
-    Serial.print("Key4:");
-    Serial.println(keyOut[3]);
+    send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
   }
 }
 
@@ -499,22 +364,22 @@ void debugOutput5() {
     Serial.print(centered[7]);
     Serial.print("||");
     Serial.print("TX:");
-    Serial.print(transX);
+    Serial.print(velocity[TRANSX]);
     Serial.print(",");
     Serial.print("TY:");
-    Serial.print(transY);
+    Serial.print(velocity[TRANSY]);
     Serial.print(",");
     Serial.print("TZ:");
-    Serial.print(transZ);
+    Serial.print(velocity[TRANSZ]);
     Serial.print(",");
     Serial.print("RX:");
-    Serial.print(rotX);
+    Serial.print(velocity[ROTX]);
     Serial.print(",");
     Serial.print("RY:");
-    Serial.print(rotY);
+    Serial.print(velocity[ROTY]);
     Serial.print(",");
     Serial.print("RZ:");
-    Serial.println(rotZ);
+    Serial.println(velocity[ROTZ]);
   }
 }
 
@@ -581,17 +446,4 @@ void calcMinMax() {
       minMaxCalcState = 3; // no further reporting
     }
   }
-}
-
-void printArray(int arr[], int size) {
-  //Serial.print("int m..Values[");
-  Serial.print(size);
-  Serial.print("] = {");
-  for (int i = 0; i < size; i++) {
-    Serial.print(arr[i]);
-    if (i < size - 1) {
-      Serial.print(", ");
-    }
-  }
-  Serial.println("};");
 }
