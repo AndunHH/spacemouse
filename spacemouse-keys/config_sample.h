@@ -49,7 +49,7 @@ int modFunc = 0;
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 // Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
-int DEADZONE = 3; // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
+#define DEADZONE 3 // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
 
 // Third calibration: getting min and max values
 // Can be done manual (debug = 2) or semi-automatic (debug = 20)
@@ -109,6 +109,9 @@ int maxVals[8] = { +512, +512, +512, +512, +512, +512, +512, +512};
 #define POS_TRANSZ_SENSITIVITY 0.5
 #define NEG_TRANSZ_SENSITIVITY 5 //I want low sensitiviy for down, therefore a high value.
 #define GATE_NEG_TRANSZ 15 // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
+#define GATE_ROTX 15 // Value under which rotX values will be forced to zero
+#define GATE_ROTY 15 // Value under which roty values will be forced to zero
+#define GATE_ROTZ 15 // Value under which rotz values will be forced to zero
 
 #define ROTX_SENSITIVITY 1.5
 #define ROTY_SENSITIVITY 1.5
@@ -133,10 +136,12 @@ int maxVals[8] = { +512, +512, +512, +512, +512, +512, +512, +512};
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //LivingTheDream added
 // Define the keycodes for each key
-int numKeys = 4;
-int KEYLIST[4] = {
+#define NUMKEYS 4
+int KEYLIST[NUMKEYS] = {
   14,
   15,
   10,
   5
 };
+
+#define DEBOUNCE_KEYS_MS 200 // time in ms which is needed to allow a new button press

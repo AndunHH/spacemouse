@@ -65,7 +65,6 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 };
 
 
-
 //LivingThe Dream added
 // Keys matched to pins (thouse corresponde to the 3D Connection Software names of the keys)
 // not used?
@@ -80,12 +79,11 @@ int totalSensitivity = 350;
 int centerPoints[8];
 
 // Variables to read of the keys
-int keyVals[4]; //store raw value of the keys, without debouncing
-int keyState[4];
+int keyVals[NUMKEYS]; //store raw value of the keys, without debouncing
 //Needed for key evaluation
-int8_t keyOut[4];
-int key_waspressed[4];
-float timestamp[4];
+int8_t keyOut[NUMKEYS];
+int8_t key_waspressed[NUMKEYS];
+unsigned long timestamp[NUMKEYS];
 
 //Modifier Functions
 int modifierFunction(int x) {
@@ -126,10 +124,9 @@ void readAllFromJoystick(int *rawReads) {
   }
 }
 
-// LivingTheDream added Daniel_1284580 modified into a forloop
 // Function to read and store the digital states for each of the keys
 void readAllFromKeys(int *keyVals) {
-  for (int i = 0; i < numKeys; i++) {
+  for (int i = 0; i < NUMKEYS; i++) {
     keyVals[i] = digitalRead(KEYLIST[i]);
   }
 }
@@ -137,7 +134,7 @@ void readAllFromKeys(int *keyVals) {
 void setup() {
   //LivingTheDream added
   /* Setting up the switches */
-  for (int i = 0; i < numKeys; i++) {
+  for (int i = 0; i < NUMKEYS; i++) {
     pinMode(KEYLIST[i], INPUT_PULLUP);
   }
 
@@ -164,7 +161,7 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   HID().SendReport(2, rot, 6);
 
   // LivingTheDream added
-  uint8_t key[4] = {keyOut[0], keyOut[1], keyOut[2], keyOut[3]};
+  uint8_t key[NUMKEYS] = {k1, k2, k3, k4};
   HID().SendReport(3, key, 4);
 }
 
@@ -256,42 +253,42 @@ void loop() {
   // rotX
   velocity[ROTX] = (-centered[CX] + centered[AX]) / ((float)ROTX_SENSITIVITY);
   velocity[ROTX] = modifierFunction(velocity[ROTX]); //recalculate with modifier function
-  if (abs(velocity[ROTX]) < 15) {
+  if (abs(velocity[ROTX]) < GATE_ROTX) {
     velocity[ROTX] = 0;
   }
 
   // rotY
   velocity[ROTY] = (-centered[BX] + centered[DX]) / ((float)ROTY_SENSITIVITY);
   velocity[ROTY] = modifierFunction(velocity[ROTY]); //recalculate with modifier function
-  if (abs(velocity[ROTY]) < 15) {
+  if (abs(velocity[ROTY]) < GATE_ROTY) {
     velocity[ROTY] = 0;
   }
 
   // rotZ
   velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / ((float)ROTZ_SENSITIVITY);
   velocity[ROTZ] = modifierFunction(velocity[ROTZ]); //recalculate with modifier function
-  if (abs(velocity[ROTZ]) < 15) {
+  if (abs(velocity[ROTZ]) < GATE_ROTZ) {
     velocity[ROTZ] = 0;
   }
 
   //Button Evaluation
-  for (int i = 0; i < numKeys; i++) {
-    if (keyVals[i] != keyState[i]) {
+  for (int i = 0; i < NUMKEYS; i++) {
+    if (keyVals[i]) {
       // Making sure button cannot trigger multiple times which would result in overloading HID.
-      if (key_waspressed[i] == 0) {
+      if (key_waspressed[i] == 0) { // if the button has not been pressed lately:
         keyOut[i] = 1;
         key_waspressed[i] = 1;
-        timestamp[i] = millis();
+        timestamp[i] = millis(); // remember the time, the button was pressed
         Serial.print("Key: "); // this is always sent, and not only in debug
         Serial.println(i);
-      } else {
+      } else { // the button was already pressed (and the event sent in the last loop), don't send the keyOut event again.
         keyOut[i] = 0;
       }
-    } else {
-      if (key_waspressed[i] == 1) {
+    } else { // the button is not pressed
+      if (key_waspressed[i] == 1) { // has it been pressed lately?
         //Debouncing
-        if (millis() - timestamp[i] > 200) {
-          key_waspressed[i] = 0;
+        if (millis() - timestamp[i] > DEBOUNCE_KEYS_MS) { // check if the last button press is long enough in the past
+          key_waspressed[i] = 0; // reset this marker and allow a new button press
         }
       }
 
