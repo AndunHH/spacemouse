@@ -179,10 +179,9 @@ void loop() {
     if (tmpInput != 0) {
       debug = tmpInput;
       if (tmpInput == -1) {
-        Serial.println("Please enter the debug mode now or while the script is reporting.");
+        Serial.println(F("Please enter the debug mode now or while the script is reporting."));
       }
     }
-
   }
 
   // Joystick values are read. 0-1023

@@ -6,14 +6,39 @@ Repository for the space mouse based on four joysticks with an addition for keys
 This repository for the necessary arduino sources is mainly based on 
 the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and the additional code for keys by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) and is intended as basis for further development, because proper source code management is needed.
 
-# Calibration
-First, you need to calibrate your space-mouse. This is described in the config_sample.h which is copied and renamed to config.h.
+# Getting Started
+This is a short overview, what needs to be done to get this project running. The paragraphs below will be extended in the future with links or further text.
 
-## Short calibration overview
+## Spacemouse emulation
+*Check the [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) video for proper instructions until more usefull stuff is written here...*
+
+Teaching Tech followed the instructions here from nebhead: https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a
+with two key differences:
+
+1. Teaching Tech changed the word 'DaemonBite' to 'Spacemouse' in all references.
+2. Teaching Tech changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
+
+Daniel_1284580 recomments changing leonardo.upload.tool=avrdude to leonardo.upload.tool.serial=avrdude to get no error when compiling
+When compiling and uploading, Teaching Tech select Arduino AVR boards (in Sketchbook) > Spacemouse and then the serial port.
+You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
+If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
+
+## Cloning the github repo
+Clone the github repo to your computer (or download it).
+
+## Create your own config file
+Copy the config_sample.h and rename it to config.h.
+Open the Arduino IDE, select the board and try to compile the project.
+
+## Calibrate your hardware 
+After compiling and uploading the programm to your hardware, you can connect via the serial monitor. In the upper line, you can send the desired debug mode to the board and observe the output. "-1" stops the debug output.
+
+Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
 
 1. Check and correct your pin out
 2. Tune dead zone to avoid jittering
-3. Getting min and max values for your joysticks
+3. Getting min and max values for your joysticks 
+	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
 4. Adjust sensitivity
 
 This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
@@ -42,17 +67,7 @@ As a reference: the pins and values the joysticks create on the analoge pins of 
 All the different joysticks name there x and y axis differently. Just connect every axis to an ADC and sort them afterwards in your config.h.
 ![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7948f8bc-7c1c-4189-9ef6-1216a6b8f164)
 
-## Spacemouse emulation
-Teaching Tech followed the instructions here from nebhead: https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a
-with two key differences:
 
-1. Teaching Tech changed the word 'DaemonBite' to 'Spacemouse' in all references.
-2. Teaching Tech changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
-
-Daniel_1284580 recomments changing leonardo.upload.tool=avrdude to leonardo.upload.tool.serial=avrdude to get no error when compiling
-When compiling and uploading, Teaching Tech select Arduino AVR boards (in Sketchbook) > Spacemouse and then the serial port.
-You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
-If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
 # See also
 
