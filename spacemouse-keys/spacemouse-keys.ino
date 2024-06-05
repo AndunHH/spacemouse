@@ -81,7 +81,7 @@ int centerPoints[8];
 // Variables to read of the keys
 int keyVals[NUMKEYS]; //store raw value of the keys, without debouncing
 //Needed for key evaluation
-int8_t keyOut[NUMKEYS];
+uint8_t keyOut[NUMKEYS];
 int8_t key_waspressed[NUMKEYS];
 unsigned long timestamp[NUMKEYS];
 
@@ -147,22 +147,22 @@ void setup() {
   Serial.setTimeout(2); // the serial interface will look for new debug values and it will only wait 2ms
   // Read idle/centre positions for joysticks.
   readAllFromJoystick(centerPoints);
-  readAllFromJoystick(centerPoints);
   delay(100);
   Serial.println("Please enter the debug mode now or while the script is reporting. -1 to shut off.");
 }
 
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
-void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, int8_t k1, int8_t k2, int8_t k3, int8_t k4) {
+void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys) {
   uint8_t trans[6] = { x & 0xFF, x >> 8, y & 0xFF, y >> 8, z & 0xFF, z >> 8 };
   HID().SendReport(1, trans, 6);
   uint8_t rot[6] = { rx & 0xFF, rx >> 8, ry & 0xFF, ry >> 8, rz & 0xFF, rz >> 8 };
   HID().SendReport(2, rot, 6);
 
-  // LivingTheDream added
-  uint8_t key[NUMKEYS] = {k1, k2, k3, k4};
-  HID().SendReport(3, key, 4);
+  if (NUMKEYS > 0) {
+    // LivingTheDream added
+    HID().SendReport(3, keys, NUMKEYS);
+  }
 }
 
 int rawReads[8], centered[8];
@@ -326,9 +326,9 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
 #if SWITCHYZ > 0
   //Original from TT, but 3DConnextion tutorial will not work:
-  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut);
 #else
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut[0], keyOut[1], keyOut[2], keyOut[3]);
+  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut);
 #endif
 }
