@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "calibration.h"
+#include "config.h"
 
 void printArray(int arr[], int size) {
   /*This functions prints an array to the Serial and you can copy the output the c code again.
@@ -22,7 +23,6 @@ void printArray(int arr[], int size) {
 }
 
 char *axisNames[] = {"AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:"}; // 8
-char *keyNames[] = {"K0:", "K1:", "K2:", "K3:"}; // 4
 char *velNames[] = {"TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:"}; // 6
 
 void debugOutput1(int* rawReads, int* keyVals) {
@@ -32,8 +32,10 @@ void debugOutput1(int* rawReads, int* keyVals) {
     Serial.print(rawReads[i]);
     Serial.print(", ");
   }
-  for (int i = 0; i < 4; i++) {
-    Serial.print(keyNames[i]);
+  for (int i = 0; i < NUMKEYS; i++) {
+    Serial.print("K");
+    Serial.print(i);
+    Serial.print(":");
     Serial.print(keyVals[i]);
     Serial.print(", ");
   }
@@ -57,9 +59,11 @@ void debugOutput4(int16_t* velocity, int8_t* keyOut) {
     Serial.print(velocity[i]);
     Serial.print(", ");
   }
-  for (int i = 0; i < 4; i++) {
-    Serial.print(keyNames[i]);
-    Serial.print(keyOut[i]);
+  for (int i = 0; i < NUMKEYS; i++) {
+    Serial.print("K");
+    Serial.print(i);
+    Serial.print(":");
+    Serial.print(keyVals[i]);
     Serial.print(", ");
   }
   Serial.println("");
