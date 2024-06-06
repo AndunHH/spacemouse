@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "calibration.h"
+#include "config.h"
 
 void printArray(int arr[], int size) {
   /*This functions prints an array to the Serial and you can copy the output the c code again.
@@ -9,16 +10,14 @@ void printArray(int arr[], int size) {
 
      Before calling this function, you should need to call the following line and change "mValues" with the variable name, you want to be printed
   */
-  //Serial.print("int mValues["); //print in calling context
-  Serial.print(size);
-  Serial.print("] = {");
+  Serial.print("{");
   for (int i = 0; i < size; i++) {
     Serial.print(arr[i]);
     if (i < size - 1) {
       Serial.print(", ");
     }
   }
-  Serial.println("};");
+  Serial.println("}");
 }
 
 char *axisNames[] = {"AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:"}; // 8
@@ -122,9 +121,9 @@ void calcMinMax(int* centered) {
     }
   }
   else if (minMaxCalcState == 2) {
-    Serial.print(F("int minVals["));
+    Serial.print(F("MINVALS "));
     printArray(minValue, 8);
-    Serial.print(F("int maxVals["));
+    Serial.print(F("MAXVALS "));
     printArray(maxValue, 8);
     for (int i = 0; i < 8; i++) {
       if (abs(minValue[i]) < 250) {

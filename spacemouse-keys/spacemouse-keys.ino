@@ -17,6 +17,8 @@
 // Please open config_sample.h, adjust your settings and save it as config.h
 #include "config.h"
 
+int debug = STARTDEBUG;
+
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
 // hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
 // Altered physical, logical range to ranges the 3DConnexion software expects by Daniel_1284580.
@@ -64,21 +66,13 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
   0xC0
 };
 
-
-//LivingThe Dream added
-// Keys matched to pins (thouse corresponde to the 3D Connection Software names of the keys)
-// not used?
-//define KEY_LEFT_MENU 14
-//define KEY_LEFT_ROTATEVIEW 15
-//define KEY_LEFT_UNKNOWN 10
-//define KEY_LEFT_FIT 5
-
 //Please do not change this anymore. Use indipendent sensitivity multiplier.
 int totalSensitivity = 350;
 // Centerpoint variable to be populated during setup routine.
 int centerPoints[8];
 
 // Variables to read of the keys
+int keyList[NUMKEYS] = {K0, K1, K2, K3};
 int keyVals[NUMKEYS]; //store raw value of the keys, without debouncing
 //Needed for key evaluation
 uint8_t keyOut[NUMKEYS];
@@ -90,26 +84,23 @@ int modifierFunction(int x) {
   //making sure function input never exedes range of -350 to 350
   x = constrain(x, -350, 350);
   double result;
-  if (modFunc == 0) {
-    //no modification
-    result = x;
-  }
-  if (modFunc == 1) {
-    // using squared function y = x^2*sign(x)
-    result = 350 * pow(x / 350.0, 2) * sign(x); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
-  }
-  if (modFunc == 2) {
-    // unsing tan function: tan(x)
-    result = 350 * tan(x / 350.0);
-  }
-  if (modFunc == 3) {
-    // unsing squared tan function: tan(x^2*sign(x))
-    result = 350 * tan(pow(x / 350.0, 2) * sign(x)); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
-  }
-  if (modFunc == 4) {
-    //unsing cubed tan function: tan(x^3)
-    result = 350 * tan(pow(x / 350.0, 3));
-  }
+#if (modFunc == 1)
+  // using squared function y = x^2*sign(x)
+  result = 350 * pow(x / 350.0, 2) * sign(x); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
+#elif (modFunc == 2)
+  // using tan function: tan(x)
+  result = 350 * tan(x / 350.0);
+#elif (modFunc == 3)
+  // using squared tan function: tan(x^2*sign(x))
+  result = 350 * tan(pow(x / 350.0, 2) * sign(x)); //sign putting out -1 or 1 depending on sign of value. (Is needed because x^2 will always be positive)
+#elif (modFunc == 4)
+  //using cubed tan function: tan(x^3)
+  result = 350 * tan(pow(x / 350.0, 3));
+#else
+  //MODFUNC == 0 or others...
+  //no modification
+  result = x;
+#endif
 
   //make sure values between-350 and 350 are allowed
   result = constrain(result, -350, 350);
@@ -117,17 +108,20 @@ int modifierFunction(int x) {
   return (int)round(result);
 }
 
+
+int pinList[8] = PINLIST;
+
 // Function to read and store analogue voltages for each joystick axis.
 void readAllFromJoystick(int *rawReads) {
   for (int i = 0; i < 8; i++) {
-    rawReads[i] = analogRead(PINLIST[i]);
+    rawReads[i] = analogRead(pinList[i]);
   }
 }
 
 // Function to read and store the digital states for each of the keys
 void readAllFromKeys(int *keyVals) {
   for (int i = 0; i < NUMKEYS; i++) {
-    keyVals[i] = digitalRead(KEYLIST[i]);
+    keyVals[i] = digitalRead(keyList[i]);
   }
 }
 
@@ -135,7 +129,7 @@ void setup() {
   //LivingTheDream added
   /* Setting up the switches */
   for (int i = 0; i < NUMKEYS; i++) {
-    pinMode(KEYLIST[i], INPUT_PULLUP);
+    pinMode(keyList[i], INPUT_PULLUP);
   }
 
   // HID protocol is set.
@@ -169,6 +163,10 @@ int rawReads[8], centered[8];
 // Declare movement variables as 16 bit integers
 // int16_t to match what the HID protocol expects.
 int16_t velocity[8];
+
+// set the min and maxvals from the config.h into real variables
+int minVals[8] = MINVALS;
+int maxVals[8] = MAXVALS;
 
 int tmpInput; // store the value, the user might input over the serial
 

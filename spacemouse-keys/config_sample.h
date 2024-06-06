@@ -11,21 +11,12 @@
 //    |           .
 //    A           Y-
 
-// First step: Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4)
-int PINLIST[8] = {
-  // The positions of the reads
-  A1, // X-axis A (A is in front of you: X is the horizontal axis)
-  A0, // Y-axis A (A: vertical axis Y)
-  A3, // X-axis B (B: on the left side, when viewed from top)
-  A2, // Y-axis B
-  A7, // X-axis C (C is "away from user" at the back)
-  A6, // Y-axis C
-  A9, // X-axis D (D: on the right side)
-  A8  // Y-axis D
-};
+// First step: Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4) to the following axis
+// AX, AY, BX, BY, CX, CY, DX, DY
+#define PINLIST { A1, A0, A3, A2, A7, A6, A9, A8 }
 // Check the correct wiring with the debug output=1
 
-// Debugging (You can send the number over the serial interface, you whish)
+// Debugging (You can send the number over the serial interface, whenever you whish)
 // -1: Debugging off. Set to this once everything is working.
 // 0: Debugging level doesn't change
 // 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
@@ -34,7 +25,7 @@ int PINLIST[8] = {
 // 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
 // 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
-int debug = 1;
+#define STARTDEBUG 0
 
 // Modifier Function
 // Modify resulting behaviour of Joystick input values
@@ -44,7 +35,7 @@ int debug = 1;
 // 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
 // 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
 // 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-int modFunc = 0;
+#define MODFUNC 3
 
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
@@ -87,8 +78,8 @@ int modFunc = 0;
 // 8. You finished calibrating.
 
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-int minVals[8] = { -512, -512, -512, -512, -512, -512, -512, -512};
-int maxVals[8] = { +512, +512, +512, +512, +512, +512, +512, +512};
+#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512};
+#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512};
 
 // Fourth calibration: Sensitivity
 // Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
@@ -134,14 +125,12 @@ int maxVals[8] = { +512, +512, +512, +512, +512, +512, +512, +512};
 
 //
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//LivingTheDream added
 // Define the keycodes for each key
 #define NUMKEYS 4
-int KEYLIST[NUMKEYS] = {
-  14,
-  15,
-  10,
-  5
-};
+// Define the pins for the keys
+#define K0 15
+#define K1 14
+#define K2 16
+#define K3 10
 
 #define DEBOUNCE_KEYS_MS 200 // time in ms which is needed to allow a new button press
