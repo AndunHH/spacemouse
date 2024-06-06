@@ -50,7 +50,7 @@ void debugOutput2(int* centered) {
   Serial.println("");
 }
 
-void debugOutput4(int16_t* velocity, int8_t* keyOut) {
+void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
   // Report translation and rotation values if enabled. Approx -350 to +350 depending on the parameter.
   for (int i = 0; i < 6; i++) {
     Serial.print(velNames[i]);
