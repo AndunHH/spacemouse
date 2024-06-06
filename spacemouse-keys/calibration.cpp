@@ -61,7 +61,7 @@ void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
     Serial.print("K");
     Serial.print(i);
     Serial.print(":");
-    Serial.print(keyVals[i]);
+    Serial.print(keyOut[i]);
     Serial.print(", ");
   }
   Serial.println("");
