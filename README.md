@@ -23,6 +23,9 @@ When compiling and uploading, Teaching Tech select Arduino AVR boards (in Sketch
 You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
 If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
+### boards.txt on mac
+https://gist.github.com/maunsen/8dbee2bddef027b04a450241c7d36668
+
 ## Cloning the github repo
 Clone the github repo to your computer (or download it).
 
