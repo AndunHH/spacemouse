@@ -6,6 +6,14 @@ Repository for the space mouse based on four joysticks with an addition for keys
 This repository for the necessary arduino sources is mainly based on 
 the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and the additional code for keys by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) and is intended as basis for further development, because proper source code management is needed.
 
+## Additional Features
+- [x] Semi-Automatic calibration methods
+- [x] Support for keys, that can triggger functions on your pc
+- [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
+
+Coming up:
+- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/)) 
+
 # Getting Started
 This is a short overview, what needs to be done to get this project running. The paragraphs below will be extended in the future with links or further text.
 
@@ -54,6 +62,8 @@ This calibration is supported by various debug outputs which can toggle on or of
 4. The movement of the joysticks is mapped from the original about ca. +/- 500 digits to exactly +/- 350. (Therefore the real min and max values will be calibrated) Now all further calculations can be done with this normalized values between +/-350.
 5. We calculate the translation and rotation based on this.
 6. Applying the modifiers to minimize very small rotations or translations.
+7. Kill, swap or invert movements
+8. Sending the velocities and keys to the PC
 
 # Printed parts
 * https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
@@ -90,6 +100,8 @@ The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's
 9. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
 10. Improved Code, improved comments and added written tutorials in comments, By LivingTheDream: https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3) 
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
+12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA.
+13. Coming up: Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/).
 
 # License
 Because TeachingTech published his source code on Printables under this license, it also applies here:
