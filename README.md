@@ -12,7 +12,10 @@ the work by [TeachingTech](https://www.printables.com/de/model/864950-open-sourc
 - [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
 
 Coming up:
-- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/)) 
+- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/))
+
+Wanted, with unclear solution ... ?
+- [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
 
 # Getting Started
 This is a short overview, what needs to be done to get this project running. The paragraphs below will be extended in the future with links or further text.
