@@ -4,14 +4,27 @@
 // Calibration instructions
 // Follow this file from top to bottom to calibrate your space mouse
 
-// Default Assembly when looking from above:
+// Default Assembly when looking from above on top of the space mouse
+//
+//   back
 //    C           Y+
 //    |           .
 // B--+--D   X-...Z+...X+
 //    |           .
 //    A           Y-
+//  front
 
-// First step: Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4) to the following axis
+// Each joysticks has
+// - a horizontal axis from left to right = Y
+// - a vertical axis from top to bottom = X
+//
+// Try to write down the two axis of every joystick with the corresponding pin numbers you chose. (A4 and A5 are not used in the example by TeachingTech).
+// Compile the script, type 1 into the serial interface and hit enter to enable debug output 1.
+// Now: At the joystick in front of you (A), move the joystick from top to bottom (X). 
+// If everything is correct: The debug output for AX should show values from 0 to 1023.
+// If another output is showing this values, swap them. Probably you have to swap the first and second element, as AX and AY may be swapped.
+// Repeat this with every axis and every joystick.
+
 // AX, AY, BX, BY, CX, CY, DX, DY
 #define PINLIST \
   { A1, A0, A3, A2, A7, A6, A9, A8 }
