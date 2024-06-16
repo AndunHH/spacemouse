@@ -1,5 +1,6 @@
 // Every file (except, "config_sample.h") will be ignored by git!
 config*.h
+.pio
 
 //this file should be included:
 !config_sample.h
