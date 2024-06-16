@@ -90,9 +90,10 @@ spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
 Instead of the above, you can use PlatformIO to flash the board:
 
 1. Install [PlatformIO](https://platformio.org/).
-2. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
-3. Run `pio run -t upload`.
-4. Done!
+2. Clone this repo and open a terminal in the cloned directory.
+3. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
+4. Run `pio run -t upload`.
+5. Done!
 
 
 ### Further reading / FAQ regarding the boards.txt:
