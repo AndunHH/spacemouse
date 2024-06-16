@@ -110,23 +110,26 @@
 #define ROTY_SENSITIVITY 1.5
 #define ROTZ_SENSITIVITY 2
 
+// ------------------------------------------------------------------------------------
 // Direction
-// Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software afterwards
+// Modify the direction of translation/rotation depending on preference. 
+// This should be done, when you are done with the pin assignment.
+// The default 0 is here for x, y and z orientation as to the picture in the readem
+// The suggestion in the comments is to accomodate the 3dConnexion Trainer "3Dc"
 // Switch between true/false as desired.
-// Switch between true/false as desired.
-#define INVX 0   // pan left/right
-#define INVY 0   // pan up/down
-#define INVZ 0   // zoom in/out
-#define INVRX 0  // Rotate around X axis (tilt front/back)
-#define INVRY 0  // Rotate around Y axis (tilt left/right)
-#define INVRZ 0  // Rotate around Z axis (twist left/right)
+#define INVX 0   // pan left/right  // 3Dc: 0
+#define INVY 0   // pan up/down     // 3Dc: 1
+#define INVZ 0   // zoom in/out     // 3Dc: 1
+#define INVRX 0  // Rotate around X axis (tilt front/back)  // 3Dc: 0
+#define INVRY 0  // Rotate around Y axis (tilt left/right)  // 3Dc: 1
+#define INVRZ 0  // Rotate around Z axis (twist left/right) // 3Dc: 1
 
 //Switch Zooming with Up/Down Movement
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
 #define SWITCHYZ 0  //change to true for switching movement
 
-//
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
+// Keys Support
 // How many keys are there in total?
 #define NUMKEYS 4
 // Define the pins for the keys
