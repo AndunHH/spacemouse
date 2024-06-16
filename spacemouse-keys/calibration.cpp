@@ -20,8 +20,8 @@ void printArray(int arr[], int size) {
   Serial.println("}");
 }
 
-char *axisNames[] = {"AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:"}; // 8
-char *velNames[] = {"TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:"}; // 6
+char* axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
+char* velNames[] = { "TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:" };                 // 6
 
 void debugOutput1(int* rawReads, int* keyVals) {
   // Report back 0-1023 raw ADC 10-bit values if enabled
@@ -84,10 +84,10 @@ void debugOutput5(int* centered, int16_t* velocity) {
 }
 
 // Variables and function to get the min and maximum value of the centered values
-int minMaxCalcState = 0; // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
-int minValue[8]; // Array to store the minimum values
-int maxValue[8]; // Array to store the maximum values
-unsigned long startTime; // Start time for the measurement
+int minMaxCalcState = 0;  // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
+int minValue[8];          // Array to store the minimum values
+int maxValue[8];          // Array to store the maximum values
+unsigned long startTime;  // Start time for the measurement
 
 void calcMinMax(int* centered) {
   // compile the sketch, upload it and wait for confirmation in the serial console.
@@ -98,14 +98,13 @@ void calcMinMax(int* centered) {
     delay(2000);
     // Initialize the arrays
     for (int i = 0; i < 8; i++) {
-      minValue[i] = 1023; // Set the min value to the maximum possible value
-      maxValue[i] = 0; // Set the max value to the minimum possible value
+      minValue[i] = 1023;  // Set the min value to the maximum possible value
+      maxValue[i] = 0;     // Set the max value to the minimum possible value
     }
-    startTime = millis(); // Record the current time
-    minMaxCalcState = 1; // next State: measure!
+    startTime = millis();  // Record the current time
+    minMaxCalcState = 1;   // next State: measure!
     Serial.println(F("Please start moving the spacemouse around!"));
-  }
-  else if (minMaxCalcState == 1) {
+  } else if (minMaxCalcState == 1) {
     if (millis() - startTime < 15000) {
       for (int i = 0; i < 8; i++) {
         // Update the minimum and maximum values
@@ -116,14 +115,12 @@ void calcMinMax(int* centered) {
           maxValue[i] = centered[i];
         }
       }
-    }
-    else {
+    } else {
       // 15s are over. go to next state and report via console
       Serial.println(F("Stop moving the spacemouse. These are the result:"));
       minMaxCalcState = 2;
     }
-  }
-  else if (minMaxCalcState == 2) {
+  } else if (minMaxCalcState == 2) {
     Serial.print(F("MINVALS "));
     printArray(minValue, 8);
     Serial.print(F("MAXVALS "));
@@ -146,6 +143,6 @@ void calcMinMax(int* centered) {
         Serial.println(maxValue[i]);
       }
     }
-    minMaxCalcState = 3; // no further reporting
+    minMaxCalcState = 3;  // no further reporting
   }
 }

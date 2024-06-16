@@ -13,7 +13,8 @@
 
 // First step: Wiring. Matches the first eight analogue pins of the Arduino Pro Micro (atmega32u4) to the following axis
 // AX, AY, BX, BY, CX, CY, DX, DY
-#define PINLIST { A1, A0, A3, A2, A7, A6, A9, A8 }
+#define PINLIST \
+  { A1, A0, A3, A2, A7, A6, A9, A8 }
 // Check the correct wiring with the debug output=1
 
 // Debugging (You can send the number over the serial interface, whenever you whish)
@@ -25,6 +26,7 @@
 // 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
 // 4: Output translation and rotation values. Approx -350 to +350 depending on the parameter.
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
+// 6: Report velocity and keys after possible kill-key feature
 #define STARTDEBUG 0
 
 // Modifier Function
@@ -40,7 +42,7 @@
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 // Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
-#define DEADZONE 3 // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
+#define DEADZONE 3  // Recommended to have this as small as possible for V2 to allow smaller knob range of motion.
 
 // Third calibration: getting min and max values
 // Can be done manual (debug = 2) or semi-automatic (debug = 20)
@@ -78,8 +80,8 @@
 // 8. You finished calibrating.
 
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512};
-#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512};
+#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 };
+#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 };
 
 // Fourth calibration: Sensitivity
 // Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
@@ -98,39 +100,82 @@
 #define TRANSX_SENSITIVITY 2
 #define TRANSY_SENSITIVITY 2
 #define POS_TRANSZ_SENSITIVITY 0.5
-#define NEG_TRANSZ_SENSITIVITY 5 //I want low sensitiviy for down, therefore a high value.
-#define GATE_NEG_TRANSZ 15 // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
-#define GATE_ROTX 15 // Value under which rotX values will be forced to zero
-#define GATE_ROTY 15 // Value under which roty values will be forced to zero
-#define GATE_ROTZ 15 // Value under which rotz values will be forced to zero
+#define NEG_TRANSZ_SENSITIVITY 5  //I want low sensitiviy for down, therefore a high value.
+#define GATE_NEG_TRANSZ 15        // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
+#define GATE_ROTX 15              // Value under which rotX values will be forced to zero
+#define GATE_ROTY 15              // Value under which roty values will be forced to zero
+#define GATE_ROTZ 15              // Value under which rotz values will be forced to zero
 
 #define ROTX_SENSITIVITY 1.5
 #define ROTY_SENSITIVITY 1.5
 #define ROTZ_SENSITIVITY 2
 
+// ------------------------------------------------------------------------------------
 // Direction
-// Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software afterwards
+// Modify the direction of translation/rotation depending on preference. 
+// This should be done, when you are done with the pin assignment.
+// The default 0 is here for x, y and z orientation as to the picture in the readem
+// The suggestion in the comments is to accomodate the 3dConnexion Trainer "3Dc"
 // Switch between true/false as desired.
-// Switch between true/false as desired.
-#define INVX  0 // pan left/right
-#define INVY  0 // pan up/down
-#define INVZ  0 // zoom in/out
-#define INVRX  0 // Rotate around X axis (tilt front/back)
-#define INVRY  0 // Rotate around Y axis (tilt left/right)
-#define INVRZ  0 // Rotate around Z axis (twist left/right)
+#define INVX 0   // pan left/right  // 3Dc: 0
+#define INVY 0   // pan up/down     // 3Dc: 1
+#define INVZ 0   // zoom in/out     // 3Dc: 1
+#define INVRX 0  // Rotate around X axis (tilt front/back)  // 3Dc: 0
+#define INVRY 0  // Rotate around Y axis (tilt left/right)  // 3Dc: 1
+#define INVRZ 0  // Rotate around Z axis (twist left/right) // 3Dc: 1
 
 //Switch Zooming with Up/Down Movement
 //DISCLAIMER: This will make your spacemouse work like in the original code from TeachingTech, but if you try the 3DConnexion tutorial in the Spacemouse Home Software you will notice it won't work.
-#define SWITCHYZ 0 //change to true for switching movement
+#define SWITCHYZ 0  //change to true for switching movement
 
-//
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Define the keycodes for each key
+// ------------------------------------------------------------------------------------
+// Keys Support
+// How many keys are there in total?
 #define NUMKEYS 4
 // Define the pins for the keys
-#define K0 15
-#define K1 14
-#define K2 16
-#define K3 10
+// the first pins are reported via HID
+#define KEYLIST \
+  { 15, 14, 16, 10 }
+// How many keys reported?
+#define NUMHIDKEYS 2
 
-#define DEBOUNCE_KEYS_MS 200 // time in ms which is needed to allow a new button press
+// Kill-Key Feature: Are there buttons to set the translation or rotation to zero?
+// How many kill keys are there? (disabled: 0; enabled: 2)
+#define NUMKILLKEYS 2
+// usually you take the last two buttons from KEYLIST as kill-keys
+// Index of the kill key for rotation
+#define KILLROT 2
+// Index of the kill key for translation
+#define KILLTRANS 3
+// Note: Technically can report the kill-keys via HID as "usual" buttons, but that doesn't make much sense...
+
+/*  Example for three usual buttons and no kill-keys
+ *  There are three keys in total:  NUMKEYS 3
+ *  The keys which shall be reported to the pc are connected to pin 15, 14 and 16
+ *  KEYLIST {15, 14, 16}
+ *  Therefore, the first three pins from the KEYLIST apply for the HID: NUMHIDKEYS 3
+ *  No keys for kill-keys NUMKILLKEYS 0
+ *  KILLROT and KILLTRANS don't matter... KILLROT 0 and KILLTRANS 0
+*/
+
+/* 
+ *  Example for two usual buttons and two kill-keys:
+ *  There are four keys in total:  NUMKEYS 4
+ *  The keys which shall be reported to the pc are connected to pin 15 and 14
+ *  The keys which shall be used to kill translation or rotation are connected to pin 16 and 10
+ *  KEYLIST {15, 14, 16, 10}
+ *  Therefore, the first two pins from the KEYLIST apply for the HID: NUMHIDKEYS 2
+ *  Two keys are used as kill-keys: NUMKILLKEYS 2
+ *  The first kill key has the third position in the KEYLIST and due to zero-based counting third-1 => KILLROT 2
+ *  The second kill key has the last position in the KEYLIST with index 3 -> KILLTRANS 3
+ */
+
+#if (NUMKILLKEYS > NUMKEYS)
+#error "Number of Kill Keys can not be larger than total number of keys"
+#endif
+#if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
+#error "Index of killkeys must be smaller than the total number of keys"
+#endif
+
+
+#define DEBOUNCE_KEYS_MS 200  // time in ms which is needed to allow a new button press
