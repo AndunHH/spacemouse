@@ -23,6 +23,9 @@
 // Now: At the joystick in front of you (A), move the joystick from top to bottom (X). 
 // If everything is correct: The debug output for AX should show values from 0 to 1023.
 // If another output is showing this values, swap them. Probably you have to swap the first and second element, as AX and AY may be swapped.
+// If you have the joystick TeachingTech recommended: 
+//     The pins labelled X and Y on the joystick are NOT the X and Y needed here, but swapped. First joysticks Y: AX and X: AY. 
+// 
 // Repeat this with every axis and every joystick.
 
 // AX, AY, BX, BY, CX, CY, DX, DY
