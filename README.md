@@ -120,7 +120,7 @@ After compiling and uploading the programm to your hardware, you can connect via
 
 Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
 
-1. Check and correct your pin out -> Refer to the pictures in the (Electronics)[#electronics] section below.
+1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics) section below.
 2. Tune dead zone to avoid jittering
 3. Getting min and max values for your joysticks 
 	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
