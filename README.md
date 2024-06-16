@@ -12,7 +12,10 @@ the work by [TeachingTech](https://www.printables.com/de/model/864950-open-sourc
 - [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
 
 Coming up:
-- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/)) 
+- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/))
+
+Wanted, with unclear solution ... ?
+- [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
 
 # Getting Started
 This is a short overview, what needs to be done to get this project running. The paragraphs below will be extended in the future with links or further text.
@@ -27,7 +30,12 @@ with two key differences:
 2. Teaching Tech changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
 
 Daniel_1284580 recomments changing leonardo.upload.tool=avrdude to leonardo.upload.tool.serial=avrdude to get no error when compiling
+
 When compiling and uploading, Teaching Tech select Arduino AVR boards (in Sketchbook) > Spacemouse and then the serial port.
+
+If you have the problem, that the port can not be found, the bootloader of your board is probably not reachable. The problem is, that the arduino pro micro has a very short time to get into the bootloader of 800 ms.
+Therefore you need to connect the reset pin twice to gnd. Than you have 8s to initially set the com port and upload your sketch. It is also quite a fast timing and needs some number of tries. Make sure to select the proper 5V 16MHz (if you also have this board). You can read the details for this reset here: https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/troubleshooting-and-faq#ts-reset
+
 You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
 If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
@@ -73,15 +81,24 @@ This calibration is supported by various debug outputs which can toggle on or of
 
 # Electronics
 
-The spacemouse is connected to an arduino pro micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys:
+The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys:
 ![WiringSpaceMouse](https://github.com/AndunHH/spacemouse/assets/76771247/e013d9e8-8c01-40e2-9800-abb08bb271dd)
 
-As a reference: the pins and values the joysticks create on the analoge pins of the arduino, when the pin mapping is A0 to A7 straight. The original version from teaching tech has pin-out A1, A0, A3, A2 etc. 
-All the different joysticks name there x and y axis differently. Just connect every axis to an ADC and sort them afterwards in your config.h.
-![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7948f8bc-7c1c-4189-9ef6-1216a6b8f164)
+The calculations in the programm expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
+Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1 and A0 follows second for AY.
 
+![analog](https://github.com/AndunHH/spacemouse/assets/76771247/150d7ad8-c8fc-4b01-9628-41bf6c72f0c1)
 
-
+The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture. 
+If this doesn't suit your programm change it by using the INVX or SWITCHYZ. 
+```
+TRANSX = -CY + AY
+TRANSY = -BY + DY 
+TRANSZ = -AX - BX - CX - DX
+ROTX = -CX + AX
+ROTY = -BX + DX
+ROTZ = AY + BY + CY + DY
+```
 # See also
 
 * Another approach for the spacemouse with an esp32: https://github.com/horvatkm/space_mouse_esp32s2
