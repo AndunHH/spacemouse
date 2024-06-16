@@ -3,7 +3,7 @@ Repository for the space mouse based on four joysticks with an addition for keys
 
 ![overview](https://github.com/AndunHH/spacemouse/assets/76771247/562b9763-a6fa-47f1-af30-2dd4bbc053b8)
 
-This repository for the necessary arduino sources is mainly based on 
+This repository for the necessary arduino sources is mainly based on
 the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and the additional code for keys by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) and is intended as basis for further development, because proper source code management is needed.
 
 ## Additional Features
@@ -40,7 +40,7 @@ Please read https://gist.github.com/maunsen/8dbee2bddef027b04a450241c7d36668
 C:\Users<USER>\AppData\Local\Arduino15\packages\arduino\hardware
 
 ### Code to add to boards.txt
-Here is the addition, which needs to be copied into the boards.txt (e.g. at the bottom). 
+Here is the addition, which needs to be copied into the boards.txt (e.g. at the bottom).
 ```
 # Add this to the bottom your boards.txt
 
@@ -85,6 +85,15 @@ spacemouse.bootloader.extended_fuses=0xCB
 spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
 ```
 
+# Installation with PlatformIO
+
+Instead of the above, you can use PlatformIO to flash the board:
+
+1. Install [PlatformIO](https://platformio.org/).
+2. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
+3. Run `pio run -t upload`.
+4. Done!
+
 
 ### Further reading / FAQ regarding the boards.txt:
 
@@ -105,24 +114,24 @@ This is done to avoid the personal config file being overwritten when pulling ne
 - Open the Arduino IDE (1.8.19 and 2.3.2 are tested on Ubuntu).
 - Open spacemouse-keys.ino
 - Select Tools -> Board -> SparkFun AVR Boards -> Spacemouse.
-- (If you followed another boards.txt instructions, which also allow 3.3V with 8 Mhz: Make sure to select the proper processor: 5V 16MHz)  
+- (If you followed another boards.txt instructions, which also allow 3.3V with 8 Mhz: Make sure to select the proper processor: 5V 16MHz)
 - Select the correct port (see troubleshooting section, which might be necessary for first upload)
 - Compile the firmware
 
 ### Troubleshooting uploading
 If you have the problem, that the port can not be found, the bootloader of your board is probably not reachable. The problem is, that the arduino pro micro has a very short time to get into the bootloader of 800 ms.
-Therefore you need to connect the reset pin twice to gnd. Than you have 8 s to initially set the com port and upload your sketch. It is also quite a fast timing and needs some number of tries. 
+Therefore you need to connect the reset pin twice to gnd. Than you have 8 s to initially set the com port and upload your sketch. It is also quite a fast timing and needs some number of tries.
 
 You can read the details for this reset here: https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/troubleshooting-and-faq#ts-reset
 
-## Calibrate your hardware 
+## Calibrate your hardware
 After compiling and uploading the programm to your hardware, you can connect via the serial monitor. In the upper line, you can send the desired debug mode to the board and observe the output. "-1" stops the debug output.
 
 Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
 
 1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics) section below.
 2. Tune dead zone to avoid jittering
-3. Getting min and max values for your joysticks 
+3. Getting min and max values for your joysticks
 	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
 4. Adjust sensitivity
 
@@ -136,7 +145,7 @@ If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless w
 ### spacenav for linux users
 Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.com/FreeSpacenav/spacenavd.
 
-# Software Main Idea 
+# Software Main Idea
 1. The software reads the eight ADC values of the four joy sticks
 2. During start-up the zero-position of the joystick is measured and subtracted from the adc-value. -> The values now range from e.g. -500 to +500
 3. A dead zone in the middle is applied to avoid small noisy movements. (E.g. every value between +/- 3 is fixed to zero)
@@ -162,11 +171,11 @@ Maybe your joystick axis are named X and Y in an other orientation. That doesn't
 
 ![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7291c95d-d679-4f29-b2e0-4cdbf8c6b466)
 
-The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture. 
-If this doesn't suit your programm change it by using the INVX or SWITCHYZ. 
+The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture.
+If this doesn't suit your programm change it by using the INVX or SWITCHYZ.
 ```
 TRANSX = -CY + AY
-TRANSY = -BY + DY 
+TRANSY = -BY + DY
 TRANSZ = -AX - BX - CX - DX
 ROTX = -CX + AX
 ROTY = -BX + DX
@@ -184,11 +193,11 @@ This code is the combination of multiple works by others:
 4. Code to emulate a 3DConnexion Space Mouse by jfedor: https://pastebin.com/gQxUrScV
 5. This code was then remixed by BennyBWalker to include the above two sketches: https://pastebin.com/erhTgRBH
 6. Four joystick remix code by fdmakara: https://www.thingiverse.com/thing:5817728
-7. Teaching Techs work involves mixing all of these: https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix 
-The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation. The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.  The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening. On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase. 
+7. Teaching Techs work involves mixing all of these: https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
+The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation. The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.  The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening. On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
 8. Code to include meassured min and max values for each Joystick by Daniel_1284580 (In Software Version V1 and newer)
 9. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
-10. Improved Code, improved comments and added written tutorials in comments, By LivingTheDream: https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3) 
+10. Improved Code, improved comments and added written tutorials in comments, By LivingTheDream: https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
 12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA.
 13. Coming up: Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/).
