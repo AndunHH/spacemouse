@@ -160,7 +160,7 @@ The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring
 The calculations in the programm expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
 Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1 and A0 follows second for AY.
 
-![analog](https://github.com/AndunHH/spacemouse/assets/76771247/150d7ad8-c8fc-4b01-9628-41bf6c72f0c1)
+![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7291c95d-d679-4f29-b2e0-4cdbf8c6b466)
 
 The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture. 
 If this doesn't suit your programm change it by using the INVX or SWITCHYZ. 
