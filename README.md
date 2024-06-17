@@ -17,15 +17,28 @@ Coming up:
 Wanted, with unclear solution ... ?
 - [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
 
-# Getting Started
-1. You purchase the [electronics](#electronics) and [print some parts](#printed-parts), which is not scope of this repository
-2. [Create a custom board](#custom-board-to-emulate-the-space-mouse) in your Arduino IDE, that emulates the original space mouse
-3. [Download or clone this github repository](#cloning-the-github-repo)
-4. [Rename the config_sample.h to config.h](#create-your-own-config-file)
-5. [Try to compile and flash your board](#compiling-and-flashing-the-firmware)
-6. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
-7. [Use your space mouse](#use-the-spacemouse)
+Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software.
+ 
+# Getting Started with PlatformIO
+You can use PlatformIO to flash the board with this fast steps:
 
+1. Install [PlatformIO](https://platformio.org/).
+2. Clone this repo and open a terminal in the cloned directory. 
+3. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
+4. Run `pio run -t upload`.
+5. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
+6. [Use your space mouse](#use-the-spacemouse)
+7. Done!
+
+# Getting Started with Arduino IDE 
+1. [Create a custom board](#custom-board-to-emulate-the-space-mouse) in your Arduino IDE, that emulates the original space mouse
+2. [Download or clone this github repository](#cloning-the-github-repo)
+3. [Rename the config_sample.h to config.h](#create-your-own-config-file)
+4. [Try to compile and flash your board](#compiling-and-flashing-the-firmware)
+5. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
+6. [Use your space mouse](#use-the-spacemouse)
+7. Done!
+   
 ## Custom board to emulate the space mouse
 The boards.txt file needs an additional Board definition, which tells the processor to report the USB identifiers correctly and immitate the 3dconnexion space-mouse.
 
@@ -85,15 +98,7 @@ spacemouse.bootloader.extended_fuses=0xCB
 spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
 ```
 
-# Installation with PlatformIO
 
-Instead of the above, you can use PlatformIO to flash the board:
-
-1. Install [PlatformIO](https://platformio.org/).
-2. Clone this repo and open a terminal in the cloned directory.
-3. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
-4. Run `pio run -t upload`.
-5. Done!
 
 
 ### Further reading / FAQ regarding the boards.txt:
@@ -125,7 +130,7 @@ Therefore you need to connect the reset pin twice to gnd. Than you have 8 s to i
 
 You can read the details for this reset here: https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/troubleshooting-and-faq#ts-reset
 
-## Calibrate your hardware
+# Calibrate your hardware
 After compiling and uploading the programm to your hardware, you can connect via the serial monitor. In the upper line, you can send the desired debug mode to the board and observe the output. "-1" stops the debug output.
 
 Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
@@ -138,12 +143,12 @@ Read and follow the instructions throughout the config.h file and write down you
 
 This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
 
-## Use the spacemouse
-### Download the 3dconnexion driver on windows and mac
+# Use the spacemouse
+## Download the 3dconnexion driver on windows and mac
 You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
 If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
-### spacenav for linux users
+## spacenav for linux users
 Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.com/FreeSpacenav/spacenavd.
 
 # Software Main Idea
