@@ -294,7 +294,7 @@ void loop() {
   }
 
   if (debug >= 1) {
-    delayMicroseconds(5000);
+    delay(25);
   }
   // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
 
