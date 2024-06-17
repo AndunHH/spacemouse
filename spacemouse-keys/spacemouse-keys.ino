@@ -292,6 +292,10 @@ void loop() {
   if (debug == 5) {
     debugOutput5(centered, velocity);
   }
+
+  if (debug >= 1) {
+    delayMicroseconds(5000);
+  }
   // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
 
   // if the kill-key feature is enabled, rotations or translations are killed=set to zero
