@@ -292,7 +292,6 @@ void loop() {
   if (debug == 5) {
     debugOutput5(centered, velocity);
   }
-  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmatic above.
 
   // if the kill-key feature is enabled, rotations or translations are killed=set to zero
 #if (NUMKILLKEYS == 2)
@@ -324,4 +323,10 @@ void loop() {
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
   send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut);
 #endif
+
+  
+  if (debug == 7) {
+    // update and report the at what frequency the loop is running
+    updateFrequencyReport();
+  }
 }

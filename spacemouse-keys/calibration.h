@@ -26,3 +26,11 @@ void calcMinMax(int* centered);
 #define ROTX 3
 #define ROTY 4
 #define ROTZ 5
+
+// call this function to find out, if a new debug output shall be generated
+// this is used in order to generate a debug line only every DEBUGDELAY ms
+#define DEBUGDELAY 100
+bool isDebugOutputDue();
+
+// update and report the function to learn at what frequency the loop is running
+void updateFrequencyReport();
