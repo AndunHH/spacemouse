@@ -2,6 +2,9 @@
 config*.h
 .pio
 .vscode
+.idea
 
 //this file should be included:
 !config_sample.h
+
+

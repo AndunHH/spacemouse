@@ -17,7 +17,7 @@ void printArray(int arr[], int size) {
       Serial.print(", ");
     }
   }
-  Serial.println("}");
+  Serial.println("};");
 }
 
 char* axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
@@ -111,7 +111,7 @@ void calcMinMax(int* centered) {
     }
     startTime = millis();  // Record the current time
     minMaxCalcState = 1;   // next State: measure!
-    Serial.println(F("Please start moving the spacemouse around!"));
+    Serial.println(F("Please start moving the spacemouse around for 15 sec!"));
   } else if (minMaxCalcState == 1) {
     if (millis() - startTime < 15000) {
       for (int i = 0; i < 8; i++) {
@@ -125,13 +125,14 @@ void calcMinMax(int* centered) {
       }
     } else {
       // 15s are over. go to next state and report via console
-      Serial.println(F("Stop moving the spacemouse. These are the result:"));
+      Serial.println(F("\n\nStop moving the spacemouse. These are the result. Copy them in config.h"));
       minMaxCalcState = 2;
     }
-  } else if (minMaxCalcState == 2) {
-    Serial.print(F("MINVALS "));
+  }
+  else if (minMaxCalcState == 2) {
+    Serial.print(F("#define MINVALS "));
     printArray(minValue, 8);
-    Serial.print(F("MAXVALS "));
+    Serial.print(F("#define MAXVALS "));
     printArray(maxValue, 8);
     for (int i = 0; i < 8; i++) {
       if (abs(minValue[i]) < 250) {
