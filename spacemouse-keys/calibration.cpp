@@ -167,3 +167,19 @@ bool isDebugOutputDue() {
     return false;
   }
 }
+
+uint16_t iterationsPerSecond = 0;       // count the iterations within one second
+unsigned long lastFrequencyUpdate = 0;  // time from millis(), when the last frequency was calculated
+
+// update and report the frequency of the loop function
+void updateFrequencyReport() {
+  // increase iterations counter
+  iterationsPerSecond++;
+  if (millis() - lastFrequencyUpdate > 1000) {  // if one second has past: report frequency
+    Serial.print("Frequency: ");
+    Serial.print(iterationsPerSecond);
+    Serial.println(" Hz");
+    lastFrequencyUpdate = millis();  // reset timer
+    iterationsPerSecond = 0;         // reset iteration counter
+  }
+}

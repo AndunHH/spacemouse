@@ -323,4 +323,10 @@ void loop() {
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
   send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut);
 #endif
+
+  
+  if (debug == 7) {
+    // update and report the at what frequency the loop is running
+    updateFrequencyReport();
+  }
 }

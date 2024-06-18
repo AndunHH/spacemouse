@@ -142,6 +142,7 @@ Read and follow the instructions throughout the config.h file and write down you
 4. Adjust sensitivity
 
 This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
+All debug outputs are described at the top of your config_sample.h.
 
 # Use the spacemouse
 ## Download the 3dconnexion driver on windows and mac
