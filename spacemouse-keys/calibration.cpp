@@ -128,8 +128,7 @@ void calcMinMax(int* centered) {
       Serial.println(F("\n\nStop moving the spacemouse. These are the result. Copy them in config.h"));
       minMaxCalcState = 2;
     }
-  }
-  else if (minMaxCalcState == 2) {
+  } else if (minMaxCalcState == 2) {
     Serial.print(F("#define MINVALS "));
     printArray(minValue, 8);
     Serial.print(F("#define MAXVALS "));
