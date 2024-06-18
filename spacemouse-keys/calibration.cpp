@@ -24,63 +24,71 @@ char* axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" }; 
 char* velNames[] = { "TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:" };                 // 6
 
 void debugOutput1(int* rawReads, int* keyVals) {
-  // Report back 0-1023 raw ADC 10-bit values if enabled
-  for (int i = 0; i < 8; i++) {
-    Serial.print(axisNames[i]);
-    Serial.print(rawReads[i]);
-    Serial.print(", ");
+  if (isDebugOutputDue()) {
+    // Report back 0-1023 raw ADC 10-bit values if enabled
+    for (int i = 0; i < 8; i++) {
+      Serial.print(axisNames[i]);
+      Serial.print(rawReads[i]);
+      Serial.print(", ");
+    }
+    for (int i = 0; i < NUMKEYS; i++) {
+      Serial.print("K");
+      Serial.print(i);
+      Serial.print(":");
+      Serial.print(keyVals[i]);
+      Serial.print(", ");
+    }
+    Serial.println("");
   }
-  for (int i = 0; i < NUMKEYS; i++) {
-    Serial.print("K");
-    Serial.print(i);
-    Serial.print(":");
-    Serial.print(keyVals[i]);
-    Serial.print(", ");
-  }
-  Serial.println("");
 }
 
 void debugOutput2(int* centered) {
-  // this routine creates the output for the former debug = 2 and debug = 3
-  for (int i = 0; i < 8; i++) {
-    Serial.print(axisNames[i]);
-    Serial.print(centered[i]);
-    Serial.print(", ");
+  if (isDebugOutputDue()) {
+    // this routine creates the output for the former debug = 2 and debug = 3
+    for (int i = 0; i < 8; i++) {
+      Serial.print(axisNames[i]);
+      Serial.print(centered[i]);
+      Serial.print(", ");
+    }
+    Serial.println("");
   }
-  Serial.println("");
 }
 
 void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
   // Report translation and rotation values if enabled. Approx -350 to +350 depending on the parameter.
-  for (int i = 0; i < 6; i++) {
-    Serial.print(velNames[i]);
-    Serial.print(velocity[i]);
-    Serial.print(", ");
+  if (isDebugOutputDue()) {
+    for (int i = 0; i < 6; i++) {
+      Serial.print(velNames[i]);
+      Serial.print(velocity[i]);
+      Serial.print(", ");
+    }
+    for (int i = 0; i < NUMKEYS; i++) {
+      Serial.print("K");
+      Serial.print(i);
+      Serial.print(":");
+      Serial.print(keyOut[i]);
+      Serial.print(", ");
+    }
+    Serial.println("");
   }
-  for (int i = 0; i < NUMKEYS; i++) {
-    Serial.print("K");
-    Serial.print(i);
-    Serial.print(":");
-    Serial.print(keyOut[i]);
-    Serial.print(", ");
-  }
-  Serial.println("");
 }
 
 void debugOutput5(int* centered, int16_t* velocity) {
   // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmetic above.
-  for (int i = 0; i < 8; i++) {
-    Serial.print(axisNames[i]);
-    Serial.print(centered[i]);
-    Serial.print(", ");
+  if (isDebugOutputDue()) {
+    for (int i = 0; i < 8; i++) {
+      Serial.print(axisNames[i]);
+      Serial.print(centered[i]);
+      Serial.print(", ");
+    }
+    Serial.print("||");
+    for (int i = 0; i < 6; i++) {
+      Serial.print(velNames[i]);
+      Serial.print(velocity[i]);
+      Serial.print(", ");
+    }
+    Serial.println("");
   }
-  Serial.print("||");
-  for (int i = 0; i < 6; i++) {
-    Serial.print(velNames[i]);
-    Serial.print(velocity[i]);
-    Serial.print(", ");
-  }
-  Serial.println("");
 }
 
 // Variables and function to get the min and maximum value of the centered values
@@ -144,5 +152,18 @@ void calcMinMax(int* centered) {
       }
     }
     minMaxCalcState = 3;  // no further reporting
+  }
+}
+
+unsigned long lastDebugOutput = 0;  // time from millis(), when the last debug output was given
+
+// call this function to find out, if a new debug output shall be generated
+// this is used in order to generate a debug line only every DEBUGDELAY ms, see calibration.h
+bool isDebugOutputDue() {
+  if (millis() - lastDebugOutput > DEBUGDELAY) {
+    lastDebugOutput = millis();
+    return true;
+  } else {
+    return false;
   }
 }
