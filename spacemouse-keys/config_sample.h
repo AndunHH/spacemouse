@@ -20,12 +20,12 @@
 //
 // Try to write down the two axis of every joystick with the corresponding pin numbers you chose. (A4 and A5 are not used in the example by TeachingTech).
 // Compile the script, type 1 into the serial interface and hit enter to enable debug output 1.
-// Now: At the joystick in front of you (A), move the joystick from top to bottom (X). 
+// Now: At the joystick in front of you (A), move the joystick from top to bottom (X).
 // If everything is correct: The debug output for AX should show values from 0 to 1023.
 // If another output is showing this values, swap them. Probably you have to swap the first and second element, as AX and AY may be swapped.
-// If you have the joystick TeachingTech recommended: 
-//     The pins labelled X and Y on the joystick are NOT the X and Y needed here, but swapped. First joysticks Y: AX and X: AY. 
-// 
+// If you have the joystick TeachingTech recommended:
+//     The pins labelled X and Y on the joystick are NOT the X and Y needed here, but swapped. First joysticks Y: AX and X: AY.
+//
 // Repeat this with every axis and every joystick.
 
 // AX, AY, BX, BY, CX, CY, DX, DY
@@ -44,6 +44,7 @@
 // 5: Output debug 4 and 5 side by side for direct cause and effect reference.
 // 6: Report velocity and keys after possible kill-key feature
 // 7: Report the frequency of the loop() -> how often is the loop() called in one second?
+// 8: Report the bits and bytes send as button codes
 #define STARTDEBUG 0
 
 // Modifier Function
@@ -129,7 +130,7 @@
 
 // ------------------------------------------------------------------------------------
 // Direction
-// Modify the direction of translation/rotation depending on preference. 
+// Modify the direction of translation/rotation depending on preference.
 // This should be done, when you are done with the pin assignment.
 // The default 0 is here for x, y and z orientation as to the picture in the readem
 // The suggestion in the comments is to accomodate the 3dConnexion Trainer "3Dc"
@@ -149,12 +150,39 @@
 // Keys Support
 // How many keys are there in total?
 #define NUMKEYS 4
-// Define the pins for the keys
+// Define the pins for the keys on the arduino
 // the first pins are reported via HID
 #define KEYLIST \
   { 15, 14, 16, 10 }
 // How many keys reported?
-#define NUMHIDKEYS 2
+#define NUMHIDKEYS 4
+
+// In order to define which key is assigned to which button, the following list must be entered in the BUTTONLIST below
+
+// #define ??     0  // Key ?
+#define SM_FIT 1 // Key "Fit"
+#define SM_T 2   // Key "T" top
+// #define ??     3  // Key ?
+#define SM_R 4 // Key "R" right
+#define SM_F 5 // Key "F" Front
+// #define ??     6  // Key ?
+// #define ??     7  // Key ?
+#define SM_CA 8 // Key Rotate 90° ("ca = cube with arrow")
+// #define ??     9  // Key ?
+// #define ??     10 // Key ?
+// #define ??     11 // Key ?
+#define SM_4 12 // Key "4" sketch
+// #define ??     13 // Key ?
+#define SM_3 14 // Key "3" Partools
+// #define ??   15 //  Key ?
+
+// BUTTONLIST must have the so many elemets as NUMHIDKEYS is set
+// The keys are from KEYLIST are assigned buttons here:
+#define BUTTONLIST            \
+  {                           \
+    SM_FIT, SM_T, SM_R, SM_CA \
+  }
+// ------------------------------------------------------------------------------------
 
 // Kill-Key Feature: Are there buttons to set the translation or rotation to zero?
 // How many kill keys are there? (disabled: 0; enabled: 2)
@@ -171,17 +199,19 @@
  *  The keys which shall be reported to the pc are connected to pin 15, 14 and 16
  *  KEYLIST {15, 14, 16}
  *  Therefore, the first three pins from the KEYLIST apply for the HID: NUMHIDKEYS 3
+ *  Those three Buttons shall be "FIT", "T" and "R": BUTTONLIST {SM_FIT, SM_T, SM_R}
  *  No keys for kill-keys NUMKILLKEYS 0
  *  KILLROT and KILLTRANS don't matter... KILLROT 0 and KILLTRANS 0
-*/
+ */
 
-/* 
+/*
  *  Example for two usual buttons and two kill-keys:
  *  There are four keys in total:  NUMKEYS 4
  *  The keys which shall be reported to the pc are connected to pin 15 and 14
  *  The keys which shall be used to kill translation or rotation are connected to pin 16 and 10
  *  KEYLIST {15, 14, 16, 10}
  *  Therefore, the first two pins from the KEYLIST apply for the HID: NUMHIDKEYS 2
+ *  Those two Buttons shall be "3", "4": BUTTONLIST {SM_3, SM_4}
  *  Two keys are used as kill-keys: NUMKILLKEYS 2
  *  The first kill key has the third position in the KEYLIST and due to zero-based counting third-1 => KILLROT 2
  *  The second kill key has the last position in the KEYLIST with index 3 -> KILLTRANS 3
