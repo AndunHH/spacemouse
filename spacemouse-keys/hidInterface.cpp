@@ -11,9 +11,9 @@ uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
 void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug)
 {
-  uint8_t trans[6] = {x & 0xFF, x >> 8, y & 0xFF, y >> 8, z & 0xFF, z >> 8};
+  uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
   HID().SendReport(1, trans, 6);
-  uint8_t rot[6] = {rx & 0xFF, rx >> 8, ry & 0xFF, ry >> 8, rz & 0xFF, rz >> 8};
+  uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
   HID().SendReport(2, rot, 6);
 
 #if (NUMKEYS > 0)

@@ -259,10 +259,10 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
 #if SWITCHYZ > 0
   // Original from TT, but 3DConnextion tutorial will not work:
-  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut);
+  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut, debug);
 #else
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut);
+  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut, debug);
 #endif
 
   

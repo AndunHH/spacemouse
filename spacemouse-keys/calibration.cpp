@@ -20,8 +20,8 @@ void printArray(int arr[], int size) {
   Serial.println("};");
 }
 
-char* axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
-char* velNames[] = { "TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:" };                 // 6
+char const * axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
+char const * velNames[] = { "TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:" };                 // 6
 
 void debugOutput1(int* rawReads, int* keyVals) {
   if (isDebugOutputDue()) {
