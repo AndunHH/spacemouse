@@ -49,13 +49,14 @@
 
 // Modifier Function
 // Modify resulting behaviour of Joystick input values
-// DISCLAIMER: This should be at level 0 when starting the calibration
+// DISCLAIMER: This should be at level 0 when starting the calibration!
 // 0: linear y = x [Standard behaviour: No modification]
 // 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
 // 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
 // 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
 // 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-#define MODFUNC 3
+// Recommendation after tuning: MODFUNC 3
+#define MODFUNC 0
 
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
@@ -176,8 +177,8 @@
 #define SM_3 14 // Key "3" Partools
 // #define ??   15 //  Key ?
 
-// BUTTONLIST must have the so many elemets as NUMHIDKEYS is set
-// The keys are from KEYLIST are assigned buttons here:
+// BUTTONLIST must have the as many elemets as NUMHIDKEYS
+// The keys from KEYLIST are assigned buttons here:
 #define BUTTONLIST            \
   {                           \
     SM_FIT, SM_T, SM_R, SM_CA \
@@ -223,6 +224,5 @@
 #if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
 #error "Index of killkeys must be smaller than the total number of keys"
 #endif
-
 
 #define DEBOUNCE_KEYS_MS 200  // time in ms which is needed to allow a new button press
