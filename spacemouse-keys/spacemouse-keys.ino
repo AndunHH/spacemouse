@@ -24,6 +24,11 @@
 // header for HID emulation of the spacemouse
 #include "hidInterface.h"
 
+#if SIMAXIS > 0
+  // if an encoder wheel is used
+  #include "encoderWheel.h" 
+#endif 
+
 // the debug mode can be set during runtime via the serial interface
 int debug = STARTDEBUG;
 
@@ -92,6 +97,10 @@ void setup() {
   // Read idle/centre positions for joysticks.
   readAllFromJoystick(centerPoints);
   delay(100);
+
+#if SIMAXIS > 0
+  initEncoderWheel();
+#endif
 }
 
 int rawReads[8], centered[8];
@@ -104,6 +113,7 @@ int minVals[8] = MINVALS;
 int maxVals[8] = MAXVALS;
 
 int tmpInput;  // store the value, the user might input over the serial
+
 
 void loop() {
   //check if the user entered a debug mode via serial interface
@@ -202,6 +212,11 @@ void loop() {
     velocity[ROTZ] = 0;
   }
 
+#if SIMAXIS > 0
+  // If an encoder wheel is used, calculate the velocity of the wheel and replace one of the former calculated velocities
+  calcEncoderWheel(velocity, debug);
+#endif
+
   // Invert directions if needed
 #if INVX > 0
   velocity[TRANSX] = velocity[TRANSX] * -1;
@@ -236,7 +251,8 @@ void loop() {
 
   // if the kill-key feature is enabled, rotations or translations are killed=set to zero
 #if (NUMKILLKEYS == 2)
-  if (keyVals[KILLROT] == LOW) {  // check for the raw keyVal and not keyOut, because keyOut is only 1 for a single iteration. keyVals has inverse Logic due to pull-ups
+  if (keyVals[KILLROT] == LOW) {  
+    // check for the raw keyVal and not keyOut, because keyOut is only 1 for a single iteration. keyVals has inverse Logic due to pull-ups
     // kill rotation
     velocity[ROTX] = 0;
     velocity[ROTY] = 0;
@@ -264,7 +280,6 @@ void loop() {
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
   send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut, debug);
 #endif
-
   
   if (debug == 7) {
     // update and report the at what frequency the loop is running

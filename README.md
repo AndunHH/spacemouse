@@ -10,9 +10,7 @@ the work by [TeachingTech](https://www.printables.com/de/model/864950-open-sourc
 - [x] Semi-Automatic calibration methods
 - [x] Support for keys, that can triggger functions on your pc
 - [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
-
-Coming up:
-- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/))
+- [x] Support for an encoder wheel to zoom
 
 Wanted, with unclear solution ... ?
 - [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
@@ -205,8 +203,8 @@ The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's
 9. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
 10. Improved Code, improved comments and added written tutorials in comments, By LivingTheDream: https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
-12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA.
-13. Coming up: Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/).
+12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA and AndunHH.
+13. Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/) and rewritten by AndunHH.
 
 # License
 Because TeachingTech published his source code on Printables under this license, it also applies here:
