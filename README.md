@@ -20,7 +20,8 @@ Wanted, with unclear solution ... ?
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software.
  
 # Getting Started with PlatformIO
-You can use PlatformIO to flash the board with this fast steps:
+You can use PlatformIO to flash the board with this fast steps.
+PlatformIO is easier than ArduinoIDE, because you don't need to change the board.txt files there.
 
 1. Install [PlatformIO](https://platformio.org/).
 2. Clone this repo and open a terminal in the cloned directory. 
@@ -63,6 +64,7 @@ Here is the addition, which needs to be copied into the boards.txt (e.g. at the 
 spacemouse.name=SpaceMouse
 
 spacemouse.upload.tool=avrdude
+spacemouse.upload.tool.default=avrdude
 spacemouse.upload.protocol=avr109
 spacemouse.upload.maximum_size=28672
 spacemouse.upload.maximum_data_size=2560
@@ -72,6 +74,7 @@ spacemouse.upload.use_1200bps_touch=true
 spacemouse.upload.wait_for_upload_port=true
 
 spacemouse.bootloader.tool=avrdude
+spacemouse.bootloader.tool.default=avrdude
 spacemouse.bootloader.unlock_bits=0x3F
 spacemouse.bootloader.lock_bits=0x2F
 spacemouse.bootloader.low_fuses=0xFF
@@ -98,16 +101,12 @@ spacemouse.bootloader.extended_fuses=0xCB
 spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
 ```
 
-
-
-
-### Further reading / FAQ regarding the boards.txt:
+### Common issues with boards.txt:
 
 - [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) video for proper instructions
 - Teaching Tech followed the instructions here from [nebhead](https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a) with two key differences:
 	- Changed the word 'DaemonBite' to 'Spacemouse' in all references.
   	- Changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
--  Some [people](https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a?permalink_comment_id=5069434#gistcomment-5069434) need to change ```spacemouse.upload.tool=avrdude``` to ```spacemouse.upload.tool.serial=avrdude``` to get no error when compiling
 
 ## Cloning the github repo
 Clone the github repo to your computer: Scroll-Up to the green "<> Code" Button and select, if you wish to clone or just download the code.
