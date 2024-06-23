@@ -1,14 +1,13 @@
 # Open Source Spacemouse with Keys
 Repository for the space mouse based on four joysticks with an addition for keys (not jet in the picture)
 
-![overview](https://github.com/AndunHH/spacemouse/assets/76771247/562b9763-a6fa-47f1-af30-2dd4bbc053b8)
+![overview](pictures/overview.jpg)
 
-This repository for the necessary arduino sources is mainly based on
-the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and the additional code for keys by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) and is intended as basis for further development, because proper source code management is needed.
+This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). 
 
-## Additional Features
+## Features
 - [x] Semi-Automatic calibration methods
-- [x] Support for keys, that can triggger functions on your pc
+- [x] Support for keys, that can trigger functions on your pc
 - [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
 - [x] Support for an encoder wheel to zoom
 
@@ -24,7 +23,7 @@ PlatformIO is easier than ArduinoIDE, because you don't need to change the board
 1. Install [PlatformIO](https://platformio.org/).
 2. Clone this repo and open a terminal in the cloned directory. 
 3. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
-4. Run `pio run -t upload`.
+4. Run `pio run -t upload` or click on the upload arrow in the IDE.
 5. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
 6. [Use your space mouse](#use-the-spacemouse)
 7. Done!
@@ -41,7 +40,7 @@ PlatformIO is easier than ArduinoIDE, because you don't need to change the board
 ## Custom board to emulate the space mouse
 The boards.txt file needs an additional Board definition, which tells the processor to report the USB identifiers correctly and immitate the 3dconnexion space-mouse.
 
-### Boards.txt on linux
+### boards.txt on linux
 You find the boards.txt in ```~/.arduino15/packages/SparkFun/hardware/avr/1.1.13```.
 If this folder doesn't exist you need to install board support for SparkFun Arduinos.
 
@@ -137,13 +136,15 @@ Read and follow the instructions throughout the config.h file and write down you
 3. Getting min and max values for your joysticks
 	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
 4. Adjust sensitivity
+5. Choose modifier function
 
 This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
 All debug outputs are described at the top of your config_sample.h.
 
 # Use the spacemouse
 ## Download the 3dconnexion driver on windows and mac
-You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
+You will also need to download and install the [3DConnexion software](https://3dconnexion.com/us/drivers-application/3dxware-10/)
+
 If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
 ## spacenav for linux users
@@ -160,23 +161,30 @@ Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.c
 8. Sending the velocities and keys to the PC
 
 # Printed parts
-* https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
-* Check out the many remixes, if you have other joystick dev-boards, because the joystick must be perfectly centered!
-* https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch
+There are many parts and remixes available. A very good starting point is the Part [Open source SpaceMouse - Space Mushroom remix](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) by Teaching Tech. Check out the many remixes, especially if you want to use other joysticks modules!
+
+Here are some of the remixes or additions that are used with this software:
+
+* [Lid with mounting for 4 MX Switch adapter](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) by LivingTheDream
+* [SpaceMouse Mini - Slim profile, with easier assembly and various improvements - v3](https://www.printables.com/de/model/908684-spacemouse-mini-slim-profile-with-easier-assembly) by Doug Joseph
+* [Hall Effect Joysticks For the Space Mouse](https://www.printables.com/de/model/918029-hall-effect-joysticks-for-the-space-mouse) by Kempy
 
 
-# Electronics
+# Electronics and pin assignment
 
 The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys:
-![WiringSpaceMouse](https://github.com/AndunHH/spacemouse/assets/76771247/e013d9e8-8c01-40e2-9800-abb08bb271dd)
+![WiringSpaceMouse](pictures/fritzing-electronics.png)
 
-The calculations in the programm expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
-Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1 and A0 follows second for AY.
+The calculations in the program expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
+Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config.h file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1, even though his joystick is labeled "y". 
 
-![analog](https://github.com/AndunHH/spacemouse/assets/76771247/7291c95d-d679-4f29-b2e0-4cdbf8c6b466)
+![analog](pictures/pins-axis.png)
 
 The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture.
-If this doesn't suit your programm change it by using the INVX or SWITCHYZ.
+If this doesn't suit your programm change it by using the INVX or SWITCHYZ afterwards.
+
+## Cinematics
+With the axis defined as shown in the picture above, the calculations for translation and rotation are as follows:
 ```
 TRANSX = -CY + AY
 TRANSY = -BY + DY
@@ -197,14 +205,15 @@ This code is the combination of multiple works by others:
 4. Code to emulate a 3DConnexion Space Mouse by jfedor: https://pastebin.com/gQxUrScV
 5. This code was then remixed by BennyBWalker to include the above two sketches: https://pastebin.com/erhTgRBH
 6. Four joystick remix code by fdmakara: https://www.thingiverse.com/thing:5817728
-7. Teaching Techs work involves mixing all of these: https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix
+7. [Teaching Techs work](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) involves mixing all of these: 
 The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation. The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.  The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening. On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
 8. Code to include meassured min and max values for each Joystick by Daniel_1284580 (In Software Version V1 and newer)
 9. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
-10. Improved Code, improved comments and added written tutorials in comments, By LivingTheDream: https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
+10. Improved Code, improved comments and added written tutorials in comments, by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files) Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
 12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA and AndunHH.
 13. Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/) and rewritten by AndunHH.
+
 
 # License
 Because TeachingTech published his source code on Printables under this license, it also applies here:

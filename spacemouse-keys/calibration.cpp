@@ -17,7 +17,7 @@ void printArray(int arr[], int size) {
       Serial.print(", ");
     }
   }
-  Serial.println("};");
+  Serial.println("}");
 }
 
 char const * axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
