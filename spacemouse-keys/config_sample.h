@@ -47,17 +47,6 @@
 // 8: Report the bits and bytes send as button codes
 #define STARTDEBUG 0
 
-// Modifier Function
-// Modify resulting behaviour of Joystick input values
-// DISCLAIMER: This should be at level 0 when starting the calibration!
-// 0: linear y = x [Standard behaviour: No modification]
-// 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
-// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
-// 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
-// 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-// Recommendation after tuning: MODFUNC 3
-#define MODFUNC 0
-
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 // Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
@@ -99,8 +88,8 @@
 // 8. You finished calibrating.
 
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 };
-#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 };
+#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 }
+#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 }
 
 // Fourth calibration: Sensitivity
 // Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
@@ -128,6 +117,18 @@
 #define ROTX_SENSITIVITY 1.5
 #define ROTY_SENSITIVITY 1.5
 #define ROTZ_SENSITIVITY 2
+
+// Modifier Function
+// Modify resulting behaviour of spacemouse outputs the suppres small movements around zero and enforce big movements even more.
+// (This function is applied on the resulting velocities and not on the direct input from the joysticks)
+// This should be at level 0 when starting the calibration!
+// 0: linear y = x [Standard behaviour: No modification]
+// 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
+// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
+// 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
+// 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
+// Recommendation after tuning: MODFUNC 3
+#define MODFUNC 0
 
 // ------------------------------------------------------------------------------------
 // Direction
