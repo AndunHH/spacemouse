@@ -150,12 +150,15 @@
 
 // ------------------------------------------------------------------------------------
 // Keys Support
+// See below for examples
 // How many keys are there in total?
 #define NUMKEYS 4
 // Define the pins for the keys on the arduino
-// the first pins are reported via HID
+// KEYLIST must be empty "{ }" if NUMKEYS = 0, i.e. no key support
+// The first pins from KEYLIST may be reported via HID
 #define KEYLIST \
   { 15, 14, 16, 10 }
+
 // How many keys reported?
 #define NUMHIDKEYS 4
 
@@ -179,11 +182,9 @@
 // #define ??   15 //  Key ?
 
 // BUTTONLIST must have the as many elemets as NUMHIDKEYS
-// The keys from KEYLIST are assigned buttons here:
-#define BUTTONLIST            \
-  {                           \
-    SM_FIT, SM_T, SM_R, SM_CA \
-  }
+// That means: BUTTONLIST must be empty "{ }" if NUMHIDKEYS = 0
+// The keys from KEYLIST are assigned to buttons here:
+#define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_CA }
 // ------------------------------------------------------------------------------------
 
 // Kill-Key Feature: Are there buttons to set the translation or rotation to zero?
@@ -195,6 +196,16 @@
 // Index of the kill key for translation
 #define KILLTRANS 3
 // Note: Technically can report the kill-keys via HID as "usual" buttons, but that doesn't make much sense...
+
+/*  Example for NO KEYS
+ *  There are zero keys in total:  NUMKEYS 0
+ *  KEYLIST { }
+ *  NUMHIDKEYS 0
+ *  BUTTONLIST { }
+ *  NUMKILLKEYS 0
+ *  KILLROT and KILLTRANS don't matter... KILLROT 0 and KILLTRANS 0
+ */
+
 
 /*  Example for three usual buttons and no kill-keys
  *  There are three keys in total:  NUMKEYS 3
