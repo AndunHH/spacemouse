@@ -47,17 +47,6 @@
 // 8: Report the bits and bytes send as button codes
 #define STARTDEBUG 0
 
-// Modifier Function
-// Modify resulting behaviour of Joystick input values
-// DISCLAIMER: This should be at level 0 when starting the calibration!
-// 0: linear y = x [Standard behaviour: No modification]
-// 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
-// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
-// 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
-// 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
-// Recommendation after tuning: MODFUNC 3
-#define MODFUNC 0
-
 // Second calibration: Tune Deadzone
 // Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 // Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
@@ -99,8 +88,8 @@
 // 8. You finished calibrating.
 
 // Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
-#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 };
-#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 };
+#define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 }
+#define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 }
 
 // Fourth calibration: Sensitivity
 // Independent sensitivity multiplier for each axis movement. Use degbug mode 4 or use for example your cad program to verify changes.
@@ -129,6 +118,18 @@
 #define ROTY_SENSITIVITY 1.5
 #define ROTZ_SENSITIVITY 2
 
+// Modifier Function
+// Modify resulting behaviour of spacemouse outputs the suppres small movements around zero and enforce big movements even more.
+// (This function is applied on the resulting velocities and not on the direct input from the joysticks)
+// This should be at level 0 when starting the calibration!
+// 0: linear y = x [Standard behaviour: No modification]
+// 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
+// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
+// 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
+// 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
+// Recommendation after tuning: MODFUNC 3
+#define MODFUNC 0
+
 // ------------------------------------------------------------------------------------
 // Direction
 // Modify the direction of translation/rotation depending on preference.
@@ -149,12 +150,15 @@
 
 // ------------------------------------------------------------------------------------
 // Keys Support
+// See below for examples
 // How many keys are there in total?
 #define NUMKEYS 4
 // Define the pins for the keys on the arduino
-// the first pins are reported via HID
+// KEYLIST must be empty "{ }" if NUMKEYS = 0, i.e. no key support
+// The first pins from KEYLIST may be reported via HID
 #define KEYLIST \
   { 15, 14, 16, 10 }
+
 // How many keys reported?
 #define NUMHIDKEYS 4
 
@@ -178,22 +182,30 @@
 // #define ??   15 //  Key ?
 
 // BUTTONLIST must have the as many elemets as NUMHIDKEYS
-// The keys from KEYLIST are assigned buttons here:
-#define BUTTONLIST            \
-  {                           \
-    SM_FIT, SM_T, SM_R, SM_CA \
-  }
+// That means: BUTTONLIST must be empty "{ }" if NUMHIDKEYS = 0
+// The keys from KEYLIST are assigned to buttons here:
+#define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_CA }
 // ------------------------------------------------------------------------------------
 
 // Kill-Key Feature: Are there buttons to set the translation or rotation to zero?
 // How many kill keys are there? (disabled: 0; enabled: 2)
-#define NUMKILLKEYS 2
+#define NUMKILLKEYS 0
 // usually you take the last two buttons from KEYLIST as kill-keys
 // Index of the kill key for rotation
 #define KILLROT 2
 // Index of the kill key for translation
 #define KILLTRANS 3
 // Note: Technically can report the kill-keys via HID as "usual" buttons, but that doesn't make much sense...
+
+/*  Example for NO KEYS
+ *  There are zero keys in total:  NUMKEYS 0
+ *  KEYLIST { }
+ *  NUMHIDKEYS 0
+ *  BUTTONLIST { }
+ *  NUMKILLKEYS 0
+ *  KILLROT and KILLTRANS don't matter... KILLROT 0 and KILLTRANS 0
+ */
+
 
 /*  Example for three usual buttons and no kill-keys
  *  There are three keys in total:  NUMKEYS 3
