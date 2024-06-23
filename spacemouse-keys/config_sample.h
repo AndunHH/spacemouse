@@ -189,7 +189,7 @@
 
 // Kill-Key Feature: Are there buttons to set the translation or rotation to zero?
 // How many kill keys are there? (disabled: 0; enabled: 2)
-#define NUMKILLKEYS 2
+#define NUMKILLKEYS 0
 // usually you take the last two buttons from KEYLIST as kill-keys
 // Index of the kill key for rotation
 #define KILLROT 2
