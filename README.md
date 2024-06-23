@@ -185,7 +185,7 @@ Maybe your joystick axis are named X and Y in an other orientation. That doesn't
 The calculation in this programm results in X, Y and Z calculated as shown in the middle of the picture.
 If this doesn't suit your programm change it by using the INVX or SWITCHYZ afterwards.
 
-## Cinematics
+## Kinematics
 With the axis defined as shown in the picture above, the calculations for translation and rotation are as follows:
 ```
 TRANSX = -CY + AY
