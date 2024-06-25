@@ -12,15 +12,26 @@ uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
 void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug)
 {
   uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
-  HID().SendReport(1, trans, 6);
+  static uint8_t prevTrans[6] = {0,0,0,0,0,0}; // init with zero, remember values from last function call with static
+  if (memcmp(trans, prevTrans,6)!= 0) {  // compare values to previous call
+    HID().SendReport(1, trans, 6);      // send new values
+    memcpy(prevTrans,trans,6);          // remember old values
+  }
   uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
-  HID().SendReport(2, rot, 6);
+  static uint8_t prevRot[6] = {0,0,0,0,0,0}; // init with zero, remember values from last function call with static
+  if (memcmp(rot, prevRot,6)!= 0) {
+    HID().SendReport(2, rot, 6);
+    memcpy(prevRot,rot,6);
+  }
+  
 
 #if (NUMKEYS > 0)
   static uint8_t data[HIDMAXBUTTONS / 8];     // array to be sent over hid
+  static uint8_t prevData[HIDMAXBUTTONS / 8];
   for (int i = 0; i < HIDMAXBUTTONS / 8; i++) // init or empty this array
   {
     data[i] = 0;
+    // do not fill prevData with zeros, as this would invalidate the approach to store old data
   }
 
   for (int i = 0; i < NUMHIDKEYS; i++)
@@ -45,8 +56,10 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
       }
     }
   }
-
-  HID().SendReport(3, data, HIDMAXBUTTONS / 8);
-
+  
+  if (memcmp(data, prevData,HIDMAXBUTTONS / 8) != 0) {  // compare previous and actual data
+    HID().SendReport(3, data, HIDMAXBUTTONS / 8);
+    memcpy(prevData,data,HIDMAXBUTTONS / 8);  // copy actual data to previous data
+  }
 #endif
 }
