@@ -24,7 +24,7 @@
 // header for HID emulation of the spacemouse
 #include "hidInterface.h"
 
-#if SIMAXIS > 0
+#if ROTARY_AXIS > 0
   // if an encoder wheel is used
   #include "encoderWheel.h" 
 #endif 
@@ -98,7 +98,7 @@ void setup() {
   readAllFromJoystick(centerPoints);
   delay(100);
 
-#if SIMAXIS > 0
+#if ROTARY_AXIS > 0
   initEncoderWheel();
 #endif
 }
@@ -212,7 +212,7 @@ void loop() {
     velocity[ROTZ] = 0;
   }
 
-#if SIMAXIS > 0
+#if ROTARY_AXIS > 0
   // If an encoder wheel is used, calculate the velocity of the wheel and replace one of the former calculated velocities
   calcEncoderWheel(velocity, debug);
 #endif

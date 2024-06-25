@@ -45,7 +45,7 @@
 // 6: Report velocity and keys after possible kill-key feature
 // 7: Report the frequency of the loop() -> how often is the loop() called in one second?
 // 8: Report the bits and bytes send as button codes
-// 9: Report details about the encoder wheel, if SIMAXIS > 0
+// 9: Report details about the encoder wheel, if ROTARY_AXIS > 0
 #define STARTDEBUG 0
 
 // Second calibration: Tune Deadzone
@@ -244,7 +244,7 @@
 // ENCODER WHEEL
 // Needs the encoder library by Paul Stoffregen.
 // There may be an additional encoder wheel to replace one of the velocities
-#define SIMAXIS 0 
+#define ROTARY_AXIS 0
 
 // Axis to replace with encoder
 // 0. None -> disable this feature completely
@@ -264,10 +264,11 @@
 // To calculate a velocity from the encoder position, the output is faded over so many loop() iterations, as defined in #ECHOES
 // Small number = short duration of zooming <-> Big Number = longer duration of zooming
 // Compare this number with the update frequency of the script, reported by debug=7:
-//    If ECHOES is ca. frequency: the zoom is faded for 1 second.
+//    If ECHOES = frequency: the zoom is faded for 1 second.
 #define ECHOES 200      
 
 // Strength of the simulated pull
-// Recommended range: 0 - 500
+// Recommended range: 0 - 350
+// Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h 
 // Recommended strength = 200
 #define SIMSTRENGTH 200

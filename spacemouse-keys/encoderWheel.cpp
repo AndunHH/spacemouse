@@ -30,7 +30,7 @@ void initEncoderWheel()
 }
 
 /// @brief Calculate the encoder wheel and update the result in the velocity array
-/// @param velocity Array with the velocity, which gets updated at position SIMAXIS-1
+/// @param velocity Array with the velocity, which gets updated at position ROTARY_AXIS-1
 /// @param debug Generate a debug output if debug=9
 void calcEncoderWheel(int16_t *velocity, int debug)
 {
@@ -53,9 +53,9 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         simpull = (factor * SIMSTRENGTH) / 100 * delta;
         zoomIterator++; // iterate
         // add the velocity of the encoder wheel to one of the 6 axis
-        // the SIMAXIS definition is one above the array definition used for the velocity array (see calibration.h)
-        // Therefore SIMAXIS-1 is used to change the velocity value
-        velocity[SIMAXIS - 1] = velocity[SIMAXIS - 1] + simpull;
+        // the ROTARY_AXIS definition is one above the array definition used for the velocity array (see calibration.h)
+        // Therefore ROTARY_AXIS-1 is used to change the velocity value
+        velocity[ROTARY_AXIS - 1] = velocity[ROTARY_AXIS - 1] + simpull;
     }
     else
     { 
