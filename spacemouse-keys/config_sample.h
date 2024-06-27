@@ -149,6 +149,16 @@
 #define SWITCHYZ 0  //change to true for switching movement
 
 // ------------------------------------------------------------------------------------
+// Equally sampled HID communication
+// In order to get equal results, indepent on the work load on the cpu of the mouse,
+// you can set the the following constant to send rotation and translation data in equal time steps.
+// The following constant defines a value in milliseconds how often the the data is send.
+// Key data are send on a key event, indepent of this.
+// default: 10 -> Data is sent every 10 ms = 100 Hz.
+// If set to 0: The data is sent at the fastest rate, check debug=7 for the update rate. 
+#define HIDUPDATERATE_MS 10
+
+// ------------------------------------------------------------------------------------
 // Keys Support
 // See below for examples
 // How many keys are there in total?
