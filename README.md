@@ -9,9 +9,7 @@ This repository for the source code is based on the work by [TeachingTech](https
 - [x] Semi-Automatic calibration methods
 - [x] Support for keys, that can trigger functions on your pc
 - [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
-
-Coming up:
-- [ ] Support for wheel to zoom (merging from [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/))
+- [x] Support for an encoder wheel to zoom
 
 Wanted, with unclear solution ... ?
 - [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
@@ -211,10 +209,11 @@ This code is the combination of multiple works by others:
 The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's HID SpaceMouse emulation. The four joystick logic sketch was setup for the joystick library instead of HID, so elements of this were omitted where not needed.  The outputs were jumbled no matter how Teaching Tech plugged them in, so Teaching Tech spent a lot of time adding debugging code to track exactly what was happening. On top of this, Teching Tech has added more control of speed/direction and comments/links to informative resources to try and explain what is happening in each phase.
 8. Code to include meassured min and max values for each Joystick by Daniel_1284580 (In Software Version V1 and newer)
 9. Improved code to make it more userfriendly by Daniel_1284580 (In Software Version V2 and newer)
-10. Improved Code, improved comments and added written tutorials in comments, by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/): Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
-11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, by Andun_HH.
-12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA.
-13. Coming up: Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/).
+10. Improved Code, improved comments and added written tutorials in comments, by [LivingTheDream](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch/files) Implemented new algorithm "modifier function" for better motioncontrol by Daniel_1284580 (In Software Version V3)
+11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
+12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA and AndunHH.
+13. Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/) and rewritten by AndunHH.
+
 
 # License
 Because TeachingTech published his source code on Printables under this license, it also applies here:
