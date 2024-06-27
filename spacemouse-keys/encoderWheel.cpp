@@ -9,6 +9,7 @@
 
 #include <Arduino.h>
 #include "config.h"
+#if ROTARY_AXIS > 0
 #include "encoderWheel.h"
 
 // Include Encoder library by Paul Stoffregen
@@ -73,3 +74,4 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         Serial.println(simpull);
     }
 }
+#endif // whole file is only implemented #if ROTARY_AXIS > 0
