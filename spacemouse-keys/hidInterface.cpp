@@ -9,6 +9,7 @@ uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
 #if HIDUPDATERATE_MS > 0
 unsigned long lastHIDsentRep1 = 0; // time from millis(), when the last HID report was sent
 unsigned long lastHIDsentRep2 = 0; // time from millis(), when the last HID report was sent
+unsigned long now = 0;             // time from millis()
 #endif
 
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier.
@@ -18,13 +19,37 @@ unsigned long lastHIDsentRep2 = 0; // time from millis(), when the last HID repo
 // returns true, if new data was sent
 bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug)
 {
+#if HIDUPDATERATE_MS > 0
+  now = millis();
+#endif
+
+#if JIGGLEVALUES > 0
+  // Manipulate the non-zero values a little bit, see more details in config.h
+  static boolean jiggle;
+#endif
+
   bool hasSentNewData = false;
   uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
 
-#if HIDUPDATERATE_MS > 0 // send new data only every HIDUPDATERATE_MS ms
-  if (millis() - lastHIDsentRep1 > HIDUPDATERATE_MS)
+#if HIDUPDATERATE_MS > 0
+  // send new data every HIDUPDATERATE_MS
+  // send zero data only every HIDUPDATERATESLOW_MS
+  if (((x != 0 || y != 0 || z != 0) && (now - lastHIDsentRep1 > HIDUPDATERATE_MS)) || (now - lastHIDsentRep1 > HIDUPDATERATESLOW_MS))
   {
-    lastHIDsentRep1 = millis();
+#if JIGGLEVALUES > 0
+    // check, if the translation data shall be jiggled, if they are not zero
+    if (jiggle)
+    { // jiggling is only done every second send
+      for (int i = 0; i < 5; i = i + 2)
+      {
+        if (trans[i] != 0)
+        {
+          trans[i] = trans[i] ^ ((uint8_t)1); // toggle the smallest bit
+        }
+      }
+    }
+#endif
+    lastHIDsentRep1 = now;
     HID().SendReport(1, trans, 6); // send new values
     hasSentNewData = true;         // return value
   }
@@ -35,10 +60,25 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 
   uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
 
-#if HIDUPDATERATE_MS > 0 // send new data only every HIDUPDATERATE_MS ms
-  if (millis() - lastHIDsentRep2 > HIDUPDATERATE_MS)
+#if HIDUPDATERATE_MS > 0
+  // send new data every HIDUPDATERATE_MS
+  // send zero data only every HIDUPDATERATESLOW_MS
+  if (((rx != 0 || ry != 0 || rz != 0) && (now - lastHIDsentRep2 > HIDUPDATERATE_MS)) || (now - lastHIDsentRep2 > HIDUPDATERATESLOW_MS))
   {
-    lastHIDsentRep2 = millis();
+#if JIGGLEVALUES > 0
+    // check, if the rotation data shall be jiggled, if they are not zero
+    if (jiggle)
+    { // jiggling is only done every second send
+      for (int i = 0; i < 5; i = i + 2)
+      {
+        if (rot[i] != 0)
+        {
+          rot[i] = rot[i] ^ ((uint8_t)1); // toggle the smalles bit
+        }
+      }
+    }
+#endif
+    lastHIDsentRep2 = now;
     HID().SendReport(2, rot, 6);
     hasSentNewData = true; // return value
   }
@@ -86,5 +126,13 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     hasSentNewData = true;                     // return value
   }
 #endif
+#if JIGGLEVALUES > 0
+  if (hasSentNewData)
+  {
+    // Toogle the jiggle flag
+    jiggle = !jiggle;
+  }
+#endif
+
   return hasSentNewData;
 }
