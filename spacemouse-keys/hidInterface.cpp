@@ -4,8 +4,11 @@
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "HID.h"
 
+#if (NUMKEYS > 0)
 // Array with the bitnumbers, which should be assign keys to buttons
 uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
+#endif
+
 #if HIDUPDATERATE_MS > 0
 unsigned long lastHIDsentRep = 0; // time from millis(), when the last HID report was sent
 unsigned long now = 0;            // time from millis()
@@ -103,6 +106,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     hasSentNewData = true;                     // return value
   }
 #endif
+
 #if JIGGLEVALUES > 0
   if (hasSentNewData)
   {

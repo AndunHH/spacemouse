@@ -72,11 +72,11 @@
 //--------------------------------
 //  AX+:         | AX-:
 //  AY+:         | AY-:
-//  BX+:         | BY-:
+//  BX+:         | BX-:
 //  BY+:         | BY-:
-//  CX+:         | CY-:
+//  CX+:         | CX-:
 //  CY+:         | CY-:
-//  DX+:         | DY-:
+//  DX+:         | DX-:
 //  DY+:         | DY-:
 //
 // 3. (a) Start out with AX (positive Values)
@@ -88,7 +88,7 @@
 // 7. Write all the negative Values starting from the top into the Array minValues
 // 8. You finished calibrating.
 
-// Insert measured Values like this: {AX,AY,BX,BY,CY,CY,DX,DY}.
+// Insert measured Values like this: {AX,AY,BX,BY,CX,CY,DX,DY}.
 #define MINVALS { -512, -512, -512, -512, -512, -512, -512, -512 }
 #define MAXVALS { +512, +512, +512, +512, +512, +512, +512, +512 }
 
