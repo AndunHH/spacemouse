@@ -150,6 +150,31 @@
 #define SWITCHYZ 0  //change to true for switching movement
 
 // ------------------------------------------------------------------------------------
+// Equally sampled HID communication
+// In order to get equal results, indepent on the work load on the cpu of the mouse,
+// you can set the the following constant to send rotation and translation data in equal time steps.
+// The following constant defines a value in milliseconds how often the the data is send.
+// Key data are send on a key event, indepent of this.
+// default: 10 -> Data is sent every 10 ms = 100 Hz.
+// If set to 0: The data is sent at the fastest rate, check debug=7 for the update rate. 
+#define HIDUPDATERATE_MS 10
+
+// If the mouse it not touched, the zero movements will be send with the slower update rate
+// suggestion: 500 ms
+#define HIDUPDATERATESLOW_MS 500
+
+// ------------------------------------------------------------------------------------
+// Repeat values for spacenavd 
+// This is only for users who you are running the spacenavd daemon to emulate the 3dConnexion driver under linux.
+// In Freecad the model stays still, if no new values are sent, even if the mouse is off-center.
+// In general, spacenavd introduced the auto-repeat intervall.
+// Unfortunately, the movement never came back to zero, see:
+// https://github.com/FreeSpacenav/spacenavd/issues/108
+// Users without this problem shall leave this disabled (=0)!
+// Users on windows shall disable this feature -> default = 0
+#define JIGGLEVALUES 0
+
+// ------------------------------------------------------------------------------------
 // Keys Support
 // See below for examples
 // How many keys are there in total?

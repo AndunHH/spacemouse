@@ -48,4 +48,4 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xC0,
     0xC0};
 
-    void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
+    bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
