@@ -4,8 +4,10 @@
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "HID.h"
 
+#if (NUMKEYS > 0)
 // Array with the bitnumbers, which should be assign keys to buttons
 uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
+#endif
 
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
