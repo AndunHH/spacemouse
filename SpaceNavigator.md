@@ -36,13 +36,35 @@ Turning LED off:
 `04 00`
 
 ## Timing of the data sent
-Report Id 1 for translation is sent and 8 ms later Report Id 2 for rotation.
-This leads to 125 packages per second with alternating report id.
+Report Id 1 for translation is sent.
+8 ms later Report Id 2 for rotation is sent.
+If keys are pressed: After 8 ms Report Id 3 is sent. Otherwise this is skipped and after 8 ms it restarts with Report Id 1.
 
-After the last package with non-zero data, three double-packages are sent afterwards.
+This leads to a constant rate of 125 packages per second with alternating report id, as long there non-zero data.
 
+After the last package with non-zero data, translation and rotation and sent three times with only zeros and in the steady 8 ms intervall.
 
-## HID Descriptor 
+## Device Descriptor
+```
+DEVICE DESCRIPTOR
+    bLength: 18
+    bDescriptorType: 0x01 (DEVICE)
+    bcdUSB: 0x0200
+    bDeviceClass: Device (0x00)
+    bDeviceSubClass: 0
+    bDeviceProtocol: 0 (Use class code info from Interface Descriptors)
+    bMaxPacketSize0: 8
+    idVendor: Logitech, Inc. (0x046d)
+    idProduct: 3Dconnexion Space Navigator 3D Mouse (0xc626)
+    bcdDevice: 0x0435
+    iManufacturer: 1
+    iProduct: 2
+    iSerialNumber: 0
+    bNumConfigurations: 1
+```
+
+## HID Report 
+Decoded with https://eleccelerator.com/usbdescreqparser/
 ```
 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 0x09, 0x08,        // Usage (Multi-axis Controller)
