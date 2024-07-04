@@ -2,8 +2,7 @@
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
 // hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
-// Altered physical, logical range to ranges the 3DConnexion software expects by Daniel_1284580.
-#define HIDMAXBUTTONS 24 // was 32 by Daniel_1284580, but 24 in the comment... must be multiple of 8!
+#define HIDMAXBUTTONS 24 // must be multiple of 8!
 
 static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x05, 0x01,          // Usage Page (Generic Desktop)
@@ -20,7 +19,8 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x09, 0x32,          // Usage (Z)
     0x75, 0x10,          // Report Size (16)
     0x95, 0x03,          // Report Count (3)
-    0x81, 0x02,          // Input (variable,absolute)
+    //0x81, 0x02,          // Input (variable,absolute) // original Space Mouse Pro (wireless) reports it values as absolute
+    0x81, 0x06,        //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position) // copied from Space Navigator to avoid the need for jiggling
     0xC0,                // End Collection
     0xa1, 0x00,          // Collection (Physical)
     0x85, 0x02,          // Report ID (2)
@@ -33,7 +33,8 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x09, 0x35,          // Usage (RZ)
     0x75, 0x10,          // Report Size (16)
     0x95, 0x03,          // Report Count (3)
-    0x81, 0x02,          // Input (variable,absolute)
+    //0x81, 0x02,          // Input (variable,absolute)     // see above
+    0x81, 0x06,        //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position) // see above
     0xC0,                // End Collection
     0xa1, 0x00,          // Collection (Physical)
     0x85, 0x03,          //  Report ID (3)
