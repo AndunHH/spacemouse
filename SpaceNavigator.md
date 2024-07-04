@@ -199,3 +199,92 @@ Decoded with https://eleccelerator.com/usbdescreqparser/
 00c0   c0 a1 02 85 0b 09 26 95 01 b1 02 c0 a1 02 85 13   ......&.........
 00d0   09 2e 95 01 b1 02 c0 c0 c0                        .........
 ```
+
+# Other related stuff
+## About relative and absolute input data
+[Full discussion](https://github.com/FreeSpacenav/spacenavd/issues/108)
+> When I wrote the first version of spacenavd, I only had a space navigator, and the first version of spacenavd only worked with "relative" inputs because that was what the space navigator emitted. I'm saying "relative" in quotes because they weren't really relative, they were just reported as such, but the values were always absolute displacements per axis. 3Dconnexion probably realized at some stage that reporting them as "relative" is incorrect, and changed to absolute in newer devices. 
+>
+> I'm pretty sure all modern 3Dconnexion devices report absolute axis usage.
+
+
+
+> The original Space Navigator reports it's data as relative positions. The original Space Navigator is very sensitive and is jiggling a lot i.e. the same value is only send repeatedly very for some milli-seconds.
+>
+> My emulated "SpaceMouse Pro Wireless (cabled)" (or at least our inherited) hid report descriptor reports absolute values
+Our emulation is very sturdy and if you hold it in position, the same value are easily calculate for a second.
+>
+> When using spacenavd and the simple example, cube or even in FreeCAD:
+>
+>Relative reports are evaluated with every event, even if they are the same as before.
+Absolute reports are only evaluated, if they differ from the previous report. This is merely visible with the SpaceNavigator, but is very annoying for our emulation, as it is reporting same values very often. I didn't figured out, if this dropping of events is done by spacenavd or linux itself...
+
+> Solution: Change our emulated mouse to Relative Positions, even if this is not "up to date". But it avoids the necessity to jiggle the values.
+
+
+
+## HID descriptor of a spacemouse wireless
+Taken from [here](https://pastebin.com/GD5mEKW6)
+```
+$ sudo usbhid-dump -d 256f:c62e
+001:011:000:DESCRIPTOR         1667648810.573469
+ 05 01 09 08 A1 01 A1 00 85 01 16 A2 FE 26 5E 01
+ 36 88 FA 46 78 05 55 0C 65 11 09 30 09 31 09 32
+ 09 33 09 34 09 35 75 10 95 06 81 02 C0 A1 02 85
+ 03 05 01 05 09 19 01 29 02 15 00 25 01 35 00 45
+ 01 75 01 95 02 81 02 95 0E 81 03 C0 A1 02 85 04
+ 05 08 09 4B 15 00 25 01 95 01 75 01 91 02 95 01
+ 75 07 91 03 C0 A1 02 85 17 15 00 25 64 55 00 65
+ 00 05 06 09 20 75 08 95 01 81 02 15 00 25 01 06
+ 00 FF 09 27 75 01 95 01 81 02 75 07 81 03 C0 06
+ 00 FF 09 01 A1 02 15 80 25 7F 75 08 09 3A A1 02
+ 85 05 09 20 95 01 B1 02 C0 A1 02 85 06 09 21 95
+ 01 B1 02 C0 A1 02 85 07 09 22 95 01 B1 02 C0 A1
+ 02 85 08 09 23 95 07 B1 02 C0 A1 02 85 09 09 24
+ 95 07 B1 02 C0 A1 02 85 0A 09 25 95 07 B1 02 C0
+ A1 02 85 0B 09 26 95 01 B1 02 C0 A1 02 85 13 09
+ 2E 95 01 B1 02 C0 A1 02 85 19 09 31 95 04 B1 02
+ C0 A1 02 85 1A 09 32 95 07 B1 02 C0 C0 C0
+ 
+Parsed relevant sections:
+0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+0x09, 0x08,        // Usage (Multi-axis Controller)
+0xA1, 0x01,        // Collection (Application)
+0xA1, 0x00,        //   Collection (Physical)
+0x85, 0x01,        //     Report ID (1)
+0x16, 0xA2, 0xFE,  //     Logical Minimum (-350)
+0x26, 0x5E, 0x01,  //     Logical Maximum (350)
+0x36, 0x88, 0xFA,  //     Physical Minimum (-1400)
+0x46, 0x78, 0x05,  //     Physical Maximum (1400)
+0x55, 0x0C,        //     Unit Exponent (-4)
+0x65, 0x11,        //     Unit (System: SI Linear, Length: Centimeter)
+0x09, 0x30,        //     Usage (X)
+0x09, 0x31,        //     Usage (Y)
+0x09, 0x32,        //     Usage (Z)
+0x09, 0x33,        //     Usage (Rx)
+0x09, 0x34,        //     Usage (Ry)
+0x09, 0x35,        //     Usage (Rz)
+0x75, 0x10,        //     Report Size (16)
+0x95, 0x06,        //     Report Count (6)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              //   End Collection
+ 
+0xA1, 0x02,        //   Collection (Logical)
+0x85, 0x03,        //     Report ID (3)
+0x05, 0x01,        //     Usage Page (Generic Desktop Ctrls)
+0x05, 0x09,        //     Usage Page (Button)
+0x19, 0x01,        //     Usage Minimum (0x01)
+0x29, 0x02,        //     Usage Maximum (0x02)
+0x15, 0x00,        //     Logical Minimum (0)
+0x25, 0x01,        //     Logical Maximum (1)
+0x35, 0x00,        //     Physical Minimum (0)
+0x45, 0x01,        //     Physical Maximum (1)
+0x75, 0x01,        //     Report Size (1)
+0x95, 0x02,        //     Report Count (2)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x95, 0x0E,        //     Report Count (14)
+0x81, 0x03,        //     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              //   End Collection
+ 
+it goes on with LED control, battery indicators and so on...
+```
