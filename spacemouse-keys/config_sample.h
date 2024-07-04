@@ -150,17 +150,6 @@
 #define SWITCHYZ 0  //change to true for switching movement
 
 // ------------------------------------------------------------------------------------
-// Repeat values for spacenavd 
-// This is only for users who you are running the spacenavd daemon to emulate the 3dConnexion driver under linux.
-// In Freecad the model stays still, if no new values are sent, even if the mouse is off-center.
-// In general, spacenavd introduced the auto-repeat intervall.
-// Unfortunately, the movement never came back to zero, see:
-// https://github.com/FreeSpacenav/spacenavd/issues/108
-// Users without this problem shall leave this disabled (=0)!
-// Users on windows shall disable this feature -> default = 0
-#define JIGGLEVALUES 0
-
-// ------------------------------------------------------------------------------------
 // Keys Support
 // See below for examples
 // How many keys are there in total?
