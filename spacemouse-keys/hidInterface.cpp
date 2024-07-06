@@ -10,13 +10,14 @@
 // little state machine to track, which report to send next
 enum States
 {
+  ST_INIT,      // init variables
   ST_START,     // start to check if something is to be sent
   ST_SENDTRANS, // send translations
   ST_SENDROT,   // send rotations
   ST_SENDKEYS   // send keys
 };
 
-States nextState = ST_START; // init state machine with start state
+States nextState = ST_INIT; // init state machine with init state
 
 #if (NUMKEYS > 0)
 // Array with the bitnumbers, which should assign keys to buttons
@@ -28,6 +29,8 @@ void prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug);
 uint8_t countTransZeros = 0; // count how many times, the zero data has been sent
 uint8_t countRotZeros = 0;
 
+unsigned long lastHIDsentRep; // time from millis(), when the last HID report was sent
+
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol
 // Three sets of data are sent: translation, rotation and key events
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
@@ -36,10 +39,7 @@ uint8_t countRotZeros = 0;
 // A HID report may be sent every HIDUPDATERATE_MS, which should be 8 ms
 bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug)
 {
-  static unsigned long now = 0; // time from millis()
-  now = millis();
-
-  static unsigned long lastHIDsentRep = now; // time from millis(), when the last HID report was sent
+  unsigned long now = millis();
 
   bool hasSentNewData = false; // this value will be returned
 
@@ -51,6 +51,11 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 
   switch (nextState) // state machine
   {
+  case ST_INIT:
+    // init the variables
+    lastHIDsentRep = now;
+    nextState = ST_START;
+  break;
   case ST_START:
     // Evaluate everytime, without waiting for 8ms
     if (countTransZeros < 3 || countRotZeros < 3 || (x != 0 || y != 0 || z != 0 || rx != 0 || ry != 0 || rz != 0))
@@ -70,7 +75,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
         nextState = ST_SENDKEYS;
       }
 #endif
-      if (nextState == ST_START && (now - lastHIDsentRep >= HIDUPDATERATE_MS))
+      if (nextState == ST_START && IsNewHidReportDue(now))
       {
         // if we are not leaving the start state and
         // we are waiting here for more than the update rate,
@@ -81,7 +86,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     break;
   case ST_SENDTRANS:
     // send translation data, if the 8 ms from the last hid report have past
-    if (now - lastHIDsentRep >= HIDUPDATERATE_MS)
+    if (IsNewHidReportDue(now))
     {
       uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
       HID().SendReport(1, trans, 6); // send new translational values
@@ -102,7 +107,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     break;
   case ST_SENDROT:
     // send rotational data, if the 8 ms from the last hid report have past
-    if (now - lastHIDsentRep >= HIDUPDATERATE_MS)
+    if (IsNewHidReportDue(now))
     {
       uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
       HID().SendReport(2, rot, 6);
@@ -138,7 +143,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 #if (NUMKEYS > 0)
   case ST_SENDKEYS:
     // report the keys, if the 8 ms since the last report have past
-    if (now - lastHIDsentRep >= HIDUPDATERATE_MS)
+    if (IsNewHidReportDue(now))
     {
       HID().SendReport(3, keyData, HIDMAXBUTTONS / 8);
       lastHIDsentRep += HIDUPDATERATE_MS;
@@ -191,3 +196,10 @@ void prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug)
   }
 }
 #endif
+
+// check if a new HID report shall be send
+bool IsNewHidReportDue(unsigned long now) {
+  // calculate the difference between now and the last time it was sent
+  // such a difference calculation is safe with regard to integer overflow after 48 days 
+  return (now - lastHIDsentRep >= HIDUPDATERATE_MS);
+}
