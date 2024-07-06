@@ -37,6 +37,7 @@
 // -1: Debugging off. Set to this once everything is working.
 // 0: Debugging level doesn't change
 // 1: Output raw joystick values. 0-1023 raw ADC 10-bit values
+// 11: Calibrate / Zero the spacemouse. (This is also done on every startup in the setup())
 // 2: Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
 // 20: semi-automatic min-max calibration
 // 3: Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.

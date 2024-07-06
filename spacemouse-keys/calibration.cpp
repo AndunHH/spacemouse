@@ -179,7 +179,56 @@ void updateFrequencyReport() {
     Serial.print("Frequency: ");
     Serial.print(iterationsPerSecond);
     Serial.println(" Hz");
-    lastFrequencyUpdate = millis();  // reset timer
-    iterationsPerSecond = 0;         // reset iteration counter
+    lastFrequencyUpdate = millis(); // reset timer
+    iterationsPerSecond = 0;        // reset iteration counter
+  }
+}
+
+// this function zeros the space mouse
+// It's blocking other functions in the meantime
+// set debugFlag=true for result on the serial console
+boolean busyZeroing(int *centerPoints, boolean debugFlag)
+{
+  if (debugFlag == true)
+  {
+    Serial.println(F("Zeroing Joysticks..."));
+  }
+  int act[8]; // actual value
+  uint32_t mean[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+  uint8_t count;
+  for (count = 0; count < 100; count++)
+  {
+    readAllFromJoystick(act);
+    for (uint8_t i = 0; i < 8; i++)
+    {
+
+      mean[i] = mean[i] + act[i];
+    }
+  }
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    centerPoints[i] = mean[i] / count;
+  }
+  if (debugFlag)
+  {
+    for (int i = 0; i < 8; i++)
+    {
+      Serial.print(axisNames[i]);
+      Serial.println(centerPoints[i]);
+    }
+  }
+  return true;
+}
+
+// define an array for reading the analog pins of the joysticks
+int pinList[8] = PINLIST;
+
+// Function to read and store analogue voltages for each joystick axis.
+void readAllFromJoystick(int *rawReads)
+{
+  for (int i = 0; i < 8; i++)
+  {
+    rawReads[i] = analogRead(pinList[i]);
   }
 }
