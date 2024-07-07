@@ -158,7 +158,7 @@ Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.c
 5. We calculate the translation and rotation based on this.
 6. Applying the modifiers to minimize very small rotations or translations.
 7. Kill, swap or invert movements
-8. Sending the velocities and keys to the PC
+8. Sending the velocities and keys to the PC, see also  [SpaceNavigator.md](SpaceNavigator.md) for further details about the emulated USB HID.
 
 # Printed parts
 There are many parts and remixes available. A very good starting point is the Part [Open source SpaceMouse - Space Mushroom remix](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) by Teaching Tech. Check out the many remixes, especially if you want to use other joysticks modules!

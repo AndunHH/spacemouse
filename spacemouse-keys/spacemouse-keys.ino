@@ -41,6 +41,7 @@ int centerPoints[8];
 int keyVals[NUMKEYS];
 // final value of the keys, after debouncing
 uint8_t keyOut[NUMKEYS];
+uint8_t keyState[NUMKEYS];
 
 //Modifier Functions
 int modifierFunction(int x) {
@@ -234,7 +235,7 @@ void loop() {
 #endif
 
 #if NUMKEYS > 0
-  evalKeys(keyVals, keyOut);
+  evalKeys(keyVals, keyOut, keyState);
 #endif
 
   if (debug == 4) {
@@ -271,10 +272,10 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
 #if SWITCHYZ > 0
   // Original from TT, but 3DConnextion tutorial will not work:
-  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyOut, debug);
+  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyState, debug);
 #else
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyOut, debug);
+  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
 #endif
   
   if (debug == 7) {
