@@ -86,8 +86,10 @@ void setup() {
   delay(100);
   Serial.setTimeout(2);  // the serial interface will look for new debug values and it will only wait 2ms
   // Read idle/centre positions for joysticks.
-  delay(100); 
-  busyZeroing(centerPoints, false);
+  
+  // zero the joystick position 500 times (takes approx. 480 ms)
+  // during setup() we are not interested in the debug output: debugFlag = false
+  busyZeroing(centerPoints, 500, false);
 
 #if ROTARY_AXIS > 0
   initEncoderWheel();
@@ -132,7 +134,8 @@ void loop() {
   if (debug == 11)
   {
     // calibrate the joystick
-    busyZeroing(centerPoints, true);
+    // if called on purpose with debug=11, increase the number of iterations from the usual 500.
+    busyZeroing(centerPoints, 1000, true);
     debug = -1; // this only done once
   }
 

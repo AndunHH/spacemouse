@@ -35,10 +35,8 @@ bool isDebugOutputDue();
 // update and report the function to learn at what frequency the loop is running
 void updateFrequencyReport();
 
-// this function zeros the space mouse
-// It's blocking other functions in the meantime
-// set debugFlag=true for result on the serial console
-boolean busyZeroing(int *centerPoints, boolean debugFlag);
+// Calibrate (=zero) the space mouse
+bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag);
 
 // Function to read and store analogue voltages for each joystick axis.
 void readAllFromJoystick(int *rawReads);
