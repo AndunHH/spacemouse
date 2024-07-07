@@ -134,8 +134,8 @@ void loop() {
   if (debug == 11)
   {
     // calibrate the joystick
-    // if called on purpose with debug=11, increase the number of iterations from the usual 500.
-    busyZeroing(centerPoints, 1000, true);
+    // As this is called in the debug=11, we do more iterations.
+    busyZeroing(centerPoints, 2000, true);
     debug = -1; // this only done once
   }
 
