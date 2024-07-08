@@ -271,3 +271,19 @@
 // Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h 
 // Recommended strength = 200
 #define SIMSTRENGTH 200
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Advanced HID settings
+// ADV_HID_REL and ADV_HID_JIGGLE change how the values are reported over HID protocoll, see hidInterface.cpp and .h
+// For windows users: DON'T CHANGE / ENABLE THIS.
+// For linux: 
+// Absolute declaration: Avoid left over values from previous motions. 
+//        But equal, non-zero movements are not reported -> fix with jiggling
+// Relative declaration: If the space mouse didn't return to zero in one axis,
+//        this axis will still report movement, when another direction is pushed.
+//        Values are reported with every report, even without jiggling. 
+// Jiggling to change the last bit to resend the value with every step
+// Suggestion for spacenavd user: #define ADV_HID_JIGGLE
+
+//define ADV_HID_REL 
+//define ADV_HID_JIGGLE

@@ -49,13 +49,20 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   prepareKeyBytes(keys, keyData, debug);         // sort the bytes from keys into the bits in keyData
 #endif
 
+#ifdef ADV_HID_JIGGLE
+  static bool toggleValue;
+#endif
+
   switch (nextState) // state machine
   {
   case ST_INIT:
     // init the variables
     lastHIDsentRep = now;
     nextState = ST_START;
-  break;
+  #ifdef ADV_HID_JIGGLE
+    toggleValue = false;
+  #endif
+break;
   case ST_START:
     // Evaluate everytime, without waiting for 8ms
     if (countTransZeros < 3 || countRotZeros < 3 || (x != 0 || y != 0 || z != 0 || rx != 0 || ry != 0 || rz != 0))
@@ -89,6 +96,11 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     if (IsNewHidReportDue(now))
     {
       uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
+
+#ifdef ADV_HID_JIGGLE
+      jiggleValues(trans, toggleValue); // toggle the last bit
+#endif
+
       HID().SendReport(1, trans, 6); // send new translational values
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
@@ -110,6 +122,12 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
     if (IsNewHidReportDue(now))
     {
       uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
+  
+#ifdef ADV_HID_JIGGLE
+      jiggleValues(rot, toggleValue);  // toggle the last bit
+      toggleValue ^= true; // toggle it
+#endif
+
       HID().SendReport(2, rot, 6);
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
@@ -202,4 +220,20 @@ bool IsNewHidReportDue(unsigned long now) {
   // calculate the difference between now and the last time it was sent
   // such a difference calculation is safe with regard to integer overflow after 48 days 
   return (now - lastHIDsentRep >= HIDUPDATERATE_MS);
+}
+
+// function to set jiggle the values, if they are not zero.
+// jiggline means to set the last bit to zero or one, depending on lastBit
+bool jiggleValues(uint8_t val[6], bool lastBit) {
+  for (uint8_t i=0; i<6; i=i+2) {
+    if ((val[i]!=0 || val [i+1] != 0) && lastBit) {
+      // value is not zero, set last bit to one
+      val[i] = val[i] | 1;
+    }
+    else { 
+		// value is zero at all, or the last bit is forced to zero
+      val[i] = val[i] & (0xFE);
+    }
+  }
+  return true;
 }
