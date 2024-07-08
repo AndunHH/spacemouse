@@ -211,11 +211,8 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
   start = millis();
 
   uint16_t count;
-  // Iterate over MAXCOUNT iterations. make sure, the 16 bit integer from readAllFromJoystick() always fits into 32 bit mean.
-  // => MAXCOUNT shall be less than 65000
-#define MAXCOUNT 500
 
-  for (count = 0; count < MAXCOUNT; count++)
+  for (count = 0; count < numIterations; count++)
   {
     readAllFromJoystick(act);
     for (uint8_t i = 0; i < 8; i++)
