@@ -166,26 +166,25 @@
 
 // In order to define which key is assigned to which button, the following list must be entered in the BUTTONLIST below
 
-// #define ??     0  // Key ?
-#define SM_FIT 1 // Key "Fit"
-#define SM_T 2   // Key "T" top
-// #define ??     3  // Key ?
-#define SM_R 4 // Key "R" right
-#define SM_F 5 // Key "F" Front
-// #define ??     6  // Key ?
-// #define ??     7  // Key ?
-#define SM_CA 8 // Key Rotate 90° ("ca = cube with arrow")
-// #define ??     9  // Key ?
-// #define ??     10 // Key ?
-// #define ??     11 // Key ?
-#define SM_4 12 // Key "4" sketch
-// #define ??     13 // Key ?
-#define SM_3 14 // Key "3" Partools
-// #define ??   15 //  Key ?
+#define SM_MENU     0 // Key "Menu"
+#define SM_FIT      1 // Key "Fit"
+#define SM_T        2 // Key "Top"
+#define SM_R        4 // Key "Right"
+#define SM_F        5 // Key "Front"
+#define SM_RCW      8 // Key "Roll 90°CW"
+#define SM_1        12 // Key "1" 
+#define SM_2        13 // Key "2" 
+#define SM_3        14 // Key "3" 
+#define SM_4        15 // Key "4"
+#define SM_ESC      22 // Key "ESC"
+#define SM_ALT      23 // Key "ALT"
+#define SM_SHFT     24 // Key "SHIFT"
+#define SM_CTRL     25 // Key "CTRL"
+#define SM_ROT      26 // Key "Rotate" 
 
 // BUTTONLIST must have the as many elemets as NUMHIDKEYS
 // The keys from KEYLIST are assigned to buttons here:
-#define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_CA }
+#define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_RCW }
 
 // ------------------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
 // hidReportDescriptor webpage can be found here: https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/
-#define HIDMAXBUTTONS 24 // must be multiple of 8!
+#define HIDMAXBUTTONS 32 // must be multiple of 8!
 
 static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x05, 0x01,          // Usage Page (Generic Desktop)
