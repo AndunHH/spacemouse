@@ -50,7 +50,7 @@ bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 #endif
 
 #ifdef ADV_HID_JIGGLE
-  static bool toggleValue;
+  static bool toggleValue;  // variable to track if values shall be jiggled or not
 #endif
 
   switch (nextState) // state machine
@@ -98,7 +98,8 @@ break;
       uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
 
 #ifdef ADV_HID_JIGGLE
-      jiggleValues(trans, toggleValue); // toggle the last bit
+      jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
+      // the toggleValue is toggled after sending the rotations, down below
 #endif
 
       HID().SendReport(1, trans, 6); // send new translational values
@@ -124,8 +125,8 @@ break;
       uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
   
 #ifdef ADV_HID_JIGGLE
-      jiggleValues(rot, toggleValue);  // toggle the last bit
-      toggleValue ^= true; // toggle it
+      jiggleValues(rot, toggleValue);  // jiggle the non-zero values, if toggleValue is true
+      toggleValue ^= true; // toggle the indicator to jiggle only every second report send
 #endif
 
       HID().SendReport(2, rot, 6);
@@ -222,8 +223,10 @@ bool IsNewHidReportDue(unsigned long now) {
   return (now - lastHIDsentRep >= HIDUPDATERATE_MS);
 }
 
-// function to set jiggle the values, if they are not zero.
-// jiggline means to set the last bit to zero or one, depending on lastBit
+#ifdef ADV_HID_JIGGLE
+// function to add jiggle to the values, if they are not zero.
+// jiggle means to set the last bit to zero or one, depending on the parameter lastBit
+// lastBit shall be toggled between true and false between repeating calls
 bool jiggleValues(uint8_t val[6], bool lastBit) {
   for (uint8_t i=0; i<6; i=i+2) {
     if ((val[i]!=0 || val [i+1] != 0) && lastBit) {
@@ -231,9 +234,10 @@ bool jiggleValues(uint8_t val[6], bool lastBit) {
       val[i] = val[i] | 1;
     }
     else { 
-		// value is zero at all, or the last bit is forced to zero
+		// value is already zero and needs not jiggling, or the last bit shall be forced to zero
       val[i] = val[i] & (0xFE);
     }
   }
   return true;
 }
+#endif
