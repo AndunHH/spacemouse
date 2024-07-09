@@ -34,3 +34,9 @@ bool isDebugOutputDue();
 
 // update and report the function to learn at what frequency the loop is running
 void updateFrequencyReport();
+
+// Calibrate (=zero) the space mouse
+bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag);
+
+// Function to read and store analogue voltages for each joystick axis.
+void readAllFromJoystick(int *rawReads);

@@ -72,16 +72,6 @@ int modifierFunction(int x) {
   return (int)round(result);
 }
 
-// define an array for reading the analog pins of the joysticks
-int pinList[8] = PINLIST;
-
-// Function to read and store analogue voltages for each joystick axis.
-void readAllFromJoystick(int *rawReads) {
-  for (int i = 0; i < 8; i++) {
-    rawReads[i] = analogRead(pinList[i]);
-  }
-}
-
 void setup() {
 // setup the keys e.g. to internal pull-ups
 #if NUMKEYS > 0
@@ -96,8 +86,10 @@ void setup() {
   delay(100);
   Serial.setTimeout(2);  // the serial interface will look for new debug values and it will only wait 2ms
   // Read idle/centre positions for joysticks.
-  readAllFromJoystick(centerPoints);
-  delay(100);
+  
+  // zero the joystick position 500 times (takes approx. 480 ms)
+  // during setup() we are not interested in the debug output: debugFlag = false
+  busyZeroing(centerPoints, 500, false);
 
 #if ROTARY_AXIS > 0
   initEncoderWheel();
@@ -114,7 +106,6 @@ int minVals[8] = MINVALS;
 int maxVals[8] = MAXVALS;
 
 int tmpInput;  // store the value, the user might input over the serial
-
 
 void loop() {
   //check if the user entered a debug mode via serial interface
@@ -138,6 +129,14 @@ void loop() {
   // Report back 0-1023 raw ADC 10-bit values if enabled
   if (debug == 1) {
     debugOutput1(rawReads, keyVals);
+  }
+
+  if (debug == 11)
+  {
+    // calibrate the joystick
+    // As this is called in the debug=11, we do more iterations.
+    busyZeroing(centerPoints, 2000, true);
+    debug = -1; // this only done once
   }
 
   // Subtract centre position from measured position to determine movement.
