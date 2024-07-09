@@ -4,10 +4,9 @@ This page contains informations about a 3Dconnexion SpaceNavigator, which has be
 `sudo modprobe usbmon` 
 `sudo wireshark`
 
-
 Test on update rate of the spacemouse with wireshark and spacenavd on ubuntu. src 1.8.1
 
-## Data transmitted
+## Data transmitted by Space Navigator
 First package: (no translation seen here)
 `01 00 00 00 00 00 00`
 
@@ -35,7 +34,7 @@ If in spnavcfg the LED is turned on, the host sends to 1.8.2
 Turning LED off:
 `04 00`
 
-## Timing of the data sent
+## Timing of the data sent by Space Navigator
 Report Id 1 for translation is sent.
 8 ms later Report Id 2 for rotation is sent.
 If keys are pressed: After 8 ms Report Id 3 is sent. Otherwise this is skipped and after 8 ms it restarts with Report Id 1.
@@ -44,7 +43,7 @@ This leads to a constant rate of 125 packages per second with alternating report
 
 After the last package with non-zero data, translation and rotation and sent three times with only zeros and in the steady 8 ms intervall.
 
-## Device Descriptor
+## Device Descriptor of Space Navigator
 ```
 DEVICE DESCRIPTOR
     bLength: 18
@@ -63,7 +62,7 @@ DEVICE DESCRIPTOR
     bNumConfigurations: 1
 ```
 
-## HID Report 
+## HID Report of Space Navigator
 Decoded with https://eleccelerator.com/usbdescreqparser/
 ```
 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
@@ -201,13 +200,16 @@ Decoded with https://eleccelerator.com/usbdescreqparser/
 ```
 
 # Other related stuff
+## Device List for other devices
+Check [ANTz wiki](https://github.com/openantz/antz/wiki/3D-Mouse#device-list) for a device list. 
+Interestingly, our code is not fully compliant with this list, as we use event#1 and event#2 with 6 byte, despite we are suggesting to be a SpaceMouse Pro Wireless (cabled), which has only one 12 byte event#1.
+This seems to be no problem, as our HID descriptor is declaring the values with report id#1 and id#2.
+
 ## About relative and absolute input data
 [Full discussion](https://github.com/FreeSpacenav/spacenavd/issues/108)
 > When I wrote the first version of spacenavd, I only had a space navigator, and the first version of spacenavd only worked with "relative" inputs because that was what the space navigator emitted. I'm saying "relative" in quotes because they weren't really relative, they were just reported as such, but the values were always absolute displacements per axis. 3Dconnexion probably realized at some stage that reporting them as "relative" is incorrect, and changed to absolute in newer devices. 
 >
 > I'm pretty sure all modern 3Dconnexion devices report absolute axis usage.
-
-
 
 > The original Space Navigator reports it's data as relative positions. The original Space Navigator is very sensitive and is jiggling a lot i.e. the same value is only send repeatedly very for some milli-seconds.
 >
