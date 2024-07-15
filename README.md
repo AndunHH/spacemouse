@@ -10,10 +10,11 @@ This repository for the source code is based on the work by [TeachingTech](https
 - Emulation of the USB identification and the HID interface to behave like an original space mouse
 - Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
 - Semi-Automatic calibration methods to find the correct pin outs and measurement ranges
+- Debug outputs can be requested over the serial interface during run time, see [config_sample.h](spacemouse-keys/config_sample.h#L36) 
 - Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
 - "Kill-Keys" may disable translation or rotation directly in the mouse
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
-
+- Check out the [config_sample.h](spacemouse-keys/config_sample.h) for more informations about configurable elements and extensive debug outputs
 
 Wanted features:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
