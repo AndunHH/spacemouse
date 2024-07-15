@@ -14,8 +14,10 @@ This repository for the source code is based on the work by [TeachingTech](https
 - "Kill-Keys" may disable translation or rotation directly in the mouse
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
 
-Wanted, with unclear solution ... ?
-- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
+
+Wanted features:
+- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
+
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software.
  
@@ -107,6 +109,35 @@ spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
 - Teaching Tech followed the instructions here from [nebhead](https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a) with two key differences:
 	- Changed the word 'DaemonBite' to 'Spacemouse' in all references.
   	- Changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
+#### "pins_arduino.h" not found
+[Taken from](https://github.com/AndunHH/spacemouse/issues/19#issue-2355907540)
+> Windows 11, 2.3.2 Arduino IDE, AVR 1.8.6
+>
+>I followed every setup step, but was getting complication error "pins_arduino.h" not found.
+>
+>Checked the file - indeed, not existing, even though it is imported in core
+>
+>Its the first time I interact with Arduino and I'm not sure if this was suppose to be auto copied or magic imported, but it didn't
+>
+> Copying the config from variants\leonardo (in my case, I used the board TeachingTech recommended) to version root (...avr\1.8.6) solved it
+
+#### Changes for Arduino 2.3.2
+Check this [issue](https://github.com/AndunHH/spacemouse/issues/19#issuecomment-2184967522).
+With Arduino IDE 2.3.2 and Arduino AVR board package 1.8.6 , a few changes in text pasted to boards.txt were needed
+
+```
+#spacemouse.build.variant=promicro
+spacemouse.build.variant=leonardo 
+
+#spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
+spacemouse.bootloader.file=caterina/Caterina-Leonardo.hex
+``` 
+Also SpaceMouse needs to be added to list of boards supported by Arduino AVR platform in package_index.json, so that you can select it in IDE.
+```
+        {
+          "name": "SpaceMouse"
+        },
+```
 
 ## Cloning the github repo
 Clone the github repo to your computer: Scroll-Up to the green "<> Code" Button and select, if you wish to clone or just download the code.
