@@ -1,18 +1,23 @@
 # Open Source Spacemouse with Keys
-Repository for the space mouse based on four joysticks with an addition for keys and an encoder wheel.
+Repository for a space mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". It is based on four joysticks with an addition for keys.
 
 ![overview](pictures/overview.jpg)
 
-This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). 
+This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). This is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll!
 
-## Features
-- [x] Semi-Automatic calibration methods
-- [x] Support for keys, that can trigger functions on your pc
-- [x] Support for "kill-keys", that disable translation or rotation directly in the mouse
-- [x] Support for an encoder wheel to zoom
+## Features of the space mouse
+- Source code for an Arduino Pro Micro to read four joysticks and calculate the kinematics
+- Emulation of the USB identification and the HID interface to behave like an original space mouse
+- Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
+- Semi-Automatic calibration methods to find the correct pin outs and measurement ranges
+- Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
+- "Kill-Keys" may disable translation or rotation directly in the mouse
+- An encoder wheel can be used to replace one axis and allow e.g. zooming
+
 
 Wanted features:
-- [ ] Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
+- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
+
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software.
  
@@ -224,10 +229,17 @@ ROTZ = AY + BY + CY + DY
 ```
 # See also
 
-* Another approach for the spacemouse with an esp32: https://github.com/horvatkm/space_mouse_esp32s2
+Here are some other projects with regard to space mice. The arrow indicates what is emulated 
+
+* [This repository itself](https://github.com/AndunHH/spacemouse) -> space mouse
+* [A 6 degrees of freedom mouse for CAD programs using cheap linear Hall Effect sensors for position measurement](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse) -> space mouse
+* [Orbion The OpenSource 3D Space Mouse](https://github.com/FaqT0tum/Orbion_3D_Space_Mouse) -> Mouse and Keyboard
+* [DIY Spacemouse for Fusion 360](https://github.com/sb-ocr/diy-spacemouse) -> Mousee and Keyboard
+* [Space Fox](https://github.com/pepijndevos/spacefox) -> Joystick
+* [spacemouse with an esp32](https://github.com/horvatkm/space_mouse_esp32s2) -> work in progress -> space mouse pro
 
 # History
-This code is the combination of multiple works by others:
+This code is the combination of multiple works by others. This list summarizes what happened before this github repository was started:
 1. Original code for the Space Mushroom by Shiura on Thingiverse: https://www.thingiverse.com/thing:5739462
 2. The next two from the comments on the instructables page: https://www.instructables.com/Space-Mushroom-Full-6-DOFs-Controller-for-CAD-Appl/
 3. and the comments of Thingiverse: https://www.thingiverse.com/thing:5739462/comments

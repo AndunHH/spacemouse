@@ -272,3 +272,29 @@
 // Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h 
 // Recommended strength = 200
 #define SIMSTRENGTH 200
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Advanced HID settings
+// ADV_HID_REL and ADV_HID_JIGGLE change how the values are reported over HID protocoll, see hidInterface.cpp and .h
+// For windows users: DON'T CHANGE / DON'T ENABLE THIS, if you don't understand what it does.
+//
+// For linux / spacenavd user: Suggestions to enable #define ADV_HID_JIGGLE
+// Translation and rotation values are either declared as absolute or relative values in the hid descriptor in hidInterface.h.
+// Relative declaration (may be activated by ADV_HID_REL) 
+//   With linux and spacenavd: If the space mouse didn't return to absolutely zero in one axis
+//   this axis will still report movement, when another direction is pushed, because only the changed values are emitted as events by the linux kernel.
+//   Despite that, values events are emited with every report send, even if they didn't changed.
+// Absolute declaration (default)
+//   Every value is always reporting the absolute position. 
+//   This means, in contrast to relative, an axis that is left alone is reported again as zero.
+//   On the other hand, events are only emitted, if at least some value changes. 
+//   This is not always the case, when the space mouse is held still at a non-zero position.
+// Solution: Jiggling (may be activated by ADV_HID_JIGGLE)
+//   Every non-zero value is reported as it is and +1 in the next report, repeating with +0 in the next iteration and +1 in the next...
+//   This little extra noise is called "jiggling" and ensures that a value declared as absolute is resent with every report, 
+//   because is not equal to the last value.
+//
+// Switch declaration of values to relative, if the following symbol is defined:
+// #define ADV_HID_REL 
+// Add Jiggling to the value reported, if the following symbol is defined:
+// #define ADV_HID_JIGGLE
