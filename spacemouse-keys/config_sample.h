@@ -20,18 +20,27 @@
 //
 // Try to write down the two axis of every joystick with the corresponding pin numbers you chose. (A4 and A5 are not used in the example by TeachingTech).
 // Compile the script, type 1 into the serial interface and hit enter to enable debug output 1.
-// Now: At the joystick in front of you (A), move the joystick from top to bottom (X).
-// If everything is correct: The debug output for AX should show values from 0 to 1023.
-// If another output is showing this values, swap them. Probably you have to swap the first and second element, as AX and AY may be swapped.
+// Now: At the joystick in front of you (A), move the joystick from the top -> down to bottom (X) and observe the debug output:
+// AX goes from 0 to 1023. -> Everything is correct.
+// AX goes from 1023 to 0 -> You need to invert AX, see below.
+// Another output is showing movement: Swap the pins in the PINLIST. Probably you have to swap the first and second element, as AX and AY may be swapped.
 // If you have the joystick TeachingTech recommended:
 //     The pins labelled X and Y on the joystick are NOT the X and Y needed here, but swapped. First joysticks Y: AX and X: AY.
 //
-// Repeat this with every axis and every joystick.
+// Continue with AY: Move the joystick from left to right and the values shall increase from 0 to 1023 and follow the instructions above.
+// Repeat this with every axis and every joystick until you have a valid PINLIST and maybe an INVERTLIST
 
 // AX, AY, BX, BY, CX, CY, DX, DY
 #define PINLIST \
   { A1, A0, A3, A2, A7, A6, A9, A8 }
 // Check the correct wiring with the debug output=1
+
+// Set to 1 to invert one joystick axis. 
+// Usually all _X values shall be inverted or none of them.
+// Usually all _Y values shall be inverted or none of them.
+#define INVERTLIST \
+  { 0, 0,  0,  0,  0,  0,  0,  0}
+// AX, AY, BX, BY, CX, CY, DX, DY
 
 // Debugging (You can send the number over the serial interface, whenever you whish)
 // -1: Debugging off. Set to this once everything is working.
