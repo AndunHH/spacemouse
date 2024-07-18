@@ -166,15 +166,20 @@ After compiling and uploading the programm to your hardware, you can connect via
 
 Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
 
+This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
+All debug outputs are described at the top of your config_sample.h.
+
 1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics) section below.
 2. Tune dead zone to avoid jittering
 3. Getting min and max values for your joysticks
 	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
 4. Adjust sensitivity
-5. Choose modifier function
+5. Choose modifier function:
 
-This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
-All debug outputs are described at the top of your config_sample.h.
+Choose a modifier function with the help of the following picture. Note, that the Squared, Squared Tan and Cubed Tan function act like a deadzone filter, because small inputs are resulting in nearly zero output, which may reduced unwanted movements. 
+Also note, that some of those functions are already at their maximum output (and therefore limited), before the input reaches 350.
+![picture illustrating the different modifier functions](pictures/modifierFunctions.svg)
+
 
 # Use the spacemouse
 ## Download the 3dconnexion driver on windows and mac

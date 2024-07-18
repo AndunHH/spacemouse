@@ -123,11 +123,12 @@
 
 // Fifth calibration: Modifier Function
 // Modify resulting behaviour of spacemouse outputs the suppres small movements around zero and enforce big movements even more.
+// Check the README.md for more details and a plot of the different functions.
 // (This function is applied on the resulting velocities and not on the direct input from the joysticks)
 // This should be at level 0 when starting the calibration!
 // 0: linear y = x [Standard behaviour: No modification]
 // 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
-// 2: tangent function: y = tan(x) [Results in a flat curve near zero but increases the more you are away from zero]
+// 2: tangent function: y = tan(x) [Results in a linear curve near zero but increases the more you are away from zero]
 // 3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
 // 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
 // Recommendation after tuning: MODFUNC 3
