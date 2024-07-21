@@ -23,6 +23,7 @@
 
 // header for HID emulation of the spacemouse
 #include "hidInterface.h"
+//#include "SpaceMouseHID.h"
 
 #if ROTARY_AXIS > 0
   // if an encoder wheel is used
@@ -78,9 +79,6 @@ void setup() {
   setupKeys();
 #endif
 
-  // HID protocol is set.
-  static HIDSubDescriptor node(_hidReportDescriptor, sizeof(_hidReportDescriptor));
-  HID().AppendDescriptor(&node);
   // Begin Seral for debugging
   Serial.begin(250000);
   delay(100);

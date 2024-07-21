@@ -2,7 +2,9 @@
 #include "config.h"
 #include "hidInterface.h"
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
-#include "HID.h"
+#include "SpaceMouseHID.h"
+
+SpaceMouseHID spaceMouse;
 
 // Send a HID report every 8 ms (found on an original SpaceNavigator)
 #define HIDUPDATERATE_MS 8
@@ -101,8 +103,7 @@ break;
       jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
       // the toggleValue is toggled after sending the rotations, down below
 #endif
-
-      HID().SendReport(1, trans, 6); // send new translational values
+      spaceMouse.SendReport(1, trans, 6); // send new translational values
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
 
@@ -128,8 +129,8 @@ break;
       jiggleValues(rot, toggleValue);  // jiggle the non-zero values, if toggleValue is true
       toggleValue ^= true; // toggle the indicator to jiggle only every second report send
 #endif
-
-      HID().SendReport(2, rot, 6);
+      
+      spaceMouse.SendReport(2, rot, 6);
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
       // if only zeros where send, increment zero counter, otherwise reset it
@@ -164,7 +165,7 @@ break;
     // report the keys, if the 8 ms since the last report have past
     if (IsNewHidReportDue(now))
     {
-      HID().SendReport(3, keyData, HIDMAXBUTTONS / 8);
+      spaceMouse.SendReport(3, keyData, HIDMAXBUTTONS / 8);
       lastHIDsentRep += HIDUPDATERATE_MS;
       memcpy(prevKeyData, keyData, HIDMAXBUTTONS / 8); // copy actual keyData to previous keyData
       hasSentNewData = true;                           // return value
@@ -176,6 +177,11 @@ break;
     nextState = ST_START; // go back to start in error?!
     // send nothing if all data is zero
     break;
+  }
+
+  int recv = spaceMouse.read();
+  if (recv != 0) {
+    Serial.println(recv);
   }
 
   return hasSentNewData;
