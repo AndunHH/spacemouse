@@ -157,11 +157,11 @@ void loop() {
       centered[i] = 0;
     } else {
       if (centered[i] < 0) {  //if the value is smaller 0 ...
-        // ... map the value from the [min,0] to [-350,0]
-        centered[i] = map(centered[i], minVals[i], 0, -totalSensitivity, 0);
+        // ... map the value from the [min,-DEADZONE] to [-350,0]
+        centered[i] = map(centered[i], minVals[i], -DEADZONE, -totalSensitivity, 0);
       } else {  // if the value is > 0 ...
-        // ... map the values from the [0,max] to [0,+350]
-        centered[i] = map(centered[i], 0, maxVals[i], 0, totalSensitivity);
+        // ... map the values from the [DEADZONE,max] to [0,+350]
+        centered[i] = map(centered[i], DEADZONE, maxVals[i], 0, totalSensitivity);
       }
     }
   }
