@@ -23,7 +23,7 @@
 
 // header for HID emulation of the spacemouse
 #include "hidInterface.h"
-//#include "SpaceMouseHID.h"
+#include "SpaceMouseHID.h"
 
 #if ROTARY_AXIS > 0
   // if an encoder wheel is used
@@ -283,4 +283,11 @@ void loop() {
     // update and report the at what frequency the loop is running
     updateFrequencyReport();
   }
+
+  // The LED status is sent with reportID 4
+  int recv = spaceMouse.readReport(4);
+  if (recv == 1)
+    Serial.println("led on!");
+  else if (recv == 0)
+    Serial.println("led off!");
 }

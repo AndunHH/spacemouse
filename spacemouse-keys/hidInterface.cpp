@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include "config.h"
+
 #include "hidInterface.h"
-// Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "SpaceMouseHID.h"
 
-SpaceMouseHID spaceMouse;
+
 
 // Send a HID report every 8 ms (found on an original SpaceNavigator)
 #define HIDUPDATERATE_MS 8
@@ -178,12 +178,6 @@ break;
     // send nothing if all data is zero
     break;
   }
-
-  int recv = spaceMouse.read();
-  if (recv != 0) {
-    Serial.println(recv);
-  }
-
   return hasSentNewData;
 }
 
