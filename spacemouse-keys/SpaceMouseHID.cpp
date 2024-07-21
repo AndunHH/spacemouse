@@ -1,34 +1,36 @@
 /*
 This class behaves as HID Device with two endpoints for in and out
 
+It was created by reverse-engineering a Space Navigator and relating to the HID Library by Nico Hood for reference. https://github.com/NicoHood/HID
+
 This code is based on https://forum.arduino.cc/t/solved-unable-to-receive-hid-reports-from-computer-using-pluggableusb/596793
 */
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "config.h"
-#include "hidInterface.h"
+
 #include "SpaceMouseHID.h"
 
-SpaceMouseHID::SpaceMouseHID() : PluggableUSBModule(2, 1, endpointTypes)
+SpaceMouseHID_::SpaceMouseHID_() : PluggableUSBModule(2, 1, endpointTypes)
 {
 	endpointTypes[0] = EP_TYPE_INTERRUPT_IN;
 	endpointTypes[1] = EP_TYPE_INTERRUPT_OUT;
 	PluggableUSB().plug(this);
 }
 
-int SpaceMouseHID::getInterface(uint8_t *interfaceNumber)
+int SpaceMouseHID_::getInterface(uint8_t *interfaceNumber)
 {
 	interfaceNumber[0] += 1;
-	USBControllerHIDDescriptor interfaceDescriptor = {
+	SpaceMouseHIDDescriptor interfaceDescriptor = {
 		D_INTERFACE(USBControllerInterface, 2, USB_DEVICE_CLASS_HUMAN_INTERFACE, 0, 0),
-		USBController_D_HIDREPORT(sizeof(USBControllerReportDescriptor)),
+		SPACEMOUSE_D_HIDREPORT(sizeof(SpaceMouseReportDescriptor)),
 		D_ENDPOINT(USB_ENDPOINT_IN(USBControllerEndpointIn), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0),
 		D_ENDPOINT(USB_ENDPOINT_OUT(USBControllerEndpointOut), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0),
 	};
 	return USB_SendControl(0, &interfaceDescriptor, sizeof(interfaceDescriptor));
 }
 
-int SpaceMouseHID::getDescriptor(USBSetup &setup)
+int SpaceMouseHID_::getDescriptor(USBSetup &setup)
 {
 	// code copied and modified from NicoHood's HID-Project
 	// check if it is a HID class Descriptor request
@@ -49,10 +51,10 @@ int SpaceMouseHID::getDescriptor(USBSetup &setup)
 
 	protocol = HID_REPORT_PROTOCOL;
 
-	return USB_SendControl(TRANSFER_PGM, USBControllerReportDescriptor, sizeof(USBControllerReportDescriptor));
+	return USB_SendControl(TRANSFER_PGM, SpaceMouseReportDescriptor, sizeof(SpaceMouseReportDescriptor));
 }
 
-bool SpaceMouseHID::setup(USBSetup &setup)
+bool SpaceMouseHID_::setup(USBSetup &setup)
 {
 	// code copied from NicoHood's HID-Project
 	if (pluggedInterface != setup.wIndex)
@@ -99,7 +101,7 @@ bool SpaceMouseHID::setup(USBSetup &setup)
 	return false;
 }
 
-int SpaceMouseHID::write(const uint8_t *buffer, size_t size)
+int SpaceMouseHID_::write(const uint8_t *buffer, size_t size)
 {
 	return USB_Send(USBControllerTX, buffer, size);
 }
@@ -109,7 +111,7 @@ int SpaceMouseHID::write(const uint8_t *buffer, size_t size)
 /// @param data Pointer to the data array
 /// @param len  Length of the data
 /// @return Length of data sent (including 1 byte for report id)
-int SpaceMouseHID::SendReport(uint8_t id, const void *data, int len)
+int SpaceMouseHID_::SendReport(uint8_t id, const void *data, int len)
 {
 	auto ret = USB_Send(USBControllerTX, &id, 1);
 	if (ret < 0)
@@ -122,7 +124,7 @@ int SpaceMouseHID::SendReport(uint8_t id, const void *data, int len)
 
 /// @brief Reads a single byte from the interface, if available
 /// @return Returns the byte or zero
-int SpaceMouseHID::readSingleByte()
+int SpaceMouseHID_::readSingleByte()
 {
 	if (USB_Available(USBControllerRX))
 	{
@@ -137,7 +139,7 @@ int SpaceMouseHID::readSingleByte()
 /// @brief Try to read a report Id with two bytes
 /// @param reportId Which shall be the first byte?
 /// @return  Returns the byte after the report id, if successfull. Returns -1 if nothing was read. Returns -2, if the reportId is wrong (data are thrown away):
-int SpaceMouseHID::readReport(uint8_t reportId)
+int SpaceMouseHID_::readReport(uint8_t reportId)
 {
 	uint8_t numBytes = USB_Available(USBControllerRX);
 	if (numBytes >= 2)
@@ -163,4 +165,10 @@ int SpaceMouseHID::readReport(uint8_t reportId)
 	}
 }
 
-SpaceMouseHID spaceMouse;
+// static function to return the pointer to the object
+// https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
+SpaceMouseHID_& SpaceMouseHID()
+{
+	static SpaceMouseHID_ obj;
+	return obj;
+}

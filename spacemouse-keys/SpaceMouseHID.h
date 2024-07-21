@@ -1,6 +1,14 @@
+/*
+This class behaves as HID Device with two endpoints for in and out
+
+It was created by reverse-engineering a Space Navigator and relating to the HID Library by Nico Hood for reference. https://github.com/NicoHood/HID
+
+This code is based on https://forum.arduino.cc/t/solved-unable-to-receive-hid-reports-from-computer-using-pluggableusb/596793
+*/
+
 #ifndef SpaceMouseHID_h
 #define SpaceMouseHID_h
-#include "Arduino.h"
+#include <Arduino.h>
 
 // make sure that it is a supported Architecture
 #ifndef ARDUINO_ARCH_AVR
@@ -10,7 +18,7 @@
 #include "PluggableUSB.h"
 #include "HID.h"
 
-#define USBController_D_HIDREPORT(length)                                  \
+#define SPACEMOUSE_D_HIDREPORT(length)                                  \
     {                                                                      \
         9, 0x21, 0x11, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) \
     }
@@ -20,25 +28,13 @@ typedef struct
     HIDDescDescriptor desc;
     EndpointDescriptor in;
     EndpointDescriptor out;
-} USBControllerHIDDescriptor;
+} SpaceMouseHIDDescriptor;
 
-typedef union
-{
-    uint8_t dataInHeader[0];
-    uint8_t dataInBlock[0];
-    uint8_t dataOutHeader[0];
-    uint8_t dataOutBlock[0];
-    struct
-    {
-        uint8_t dataIn;
-        uint8_t dataOut;
-    };
-} USBControllerDataPacket;
-
-static const uint8_t USBControllerReportDescriptor[] PROGMEM = {
+static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x05, 0x01,       // Usage Page (Generic Desktop)
     0x09, 0x08,       // Usage (Multi-Axis)
     0xA1, 0x01,       // Collection (Application)
+// Report 1: Translation
     0xa1, 0x00,       // Collection (Physical)
     0x85, 0x01,       // Report ID (1)
     0x16, 0xA2, 0xFE, // Logical Minimum (-350) (0xFEA2 in little-endian)
@@ -56,6 +52,7 @@ static const uint8_t USBControllerReportDescriptor[] PROGMEM = {
     0x81, 0x02, // Input (variable,absolute)
 #endif
     0xC0,             // End Collection
+// Report 2: Rotation
     0xa1, 0x00,       // Collection (Physical)
     0x85, 0x02,       // Report ID (2)
     0x16, 0xA2, 0xFE, // Logical Minimum (-350)
@@ -73,6 +70,7 @@ static const uint8_t USBControllerReportDescriptor[] PROGMEM = {
     0x81, 0x02, // Input (variable,absolute)
 #endif
     0xC0,                // End Collection
+// Report 3: Keys  // find #define HIDMAXBUTTONS 32 in config_sample.h
     0xa1, 0x00,          // Collection (Physical)
     0x85, 0x03,          //  Report ID (3)
     0x15, 0x00,          //   Logical Minimum (0)
@@ -84,7 +82,7 @@ static const uint8_t USBControllerReportDescriptor[] PROGMEM = {
     0x29, HIDMAXBUTTONS, //    Usage Maximum (Button #24)
     0x81, 0x02,          //    Input (variable,absolute)
     0xC0,                // End Collection
-
+// Report 4: LEDs
     0xA1, 0x02, //   Collection (Logical)
     0x85, 0x04, //     Report ID (4)
     0x05, 0x08, //     Usage Page (LEDs)
@@ -107,10 +105,10 @@ static const uint8_t USBControllerReportDescriptor[] PROGMEM = {
 #define USBControllerTX USBControllerEndpointIn
 #define USBControllerRX USBControllerEndpointOut
 
-class SpaceMouseHID : public PluggableUSBModule
+class SpaceMouseHID_ : public PluggableUSBModule
 {
 public:
-    SpaceMouseHID();
+    SpaceMouseHID_();
     int write(const uint8_t *buffer, size_t size);
     int SendReport(uint8_t id, const void *data, int len);
     int readSingleByte();
@@ -127,6 +125,9 @@ protected:
     bool setup(USBSetup &setup);
 };
 
-extern SpaceMouseHID spaceMouse;
+// Replacement for global singleton.
+// This function prevents static-initialization-order-fiasco
+// https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
+SpaceMouseHID_& SpaceMouseHID();
 
 #endif // SpaceMouseHID_h import guard

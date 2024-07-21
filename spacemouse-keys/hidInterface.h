@@ -1,5 +1,5 @@
 // hidInterface.h
-#define HIDMAXBUTTONS 32 // must be multiple of 8!
+
 
 bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
 bool IsNewHidReportDue(unsigned long now);

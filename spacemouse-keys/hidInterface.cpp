@@ -4,8 +4,6 @@
 #include "hidInterface.h"
 #include "SpaceMouseHID.h"
 
-
-
 // Send a HID report every 8 ms (found on an original SpaceNavigator)
 #define HIDUPDATERATE_MS 8
 
@@ -103,7 +101,7 @@ break;
       jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
       // the toggleValue is toggled after sending the rotations, down below
 #endif
-      spaceMouse.SendReport(1, trans, 6); // send new translational values
+      SpaceMouseHID().SendReport(1, trans, 6); // send new translational values
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
 
@@ -130,7 +128,7 @@ break;
       toggleValue ^= true; // toggle the indicator to jiggle only every second report send
 #endif
       
-      spaceMouse.SendReport(2, rot, 6);
+      SpaceMouseHID().SendReport(2, rot, 6);
       lastHIDsentRep += HIDUPDATERATE_MS;
       hasSentNewData = true; // return value
       // if only zeros where send, increment zero counter, otherwise reset it
@@ -165,7 +163,7 @@ break;
     // report the keys, if the 8 ms since the last report have past
     if (IsNewHidReportDue(now))
     {
-      spaceMouse.SendReport(3, keyData, HIDMAXBUTTONS / 8);
+      SpaceMouseHID().SendReport(3, keyData, HIDMAXBUTTONS / 8);
       lastHIDsentRep += HIDUPDATERATE_MS;
       memcpy(prevKeyData, keyData, HIDMAXBUTTONS / 8); // copy actual keyData to previous keyData
       hasSentNewData = true;                           // return value

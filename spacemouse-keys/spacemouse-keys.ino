@@ -285,7 +285,7 @@ void loop() {
   }
 
   // The LED status is sent with reportID 4
-  int recv = spaceMouse.readReport(4);
+  int recv = SpaceMouseHID().readReport(4);
   if (recv == 1)
     Serial.println("led on!");
   else if (recv == 0)
