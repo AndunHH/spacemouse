@@ -272,10 +272,10 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
 #if SWITCHYZ > 0
   // Original from TT, but 3DConnextion tutorial will not work:
-  SpaceMouseHID().send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyState, debug);
+  SpaceMouseHID.send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyState, debug);
 #else
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-  SpaceMouseHID().send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
+  SpaceMouseHID.send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
 #endif
   
   if (debug == 7) {
@@ -284,10 +284,11 @@ void loop() {
   }
 
   // The LED status is sent with reportID 4
-  /*int recv = SpaceMouseHID().readReport(4);
+  int recv = SpaceMouseHID.readReport(4);
   if (recv == 1)
     Serial.println("led on!");
   else if (recv == 0)
-    Serial.println("led off!");*/
-  SpaceMouseHID().printAllReports();
+    Serial.println("led off!");
+  // either readReport or printAllReports, because the fifo is empty after one of this calls.
+  //SpaceMouseHID.printAllReports();
 }

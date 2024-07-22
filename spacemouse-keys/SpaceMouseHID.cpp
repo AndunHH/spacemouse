@@ -262,7 +262,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
 											  // the toggleValue is toggled after sending the rotations, down below
 #endif
-			SpaceMouseHID().SendReport(1, trans, 6); // send new translational values
+			SendReport(1, trans, 6); // send new translational values
 			lastHIDsentRep += HIDUPDATERATE_MS;
 			hasSentNewData = true; // return value
 
@@ -289,7 +289,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			toggleValue ^= true;			// toggle the indicator to jiggle only every second report send
 #endif
 
-			SpaceMouseHID().SendReport(2, rot, 6);
+			SendReport(2, rot, 6);
 			lastHIDsentRep += HIDUPDATERATE_MS;
 			hasSentNewData = true; // return value
 			// if only zeros where send, increment zero counter, otherwise reset it
@@ -324,7 +324,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		// report the keys, if the 8 ms since the last report have past
 		if (IsNewHidReportDue(now))
 		{
-			SpaceMouseHID().SendReport(3, keyData, HIDMAXBUTTONS / 8);
+			SendReport(3, keyData, HIDMAXBUTTONS / 8);
 			lastHIDsentRep += HIDUPDATERATE_MS;
 			memcpy(prevKeyData, keyData, HIDMAXBUTTONS / 8); // copy actual keyData to previous keyData
 			hasSentNewData = true;							 // return value
@@ -404,10 +404,4 @@ void SpaceMouseHID_::prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug)
 }
 #endif
 
-// static function to return the pointer to the object
-// https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-SpaceMouseHID_ &SpaceMouseHID()
-{
-	static SpaceMouseHID_ obj;
-	return obj;
-}
+SpaceMouseHID_ SpaceMouseHID;
