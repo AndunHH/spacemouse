@@ -18,7 +18,7 @@ This code is based on https://forum.arduino.cc/t/solved-unable-to-receive-hid-re
 #include "PluggableUSB.h"
 #include "HID.h"
 
-#define SPACEMOUSE_D_HIDREPORT(length)                                  \
+#define SPACEMOUSE_D_HIDREPORT(length)                                     \
     {                                                                      \
         9, 0x21, 0x11, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) \
     }
@@ -34,7 +34,7 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x05, 0x01,       // Usage Page (Generic Desktop)
     0x09, 0x08,       // Usage (Multi-Axis)
     0xA1, 0x01,       // Collection (Application)
-// Report 1: Translation
+                      // Report 1: Translation
     0xa1, 0x00,       // Collection (Physical)
     0x85, 0x01,       // Report ID (1)
     0x16, 0xA2, 0xFE, // Logical Minimum (-350) (0xFEA2 in little-endian)
@@ -47,12 +47,12 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x75, 0x10,       // Report Size (16)
     0x95, 0x03,       // Report Count (3)
 #ifdef ADV_HID_REL    // see Advanced HID settings in config_sample.h
-    0x81, 0x06, //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x06,       //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
 #else
     0x81, 0x02, // Input (variable,absolute)
 #endif
     0xC0,             // End Collection
-// Report 2: Rotation
+                      // Report 2: Rotation
     0xa1, 0x00,       // Collection (Physical)
     0x85, 0x02,       // Report ID (2)
     0x16, 0xA2, 0xFE, // Logical Minimum (-350)
@@ -65,12 +65,12 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x75, 0x10,       // Report Size (16)
     0x95, 0x03,       // Report Count (3)
 #ifdef ADV_HID_REL    // see Advanced HID settings in config_sample.h
-    0x81, 0x06, //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x06,       //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
 #else
     0x81, 0x02, // Input (variable,absolute)
 #endif
     0xC0,                // End Collection
-// Report 3: Keys  // find #define HIDMAXBUTTONS 32 in config_sample.h
+                         // Report 3: Keys  // find #define HIDMAXBUTTONS 32 in config_sample.h
     0xa1, 0x00,          // Collection (Physical)
     0x85, 0x03,          //  Report ID (3)
     0x15, 0x00,          //   Logical Minimum (0)
@@ -82,21 +82,21 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x29, HIDMAXBUTTONS, //    Usage Maximum (Button #24)
     0x81, 0x02,          //    Input (variable,absolute)
     0xC0,                // End Collection
-// Report 4: LEDs
-    0xA1, 0x02, //   Collection (Logical)
-    0x85, 0x04, //     Report ID (4)
-    0x05, 0x08, //     Usage Page (LEDs)
-    0x09, 0x4B, //     Usage (Generic Indicator)
-    0x15, 0x00, //     Logical Minimum (0)
-    0x25, 0x01, //     Logical Maximum (1)
-    0x95, 0x01, //     Report Count (1)
-    0x75, 0x01, //     Report Size (1)
-    0x91, 0x02, //     Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
-    0x95, 0x01, //     Report Count (1)
-    0x75, 0x07, //     Report Size (7)
-    0x91, 0x03, //     Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
-    0xC0,       //   End Collection
-    0xc0        // END_COLLECTION
+                         // Report 4: LEDs
+    0xA1, 0x02,          //   Collection (Logical)
+    0x85, 0x04,          //     Report ID (4)
+    0x05, 0x08,          //     Usage Page (LEDs)
+    0x09, 0x4B,          //     Usage (Generic Indicator)
+    0x15, 0x00,          //     Logical Minimum (0)
+    0x25, 0x01,          //     Logical Maximum (1)
+    0x95, 0x01,          //     Report Count (1)
+    0x75, 0x01,          //     Report Size (1)
+    0x91, 0x02,          //     Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x95, 0x01,          //     Report Count (1)
+    0x75, 0x07,          //     Report Size (7)
+    0x91, 0x03,          //     Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,                //   End Collection
+    0xc0                 // END_COLLECTION
 };
 
 #define USBControllerInterface pluggedInterface
@@ -104,6 +104,19 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
 #define USBControllerEndpointOut (pluggedEndpoint + 1)
 #define USBControllerTX USBControllerEndpointIn
 #define USBControllerRX USBControllerEndpointOut
+
+// Send a HID report every 8 ms
+#define HIDUPDATERATE_MS 8
+
+// State machine to track, which report to send next
+enum SpaceMouseHIDStates
+{
+    ST_INIT,      // init variables
+    ST_START,     // start to check if something is to be sent
+    ST_SENDTRANS, // send translations
+    ST_SENDROT,   // send rotations
+    ST_SENDKEYS   // send keys
+};
 
 class SpaceMouseHID_ : public PluggableUSBModule
 {
@@ -113,8 +126,23 @@ public:
     int SendReport(uint8_t id, const void *data, int len);
     int readSingleByte();
     int readReport(uint8_t reportId);
+    bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
 
 private:
+    bool IsNewHidReportDue(unsigned long now);
+    bool jiggleValues(uint8_t val[6], bool lastBit);
+
+    SpaceMouseHIDStates nextState;
+#if (NUMKEYS > 0)
+    // Array with the bitnumbers, which should assign keys to buttons
+    uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
+    void prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug);
+#endif
+    uint8_t countTransZeros = 0; // count how many times, the zero data has been sent
+    uint8_t countRotZeros = 0;
+
+    unsigned long lastHIDsentRep; // time from millis(), when the last HID report was sent
+
 protected:
     uint8_t endpointTypes[2];
     uint8_t protocol;
@@ -128,6 +156,6 @@ protected:
 // Replacement for global singleton.
 // This function prevents static-initialization-order-fiasco
 // https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-SpaceMouseHID_& SpaceMouseHID();
+SpaceMouseHID_ &SpaceMouseHID();
 
 #endif // SpaceMouseHID_h import guard
