@@ -94,7 +94,18 @@ bool SpaceMouseHID_::setup(USBSetup &setup)
 		}
 		if (request == HID_SET_REPORT)
 		{
-			// do what??
+			// If you press "Calibrate" the following setup request is sent:
+			// wValue: 0x0307
+			// wIndex: 0 (0x0000)
+			// wLength: 2
+			// Data Fragment: 0700
+			Serial.print(setup.wValueH,HEX);
+			Serial.print(" ");
+			Serial.print(setup.wValueL,HEX);
+			Serial.print("calibrate!");
+			// how to get data? 
+			Serial.print(readSingleByte(), HEX);
+			Serial.print(readSingleByte(), HEX);
 			return true;
 		}
 	}
@@ -163,6 +174,27 @@ int SpaceMouseHID_::readReport(uint8_t reportId)
 	else
 	{
 		return -1;
+	}
+}
+
+/// @brief Try to read some reports and print them
+/// @return  Returns nothing
+void SpaceMouseHID_::printAllReports()
+{
+	uint8_t numBytes = USB_Available(USBControllerRX);
+	if (numBytes >= 2)
+	{
+		uint8_t data[2] = {0};
+		USB_Recv(USBControllerRX, data, numBytes);
+		for (int i = 0; i < numBytes; i++) {
+		Serial.print(data[i], HEX);	
+		Serial.print(", ");
+		}
+		Serial.println(" ");
+	}
+	else
+	{
+		//Serial.print(".");
 	}
 }
 

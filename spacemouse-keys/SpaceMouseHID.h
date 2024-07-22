@@ -96,7 +96,66 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x75, 0x07,          //     Report Size (7)
     0x91, 0x03,          //     Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
     0xC0,                //   End Collection
-    0xc0                 // END_COLLECTION
+    // The following commeted block comes from a Space Navigator and defines something vendor specific.
+    // They are suspected to have something to do with speed or configuration, but no usb traffic can be seen here.
+    // Therefore they are not active...
+    /*0x06, 0x00, 0xFF, //   Usage Page (Vendor Defined 0xFF00)
+    0x09, 0x01,       //   Usage (0x01)
+    0xA1, 0x02,       //   Collection (Logical)
+    0x15, 0x80,       //     Logical Minimum (-128)
+    0x25, 0x7F,       //     Logical Maximum (127)
+    0x75, 0x08,       //     Report Size (8)
+    0x09, 0x3A,       //     Usage (0x3A)
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x05,       //       Report ID (5)
+    0x09, 0x20,       //       Usage (0x20)
+    0x95, 0x01,       //       Report Count (1)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x06,       //       Report ID (6)
+    0x09, 0x21,       //       Usage (0x21)
+    0x95, 0x01,       //       Report Count (1)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x07,       //       Report ID (7)
+    0x09, 0x22,       //       Usage (0x22)
+    0x95, 0x01,       //       Report Count (1)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x08,       //       Report ID (8)
+    0x09, 0x23,       //       Usage (0x23)
+    0x95, 0x07,       //       Report Count (7)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x09,       //       Report ID (9)
+    0x09, 0x24,       //       Usage (0x24)
+    0x95, 0x07,       //       Report Count (7)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x0A,       //       Report ID (10)
+    0x09, 0x25,       //       Usage (0x25)
+    0x95, 0x07,       //       Report Count (7)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x0B,       //       Report ID (11)
+    0x09, 0x26,       //       Usage (0x26)
+    0x95, 0x01,       //       Report Count (1)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xA1, 0x02,       //     Collection (Logical)
+    0x85, 0x13,       //       Report ID (19)
+    0x09, 0x2E,       //       Usage (0x2E)
+    0x95, 0x01,       //       Report Count (1)
+    0xB1, 0x02,       //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC0,             //     End Collection
+    0xC0,             //   End Collection*/
+    0xc0              // END_COLLECTION
 };
 
 #define USBControllerInterface pluggedInterface
@@ -126,6 +185,7 @@ public:
     int SendReport(uint8_t id, const void *data, int len);
     int readSingleByte();
     int readReport(uint8_t reportId);
+    void printAllReports();
     bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
 
 private:
