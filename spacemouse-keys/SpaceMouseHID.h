@@ -125,8 +125,9 @@ public:
     int write(const uint8_t *buffer, size_t size);
     int SendReport(uint8_t id, const void *data, int len);
     int readSingleByte();
-    int readReport(uint8_t reportId);
     void printAllReports();
+    bool updateLEDState();
+    bool getLEDState();
     bool send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug);
 
 private:
@@ -144,9 +145,11 @@ private:
 
     unsigned long lastHIDsentRep; // time from millis(), when the last HID report was sent
 
+    bool ledState;
+
 protected:
     uint8_t endpointTypes[2];
-    uint8_t protocol;
+    uint8_t protocol; 
     uint8_t idle;
 
     int getInterface(uint8_t *interfaceNumber);

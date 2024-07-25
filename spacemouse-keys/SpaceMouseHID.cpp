@@ -17,6 +17,7 @@ SpaceMouseHID_::SpaceMouseHID_() : PluggableUSBModule(2, 1, endpointTypes)
 	endpointTypes[1] = EP_TYPE_INTERRUPT_OUT;
 	PluggableUSB().plug(this);
 	nextState = ST_INIT; // init state machine with init state
+	ledState = false;
 }
 
 int SpaceMouseHID_::getInterface(uint8_t *interfaceNumber)
@@ -83,7 +84,7 @@ bool SpaceMouseHID_::setup(USBSetup &setup)
 	if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE)
 	{
 		if (request == HID_SET_PROTOCOL)
-		{
+		{	
 			protocol = setup.wValueL;
 			return true;
 		}
@@ -94,18 +95,13 @@ bool SpaceMouseHID_::setup(USBSetup &setup)
 		}
 		if (request == HID_SET_REPORT)
 		{
-			// If you press "Calibrate" the following setup request is sent:
+			// If you press "Calibrate" in the windows driver of a _SpaceNavigator_ the following setup request is sent:
 			// wValue: 0x0307
 			// wIndex: 0 (0x0000)
 			// wLength: 2
 			// Data Fragment: 0700
-			Serial.print(setup.wValueH,HEX);
-			Serial.print(" ");
-			Serial.print(setup.wValueL,HEX);
-			Serial.print("calibrate!");
-			// how to get data? 
-			Serial.print(readSingleByte(), HEX);
-			Serial.print(readSingleByte(), HEX);
+			// Unfortunately, we are simulating a _SpaceMouse Pro Wireless (cabled)_, because it has more than two buttons
+			// With this SM pro, the windows driver is NOT sending this status report and their is no point in waiting for it...
 			return true;
 		}
 	}
@@ -148,35 +144,6 @@ int SpaceMouseHID_::readSingleByte()
 	}
 }
 
-/// @brief Try to read a report Id with two bytes
-/// @param reportId Which shall be the first byte?
-/// @return  Returns the byte after the report id, if successfull. Returns -1 if nothing was read. Returns -2, if the reportId is wrong (data are thrown away):
-int SpaceMouseHID_::readReport(uint8_t reportId)
-{
-	uint8_t numBytes = USB_Available(USBControllerRX);
-	if (numBytes >= 2)
-	{
-		uint8_t data[2] = {0};
-		USB_Recv(USBControllerRX, data, 2);
-		/*Serial.print(data[0]);
-		Serial.print(" ");
-		Serial.print(data[1]);
-		Serial.println(" ");*/
-		if (data[0] == reportId)
-		{
-			return data[1];
-		}
-		else
-		{
-			return -2;
-		}
-	}
-	else
-	{
-		return -1;
-	}
-}
-
 /// @brief Try to read some reports and print them
 /// @return  Returns nothing
 void SpaceMouseHID_::printAllReports()
@@ -186,16 +153,50 @@ void SpaceMouseHID_::printAllReports()
 	{
 		uint8_t data[2] = {0};
 		USB_Recv(USBControllerRX, data, numBytes);
-		for (int i = 0; i < numBytes; i++) {
-		Serial.print(data[i], HEX);	
-		Serial.print(", ");
+		for (int i = 0; i < numBytes; i++)
+		{
+			Serial.print(data[i], HEX);
+			Serial.print(", ");
 		}
 		Serial.println(" ");
 	}
 	else
 	{
-		//Serial.print(".");
+		// Serial.print(".");
 	}
+}
+
+/// @brief Check for LED hid reports (report Id: 4). This empties the RX buffer.
+/// @return  Returns the led status
+bool SpaceMouseHID_::updateLEDState()
+{
+	uint8_t numBytes = USB_Available(USBControllerRX);
+	if (numBytes >= 2)
+	{
+		uint8_t data[2] = {0};
+		USB_Recv(USBControllerRX, data, 2);
+		if (data[0] == 4) // LED report id: 4
+		{
+			if (data[1] == 1) // if 1, led on!
+			{
+				ledState = true;
+				//Serial.println("led on!");
+			}
+			else
+			{
+				ledState = false;
+				//Serial.println("led off!");
+			}
+		}
+	}
+	return ledState;
+}
+
+/// @brief Get the LED state, which shall be updated regularly by calling updateLEDstate()
+/// @return Boolean LED state
+bool SpaceMouseHID_::getLEDState()
+{
+	return ledState;
 }
 
 bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int16_t z, uint8_t *keys, int debug)
@@ -403,5 +404,6 @@ void SpaceMouseHID_::prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug)
   }
 }
 #endif
+
 
 SpaceMouseHID_ SpaceMouseHID;

@@ -91,6 +91,9 @@ void setup() {
 #if ROTARY_AXIS > 0
   initEncoderWheel();
 #endif
+
+  // configure LED output
+  pinMode(LEDpin, OUTPUT);
 }
 
 int rawReads[8], centered[8];
@@ -283,12 +286,20 @@ void loop() {
     updateFrequencyReport();
   }
 
-  // The LED status is sent with reportID 4
-  int recv = SpaceMouseHID.readReport(4);
-  if (recv == 1)
-    Serial.println("led on!");
-  else if (recv == 0)
-    Serial.println("led off!");
-  // either readReport or printAllReports, because the fifo is empty after one of this calls.
-  //SpaceMouseHID.printAllReports();
+  // Check for the LED state by calling updateLEDState. 
+  // This empties the USB input buffer and checks for the corresponding report.
+  #ifdef LEDinvert
+  // Swap the LED logic, if necessary
+  if(!SpaceMouseHID.updateLEDState()) {
+  #else
+  if(SpaceMouseHID.updateLEDState()) {
+  #endif
+    // true -> LED on -> pull kathode down
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED o
+  }
+  else {
+    // false -> LED off -> pull kathode up 
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED 
+  }
+
 }
