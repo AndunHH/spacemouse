@@ -156,10 +156,10 @@ This is done to avoid the personal config file being overwritten when pulling ne
 - Compile the firmware
 
 ### Troubleshooting uploading
-If you have the problem, that the port can not be found, the bootloader of your board is probably not reachable. The problem is, that the arduino pro micro has a very short time to get into the bootloader of 800 ms.
-Therefore you need to connect the reset pin twice to gnd. Than you have 8 s to initially set the com port and upload your sketch. It is also quite a fast timing and needs some number of tries.
+Troubleshooting for uploading is explained in detail here: 
 
-You can read the details for this reset here: https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/troubleshooting-and-faq#ts-reset
+[Uploading firmware to the Pro Micro](https://github.com/AndunHH/spacemouse/wiki/Uploading-firmware-to-the-Pro-Micro)
+
 
 # Calibrate your hardware
 After compiling and uploading the programm to your hardware, you can connect via the serial monitor. In the upper line, you can send the desired debug mode to the board and observe the output. "-1" stops the debug output.
