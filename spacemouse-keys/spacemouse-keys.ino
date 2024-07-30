@@ -295,11 +295,11 @@ void loop() {
   if(SpaceMouseHID.updateLEDState()) {
   #endif
     // true -> LED on -> pull kathode down
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED o
+    digitalWrite(LEDpin, LOW);   // turn the LED o
   }
   else {
     // false -> LED off -> pull kathode up 
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED 
+    digitalWrite(LEDpin, HIGH);   // turn the LED 
   }
 
 }

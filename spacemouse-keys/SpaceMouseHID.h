@@ -30,6 +30,8 @@ typedef struct
     EndpointDescriptor out;
 } SpaceMouseHIDDescriptor;
 
+// The USB VID and PID for this emulated space mouse pro must be set in the boards.txt in arduino IDE or in set_hwids.py in platformIO.
+
 static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x05, 0x01,       // Usage Page (Generic Desktop)
     0x09, 0x08,       // Usage (Multi-Axis)
