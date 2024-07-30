@@ -15,6 +15,7 @@ This repository for the source code is based on the work by [TeachingTech](https
 - "Kill-Keys" may disable translation or rotation directly in the mouse
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
 - Check out the [config_sample.h](spacemouse-keys/config_sample.h) for more informations about configurable elements and extensive debug outputs
+- LED can be enabled by the PC driver
 
 Wanted features:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
