@@ -22,7 +22,7 @@
 #include "spaceKeys.h"
 
 // header for HID emulation of the spacemouse
-#include "hidInterface.h"
+#include "SpaceMouseHID.h"
 
 #if ROTARY_AXIS > 0
   // if an encoder wheel is used
@@ -78,9 +78,6 @@ void setup() {
   setupKeys();
 #endif
 
-  // HID protocol is set.
-  static HIDSubDescriptor node(_hidReportDescriptor, sizeof(_hidReportDescriptor));
-  HID().AppendDescriptor(&node);
   // Begin Seral for debugging
   Serial.begin(250000);
   delay(100);
@@ -94,6 +91,9 @@ void setup() {
 #if ROTARY_AXIS > 0
   initEncoderWheel();
 #endif
+
+  // configure LED output
+  pinMode(LEDpin, OUTPUT);
 }
 
 int rawReads[8], centered[8];
@@ -275,14 +275,31 @@ void loop() {
   // The correct order for TeachingTech was determined after trial and error
 #if SWITCHYZ > 0
   // Original from TT, but 3DConnextion tutorial will not work:
-  send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyState, debug);
+  SpaceMouseHID.send_command(velocity[ROTX], velocity[ROTZ], velocity[ROTY], velocity[TRANSX], velocity[TRANSZ], velocity[TRANSY], keyState, debug);
 #else
   // Daniel_1284580 noticed the 3dconnexion tutorial was not working the right way so they got changed
-  send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
+  SpaceMouseHID.send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
 #endif
   
   if (debug == 7) {
     // update and report the at what frequency the loop is running
     updateFrequencyReport();
   }
+
+  // Check for the LED state by calling updateLEDState. 
+  // This empties the USB input buffer and checks for the corresponding report.
+  #ifdef LEDinvert
+  // Swap the LED logic, if necessary
+  if(!SpaceMouseHID.updateLEDState()) {
+  #else
+  if(SpaceMouseHID.updateLEDState()) {
+  #endif
+    // true -> LED on -> pull kathode down
+    digitalWrite(LEDpin, LOW);   // turn the LED o
+  }
+  else {
+    // false -> LED off -> pull kathode up 
+    digitalWrite(LEDpin, HIGH);   // turn the LED 
+  }
+
 }

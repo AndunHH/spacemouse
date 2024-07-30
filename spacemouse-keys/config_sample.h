@@ -284,7 +284,20 @@
 #define SIMSTRENGTH 200
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// LED
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Which pin shall be used as LED?
+// LED shall be connected to 5V and the controller port.
+#define LEDpin 5
+// If you have connected the LED to the controller port and gnd, invert it by uncommenting this #define
+// #define LEDinvert
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Advanced HID settings
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Definition, how many bits are used in the HID report to encode the keys
+ #define HIDMAXBUTTONS 32 // must be multiple of 8!
+ //
 // ADV_HID_REL and ADV_HID_JIGGLE change how the values are reported over HID protocoll, see hidInterface.cpp and .h
 // For windows users: DON'T CHANGE / DON'T ENABLE THIS, if you don't understand what it does.
 //

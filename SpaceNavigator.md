@@ -63,7 +63,9 @@ DEVICE DESCRIPTOR
 ```
 
 ## HID Report of Space Navigator
-Decoded with https://eleccelerator.com/usbdescreqparser/
+See also [the wireshark protocoll](Reverse-Engineering-Docs/SpaceNavigator-Connected-Calibrate.pcapng) for a SpaceNavigator connected and pressed "calibrate" in the windows driver.
+
+The HID following HID descriptor has been decoded with https://eleccelerator.com/usbdescreqparser/ 
 ```
 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 0x09, 0x08,        // Usage (Multi-axis Controller)
@@ -180,8 +182,6 @@ Decoded with https://eleccelerator.com/usbdescreqparser/
 0xC0,              // End Collection
 
 // 217 bytes
-
-
 
 0000   05 01 09 08 a1 01 a1 00 85 01 16 a2 fe 26 5e 01   .............&^.
 0010   36 88 fa 46 78 05 55 0c 65 11 09 30 09 31 09 32   6..Fx.U.e..0.1.2
