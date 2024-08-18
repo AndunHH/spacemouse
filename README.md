@@ -1,9 +1,14 @@
 # Open Source Spacemouse with Keys
-Repository for a space mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". It is based on four joysticks with an addition for keys.
+Repository for a space mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". It is based on four joysticks with additional keys or an encoder.
 
 ![overview](pictures/overview.jpg)
 
 This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). This is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll!
+
+To see all features in place, like the buttons and the encoder, check out the different versions by Jose L. González, like the 
+ [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno): 
+
+![ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](pictures/ergonomouse.webp)
 
 ## Features of the space mouse
 - Source code for an Arduino Pro Micro to read four joysticks and calculate the kinematics
@@ -45,101 +50,7 @@ PlatformIO is easier than ArduinoIDE, because you don't need to change the board
 7. Done!
    
 ## Custom board to emulate the space mouse
-The boards.txt file needs an additional Board definition, which tells the processor to report the USB identifiers correctly and immitate the 3dconnexion space-mouse.
-
-### boards.txt on linux
-You find the boards.txt in ```~/.arduino15/packages/SparkFun/hardware/avr/1.1.13```.
-If this folder doesn't exist you need to install board support for SparkFun Arduinos.
-
-### boards.txt on mac
-Please read https://gist.github.com/maunsen/8dbee2bddef027b04a450241c7d36668
-
-### boards.txt on windows
-C:\Users<USER>\AppData\Local\Arduino15\packages\arduino\hardware
-
-### Code to add to boards.txt
-Here is the addition, which needs to be copied into the boards.txt (e.g. at the bottom).
-```
-# Add this to the bottom your boards.txt
-
-################################################################################
-################################## Spacemouse based on Pro Micro ###################################
-################################################################################
-spacemouse.name=SpaceMouse
-
-spacemouse.upload.tool=avrdude
-spacemouse.upload.tool.default=avrdude
-spacemouse.upload.protocol=avr109
-spacemouse.upload.maximum_size=28672
-spacemouse.upload.maximum_data_size=2560
-spacemouse.upload.speed=57600
-spacemouse.upload.disable_flushing=true
-spacemouse.upload.use_1200bps_touch=true
-spacemouse.upload.wait_for_upload_port=true
-
-spacemouse.bootloader.tool=avrdude
-spacemouse.bootloader.tool.default=avrdude
-spacemouse.bootloader.unlock_bits=0x3F
-spacemouse.bootloader.lock_bits=0x2F
-spacemouse.bootloader.low_fuses=0xFF
-spacemouse.bootloader.high_fuses=0xD8
-
-spacemouse.build.board=AVR_PROMICRO
-spacemouse.build.core=arduino:arduino
-spacemouse.build.variant=promicro
-spacemouse.build.mcu=atmega32u4
-spacemouse.build.usb_product="Spacemouse Pro Wireless (cabled)"
-spacemouse.build.usb_manufacturer="3Dconnexion"
-spacemouse.build.vid=0x256f
-spacemouse.build.extra_flags={build.usb_flags}
-
-############################# Spacemouse Pro Micro 5V / 16MHz #############################
-# deleted 3.3V / 8 Mhz variant to avoid bricking
-
-spacemouse.build.pid.0=0xc631
-spacemouse.build.pid.1=0xc631
-spacemouse.build.pid=0xc631
-spacemouse.build.f_cpu=16000000L
-
-spacemouse.bootloader.extended_fuses=0xCB
-spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
-```
-
-### Common issues with boards.txt:
-
-- [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) video for proper instructions
-- Teaching Tech followed the instructions here from [nebhead](https://gist.github.com/nebhead/c92da8f1a8b476f7c36c032a0ac2592a) with two key differences:
-	- Changed the word 'DaemonBite' to 'Spacemouse' in all references.
-  	- Changed the VID and PID values as per jfedor's instructions: vid=0x256f, pid=0xc631 (SpaceMouse Pro Wireless (cabled))
-#### "pins_arduino.h" not found
-[Taken from](https://github.com/AndunHH/spacemouse/issues/19#issue-2355907540)
-> Windows 11, 2.3.2 Arduino IDE, AVR 1.8.6
->
->I followed every setup step, but was getting complication error "pins_arduino.h" not found.
->
->Checked the file - indeed, not existing, even though it is imported in core
->
->Its the first time I interact with Arduino and I'm not sure if this was suppose to be auto copied or magic imported, but it didn't
->
-> Copying the config from variants\leonardo (in my case, I used the board TeachingTech recommended) to version root (...avr\1.8.6) solved it
-
-#### Changes for Arduino 2.3.2
-Check this [issue](https://github.com/AndunHH/spacemouse/issues/19#issuecomment-2184967522).
-With Arduino IDE 2.3.2 and Arduino AVR board package 1.8.6 , a few changes in text pasted to boards.txt were needed
-
-```
-#spacemouse.build.variant=promicro
-spacemouse.build.variant=leonardo 
-
-#spacemouse.bootloader.file=caterina/Caterina-promicro16.hex
-spacemouse.bootloader.file=caterina/Caterina-Leonardo.hex
-``` 
-Also SpaceMouse needs to be added to list of boards supported by Arduino AVR platform in package_index.json, so that you can select it in IDE.
-```
-        {
-          "name": "SpaceMouse"
-        },
-```
+The boards.txt file needs an additional board definition, which tells the microprocessor to report the USB identifiers correctly and emulate the 3dconnexion space-mouse. Please follow the detailled instructions on the [wiki page about custom board definition](https://github.com/AndunHH/spacemouse/wiki/Creating-a-custom-board-for-Arduino-IDE). 
 
 ## Cloning the github repo
 Clone the github repo to your computer: Scroll-Up to the green "<> Code" Button and select, if you wish to clone or just download the code.
@@ -206,6 +117,7 @@ There are many parts and remixes available. A very good starting point is the Pa
 
 Here are some of the remixes or additions that are used with this software:
 
+* [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno) by Jose L. González (Free and premium version available)
 * [Lid with mounting for 4 MX Switch adapter](https://www.printables.com/de/model/883967-tt-spacemouse-v2-lid-with-mounting-for-4-mx-switch) by LivingTheDream
 * [SpaceMouse Mini - Slim profile, with easier assembly and various improvements - v3](https://www.printables.com/de/model/908684-spacemouse-mini-slim-profile-with-easier-assembly) by Doug Joseph
 * [Hall Effect Joysticks For the Space Mouse](https://www.printables.com/de/model/918029-hall-effect-joysticks-for-the-space-mouse) by Kempy
