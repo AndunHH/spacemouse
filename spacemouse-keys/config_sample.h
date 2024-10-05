@@ -17,11 +17,13 @@
 // Each joysticks has
 // - a horizontal axis from left to right = Y
 // - a vertical axis from top to bottom = X
+// (This definition of X and Y may not correspond to the print on your joysticks... We will find out which signal is X and Y now.)
 //
-// Try to write down the two axis of every joystick with the corresponding pin numbers you chose. (A4 and A5 are not used in the example by TeachingTech).
+// Try to write down the two axis of every joystick with the corresponding pin numbers you chose. 
+// (A4 and A5 are not used in the example by TeachingTech).
 // Compile the script, type 1 into the serial interface and hit enter to enable debug output 1.
 // Now: At the joystick in front of you (A), move the joystick from the top -> down to bottom (X) and observe the debug output:
-// AX goes from 0 to 1023. -> Everything is correct.
+// AX goes from 0 (=joystick at the top) to 1023 (joystick at bottom) -> Everything is correct.  
 // AX goes from 1023 to 0 -> You need to invert AX, see below.
 // Another output is showing movement: Swap the pins in the PINLIST. Probably you have to swap the first and second element, as AX and AY may be swapped.
 // If you have the joystick TeachingTech recommended:
@@ -288,7 +290,7 @@
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Which pin shall be used as LED?
 // LED shall be connected to 5V and the controller port.
-#define LEDpin 5
+// #define LEDpin 5
 // If you have connected the LED to the controller port and gnd, invert it by uncommenting this #define
 // #define LEDinvert
 
