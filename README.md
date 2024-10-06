@@ -1,16 +1,20 @@
-# Open Source Spacemouse with Keys
-Repository for a space mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". It is based on four joysticks with additional keys or an encoder.
+# Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
+Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". (This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll.)
+
+![Overview over the 6 DOF mouse](pictures/Ergonomouse-Advertiser.png)
+
+It is based on four joysticks with additional keys or an encoder.
 
 ![overview](pictures/overview.jpg)
 
-This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). This is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll!
+This repository for the source code is based on the work by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix) and many other contributors, as seen in [the history](#History). 
 
 To see all features in place, like the buttons and the encoder, check out the different versions by Jose L. González, like the 
  [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno): 
 
 ![ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](pictures/ergonomouse.webp)
 
-## Features of the space mouse
+## Features of the 6 DOF mouse
 - Source code for an Arduino Pro Micro to read four joysticks and calculate the kinematics
 - Emulation of the USB identification and the HID interface to behave like an original space mouse
 - Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
@@ -26,7 +30,7 @@ Wanted features:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
 
 
-Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software.
+Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read a build report in the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build)
  
 # Getting Started with PlatformIO
 You can use PlatformIO to flash the board with this fast steps.
@@ -93,7 +97,7 @@ Also note, that some of those functions are already at their maximum output (and
 ![picture illustrating the different modifier functions](pictures/modifierFunctions.svg)
 
 
-# Use the spacemouse
+# Use the 6 DOF mouse
 ## Download the 3dconnexion driver on windows and mac
 You will also need to download and install the [3DConnexion software](https://3dconnexion.com/us/drivers-application/3dxware-10/)
 
@@ -129,7 +133,7 @@ The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring
 ![WiringSpaceMouse](pictures/fritzing-electronics.png)
 
 The calculations in the program expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
-Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config.h file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1, even though his joystick is labeled "y". 
+Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config.h file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1, even though his joystick is labeled "y". See also the [wiki](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build#calibration) for some additional pictures.
 
 ![analog](pictures/pins-axis.png)
 
