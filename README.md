@@ -27,11 +27,13 @@ To see all features in place, like the buttons and the encoder, check out the di
 - LED can be enabled by the PC driver
 
 Wanted features:
-- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings. 
-
+- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read a build report in the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build)
  
+## Macro-Pad for CAD users
+The original 3Dconnexion windows driver is very elegant to detect which programm you are running and offering custom actions for the keys on a space mouse. You can utilize this behavior and build a space mouse with keys, just without the central part, the space mouse itself. You are left with keys, that you can assign to actions for your CAD programm. This comes handy, if your original spacemouse doesn't have enough keys. In this case your PC will see an additional mouse where only the keystrokes are send and evaluated.
+
 # Getting Started with PlatformIO
 You can use PlatformIO to flash the board with this fast steps.
 PlatformIO is easier than ArduinoIDE, because you don't need to change the board.txt files there.
