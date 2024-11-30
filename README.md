@@ -154,14 +154,17 @@ ROTZ = AY + BY + CY + DY
 ```
 # See also
 
-Here are some other projects with regard to space mice. The arrow indicates what is emulated 
+Here are some other projects with regard to space mice. The arrow indicates what is emulated. 
 
 * [This repository itself](https://github.com/AndunHH/spacemouse) -> space mouse
+* [DIY SpaceMouse Profiles](https://github.com/raulpetru/DIY_SpaceMouse_Profiles) -> User interface to tune e.g. sensitivity of the mouse
 * [A 6 degrees of freedom mouse for CAD programs using cheap linear Hall Effect sensors for position measurement](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse) -> space mouse
-* [Orbion The OpenSource 3D Space Mouse](https://github.com/FaqT0tum/Orbion_3D_Space_Mouse) -> Mouse and Keyboard
-* [DIY Spacemouse for Fusion 360](https://github.com/sb-ocr/diy-spacemouse) -> Mousee and Keyboard
-* [Space Fox](https://github.com/pepijndevos/spacefox) -> Joystick
+* [DIY Spacemouse for Fusion 360](https://github.com/sb-ocr/diy-spacemouse) -> Mouse and Keyboard
 * [spacemouse with an esp32](https://github.com/horvatkm/space_mouse_esp32s2) -> work in progress -> space mouse pro
+* [Space Fox](https://github.com/pepijndevos/spacefox) -> Joystick based on potentiometers
+* [Orbion The OpenSource 3D Space Mouse](https://github.com/FaqT0tum/Orbion_3D_Space_Mouse) -> Mouse and Keyboard
+* 
+
 
 # History
 This code is the combination of multiple works by others. This list summarizes what happened before this github repository was started:
