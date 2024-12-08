@@ -29,6 +29,10 @@
   #include "encoderWheel.h" 
 #endif 
 
+#ifdef LEDRING 
+  #include "ledring.h"
+#endif
+
 // the debug mode can be set during runtime via the serial interface
 int debug = STARTDEBUG;
 
@@ -92,15 +96,20 @@ void setup() {
   initEncoderWheel();
 #endif
 #ifdef LEDpin
-  // configure LED output
-  pinMode(LEDpin, OUTPUT);
+  #ifdef LEDRING 
+    initLEDring();
+  #else 
+    // configure LED output for simple LED
+    pinMode(LEDpin, OUTPUT);
+  #endif
 #endif
 }
 
 int rawReads[8], centered[8];
-// Declare movement variables as 16 bit integers
+
+// Resulting calculated velocities / movements
 // int16_t to match what the HID protocol expects.
-int16_t velocity[8];
+int16_t velocity[6];
 
 // set the min and maxvals from the config.h into real variables
 int minVals[8] = MINVALS;
@@ -287,21 +296,28 @@ void loop() {
     updateFrequencyReport();
   }
 
-#ifdef LEDpin
-  // Check for the LED state by calling updateLEDState. 
-  // This empties the USB input buffer and checks for the corresponding report.
-  #ifdef LEDinvert
-  // Swap the LED logic, if necessary
-  if(!SpaceMouseHID.updateLEDState()) {
+
+
+#ifdef LEDpin 
+  #ifdef LEDRING 
+    processLED(velocity);
   #else
-  if(SpaceMouseHID.updateLEDState()) {
+
+    // Check for the LED state by calling updateLEDState. 
+    // This empties the USB input buffer and checks for the corresponding report.
+    #ifdef LEDinvert
+    // Swap the LED logic, if necessary
+    if(!SpaceMouseHID.updateLEDState()) {
+    #else
+    if(SpaceMouseHID.updateLEDState()) {
+    #endif
+      // true -> LED on -> pull kathode down
+      digitalWrite(LEDpin, LOW);   // turn the LED o
+    }
+    else {
+      // false -> LED off -> pull kathode up 
+      digitalWrite(LEDpin, HIGH);   // turn the LED 
+    }
   #endif
-    // true -> LED on -> pull kathode down
-    digitalWrite(LEDpin, LOW);   // turn the LED o
-  }
-  else {
-    // false -> LED off -> pull kathode up 
-    digitalWrite(LEDpin, HIGH);   // turn the LED 
-  }
 #endif
 }
