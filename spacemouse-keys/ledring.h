@@ -1,2 +1,2 @@
 void initLEDring();
-void processLED();
+void processLED(int16_t* velocity);

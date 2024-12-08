@@ -14,7 +14,7 @@ void initLEDring() {
     FastLED.addLeds<WS2811, LEDpin, RGB>(leds, LEDRING);
 }
 
-void processLED() {
+void processLED(int16_t* velocity) {
     unsigned long now = millis();
     static unsigned long lastLEDupdate = now;
     static int whiteLed = 0;
@@ -31,3 +31,4 @@ void processLED() {
       lastLEDupdate += LEDUPDATERATE_MS;
     }
 }
+

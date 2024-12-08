@@ -106,9 +106,10 @@ void setup() {
 }
 
 int rawReads[8], centered[8];
-// Declare movement variables as 16 bit integers
+
+// Resulting calculated velocities / movements
 // int16_t to match what the HID protocol expects.
-int16_t velocity[8];
+int16_t velocity[6];
 
 // set the min and maxvals from the config.h into real variables
 int minVals[8] = MINVALS;
@@ -299,7 +300,7 @@ void loop() {
 
 #ifdef LEDpin 
   #ifdef LEDRING 
-    processLED();
+    processLED(velocity);
   #else
 
     // Check for the LED state by calling updateLEDState. 
