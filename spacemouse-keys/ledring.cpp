@@ -29,7 +29,7 @@ void processLED(int16_t* velocity) {
       //whiteLed = (whiteLed + 1) % LEDRING;
 
       calcLEDstate(velocity);
-
+    getMainVelocity(velocity);
       // Turn our current led on to white, then show the leds
       //leds[whiteLed] = CRGB::White;
 
@@ -64,4 +64,21 @@ void calcLEDstate(int16_t *velocity)
         leds[0] = CRGB::White;
         leds[12] = CRGB::Black;
     }
+}
+
+/// @brief Calculate which velocity is the main action. What is the strongest movement?
+/// @param velocity array with velocities
+/// @return index with the biggest velocity. returns -1 if all in deadzone
+int8_t getMainVelocity(int16_t *velocity)
+{
+    int8_t mainVelocity = -1;
+    int16_t velMax = 0;
+    for (int i = 0; i < 6; i++) {
+        // bigger than deadzone and bigger than before?
+        if((abs(velocity[i]) > velMax) && (abs(velocity[i]) > VelocityDeadzoneForLED)) {
+            velMax = abs(velocity[i]);
+            mainVelocity = i;
+        }
+    }
+    return mainVelocity;
 }
