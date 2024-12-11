@@ -298,7 +298,12 @@
 // The LEDpin is used as a data pin
 // which velocitys are regarded no movement for led?
 #define VelocityDeadzoneForLED 15
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 
+// about how many LEDs must the ring by turned to align?
+#define LEDclockOffset 0
+// move defines to config.h!
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Advanced HID settings
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Definition, how many bits are used in the HID report to encode the keys

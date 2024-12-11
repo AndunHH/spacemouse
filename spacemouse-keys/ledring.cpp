@@ -2,19 +2,24 @@
 // Please open config_sample.h, adjust your settings and save it as config.h
 #include "config.h"
 #include <Arduino.h>
+#include <FastLED.h>
 
 #include "ledring.h"
-#include <FastLED.h>
+
+void setLEDsOnClock(uint16_t clock, CRGB color); // should stay private - move  to better place TODO
+void setAllLEDs(CRGB color);
+void rotateColor(boolean clockwise, CRGB color);
+
 
 #include "calibration.h"
 
 CRGB leds[LEDRING];
 ; // time from millis(), when the last led was set
-#define LEDUPDATERATE_MS 500
+#define LEDUPDATERATE_MS 200
 
 /// @brief Initialize the LED ring. Call this once during setup()
 void initLEDring() {
-    FastLED.addLeds<WS2811, LEDpin, RGB>(leds, LEDRING);
+    FastLED.addLeds<WS2811, LEDpin, GRB>(leds, LEDRING);
 }
 
 /// @brief process the LEDs connected via FastLED. Call this in loop()
@@ -22,49 +27,111 @@ void initLEDring() {
 void processLED(int16_t* velocity) {
     unsigned long now = millis();
     static unsigned long lastLEDupdate = now;
-    //static int whiteLed = 0;
+    
     if (now - lastLEDupdate >= LEDUPDATERATE_MS) {  
-      // Turn our current led back to black for the next loop around
-      //leds[whiteLed] = CRGB::Black;
-      //whiteLed = (whiteLed + 1) % LEDRING;
+        setAllLEDs(CRGB::Black);
 
-      calcLEDstate(velocity);
-    getMainVelocity(velocity);
-      // Turn our current led on to white, then show the leds
-      //leds[whiteLed] = CRGB::White;
-
-      // Show the leds (only one of which is set to white, from above)
+       switch (getMainVelocity(velocity)) {
+            case TRANSX:
+            // TX pos: 3 o'clock neg: 9 o'clock
+                if(velocity[TRANSX] > 0) {
+                    setLEDsOnClock(3, CRGB::Red);
+                } 
+                else {
+                    setLEDsOnClock(9, CRGB::Red);
+                }
+            break;
+            case TRANSY:
+            // TY pos: 12 o'clock neg, 6 o'clock
+                if(velocity[TRANSY] > 0) {
+                    setLEDsOnClock(12, CRGB::Red);
+                } 
+                else {
+                    setLEDsOnClock(6, CRGB::Red);
+                }
+            break;
+            case TRANSZ:
+            // TZ pos: all white, neg: all dark blue
+                if(velocity[TRANSZ] > 0) {
+                    setAllLEDs(CRGB::AntiqueWhite);
+                    FastLED.setBrightness(50);
+                } 
+                else {
+                    setAllLEDs(CRGB::DarkBlue);
+                    FastLED.setBrightness(50);
+                }
+            break;
+            case ROTX:
+            // RX pos: red 6 o'clock, neg red 12 o'clock
+                if(velocity[ROTX] > 0) {
+                    setLEDsOnClock(6, CRGB::Green);
+                } 
+                else {
+                    setLEDsOnClock(12, CRGB::Green);
+                }
+            break;
+            case ROTY:
+            // RY pos: red 3 o'clock, neg red 9 o'clock
+                if(velocity[ROTY] > 0) {
+                    setLEDsOnClock(3, CRGB::Green);
+                } 
+                else {
+                    setLEDsOnClock(9, CRGB::Green);
+                }
+            break;
+            case ROTZ:
+            // RZ pos: red ring wandering around counterclock wise; neg: clockwise
+                if(velocity[ROTZ] > 0) {
+                    rotateColor(false, CRGB::Green);
+                }
+                else {
+                    rotateColor(true, CRGB::Red);
+                }
+            break;
+            default: // all very dimm
+                    setAllLEDs(CRGB::DarkGrey);
+                    FastLED.setBrightness(10);
+            break;
+        }
+        
       FastLED.show();
       lastLEDupdate += LEDUPDATERATE_MS;
     }
 }
 
-/// @brief calculate which LEDs shall light up, depending on the velocity informations
-/// @param velocity 
-void calcLEDstate(int16_t *velocity)
-{
-    if (velocity[TRANSX] > 10)
-    {
-        leds[6] = CRGB::White;
-        leds[18] = CRGB::Black;
+/// @brief rotate a single around the LED ring
+/// @param clockwise turns clockwise if true
+/// @param color which CRGB color
+void rotateColor(boolean clockwise, CRGB color) {
+    static int rotateLEDpos = 0;
+    leds[rotateLEDpos] = color;
+    if (clockwise) {
+        rotateLEDpos = (rotateLEDpos + 1) % LEDRING;
     }
-    else
-    {
-        leds[18] = CRGB::White;
-        leds[6] = CRGB::Black;
+    else{
+        rotateLEDpos = (rotateLEDpos + LEDRING - 1) % LEDRING; // avoid negativ led position 
     }
+    
+}
 
-    if (velocity[TRANSY] > 10)
-    {
-        leds[12] = CRGB::White;
-        leds[0] = CRGB::Black;
-    }
-    else
-    {
-        leds[0] = CRGB::White;
-        leds[12] = CRGB::Black;
+/// @brief set all leds to given color
+/// @param color 
+void setAllLEDs(CRGB color) {
+    for (int i = 0; i<LEDRING; i++) {
+    leds[i] = color;
     }
 }
+
+/// @brief set LED on LED ring regarding the ring as a clock
+/// @param clock position of the LED to light up
+/// @param color color to light
+void setLEDsOnClock(uint16_t clock, CRGB color) {
+    uint16_t pos = 0;
+    pos = (clock * (LEDRING/12))%LEDRING;
+    pos = (LEDclockOffset + pos)%LEDRING;
+    leds[pos] = color;
+}
+
 
 /// @brief Calculate which velocity is the main action. What is the strongest movement?
 /// @param velocity array with velocities
