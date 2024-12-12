@@ -29,9 +29,13 @@
   #include "encoderWheel.h" 
 #endif 
 
+#ifdef LEDpin
+  void lightSimpleLED(boolean light);
+#endif
 #ifdef LEDRING 
   #include "ledring.h"
 #endif
+
 
 // the debug mode can be set during runtime via the serial interface
 int debug = STARTDEBUG;
@@ -296,21 +300,31 @@ void loop() {
     updateFrequencyReport();
   }
 
-
-
 #ifdef LEDpin 
   #ifdef LEDRING 
-    processLED(velocity);
+    processLED(velocity, SpaceMouseHID.updateLEDState());
   #else
+    lightSimpleLED(SpaceMouseHID.updateLEDState());
+    // Check for the LED state by calling updateLEDState. 
+    // This empties the USB input buffer and checks for the corresponding report.
+  #endif
+#endif
 
+} // end loop()
+
+#ifdef LEDpin
+/// @brief Turn on or off a simple led. The pin is defined by LEDpin in config.h. If the LED needs to be inverted, define LEDinvert in config.h
+/// @param light turn on or off
+void lightSimpleLED(boolean light) {
     // Check for the LED state by calling updateLEDState. 
     // This empties the USB input buffer and checks for the corresponding report.
     #ifdef LEDinvert
-    // Swap the LED logic, if necessary
-    if(!SpaceMouseHID.updateLEDState()) {
+        // Swap the LED logic, if necessary
+      if (light) 
     #else
-    if(SpaceMouseHID.updateLEDState()) {
+      if(!light) 
     #endif
+    {
       // true -> LED on -> pull kathode down
       digitalWrite(LEDpin, LOW);   // turn the LED o
     }
@@ -318,6 +332,5 @@ void loop() {
       // false -> LED off -> pull kathode up 
       digitalWrite(LEDpin, HIGH);   // turn the LED 
     }
-  #endif
-#endif
 }
+#endif
