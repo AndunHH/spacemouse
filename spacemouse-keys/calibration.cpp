@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "calibration.h"
+#include "kinematics.h"
 #include "config.h"
 
 void printArray(int arr[], int size) {
@@ -294,23 +295,4 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
     Serial.println(F(" iterations."));
   }
   return noWarningsOccured;
-}
-
-// define an array for reading the analog pins of the joysticks, see config.h
-int pinList[8] = PINLIST;
-int invertList[8] = INVERTLIST; 
-
-// Function to read and store analogue voltages for each joystick axis.
-void readAllFromJoystick(int *rawReads)
-{
-  for (int i = 0; i < 8; i++)
-  {
-    if (invertList[i] == 1) {
-      // invert the reading
-      rawReads[i] = 1023 - analogRead(pinList[i]);  
-    }
-    else {
-      rawReads[i] = analogRead(pinList[i]);
-    } 
-  }
 }
