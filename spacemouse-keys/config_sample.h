@@ -293,8 +293,17 @@
 // #define LEDpin 5
 // If you have connected the LED to the controller port and gnd, invert it by uncommenting this #define
 // #define LEDinvert
+// The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring.
+#define LEDRING 24 
+// The LEDpin is used as a data pin
+// which velocitys are regarded no movement for led?
+#define VelocityDeadzoneForLED 15
+// 
+// about how many LEDs must the ring by turned to align?
+#define LEDclockOffset 0
+// move defines to config.h!
 
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Advanced HID settings
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Definition, how many bits are used in the HID report to encode the keys
