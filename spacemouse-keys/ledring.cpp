@@ -6,12 +6,13 @@
 #include <FastLED.h>
 
 #include "ledring.h"
+#include "kinematics.h"
 
 void setLEDsOnClock(uint16_t clock, CRGB color); // should stay private - move  to better place TODO
 void setAllLEDs(CRGB color);
 void rotateColor(boolean clockwise, CRGB color);
 
-#include "calibration.h"
+
 
 CRGB leds[LEDRING];
 ; // time from millis(), when the last led was set
@@ -30,6 +31,7 @@ void processLED(int16_t *velocity, boolean ledCmd)
 {
     unsigned long now = millis();
     static unsigned long lastLEDupdate = now;
+    
 
     if (now - lastLEDupdate >= LEDUPDATERATE_MS)
     {
