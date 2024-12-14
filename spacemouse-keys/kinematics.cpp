@@ -122,7 +122,7 @@ void calculateKinematic(int *centered, int16_t *velocity)
         }
     }
     else
-    {                                                                                                // pulling the knob upwards is much heavier... smaller factor
+    {                                                                               // pulling the knob upwards is much heavier... smaller factor
         velocity[TRANSZ] = constrain(velocity[TRANSZ] / ((float)POS_TRANSZ_SENSITIVITY), -350, 350); // no modifier function, just constrain linear!
     }
 
@@ -173,12 +173,13 @@ void calculateKinematic(int *centered, int16_t *velocity)
 
 /// @brief Switch position of X and Y values
 /// @param velocity pointer to velocity array
-void switchXY(int16_t *velocity) {
+void switchXY(int16_t *velocity)
+{
     int16_t tmp = 0;
     tmp = velocity[TRANSX];
     velocity[TRANSX] = velocity[TRANSY];
     velocity[TRANSY] = tmp;
-    
+
     tmp = velocity[ROTX];
     velocity[ROTX] = velocity[ROTY];
     velocity[ROTY] = tmp;

@@ -8,15 +8,14 @@
 #include "ledring.h"
 #include "kinematics.h"
 
-void setLEDsOnClock(uint16_t clock, CRGB color); // should stay private - move  to better place TODO
+// the following functions are only called from ledring.cpp and are therefore not in the header file
+void setLEDsOnClock(uint16_t clock, CRGB color); 
+void set4LEDsOnClock(uint16_t clock, CRGB color);
 void setAllLEDs(CRGB color);
 void rotateColor(boolean clockwise, CRGB color);
 
-
-
 CRGB leds[LEDRING];
-; // time from millis(), when the last led was set
-#define LEDUPDATERATE_MS 200
+
 
 /// @brief Initialize the LED ring. Call this once during setup()
 void initLEDring()
@@ -47,30 +46,33 @@ void processLED(int16_t *velocity, boolean ledCmd)
             switch (getMainVelocity(velocity))
             {
             case TRANSX:
-                // TX pos: 3 o'clock neg: 9 o'clock
-                if (velocity[TRANSX] > 0)
+                setAllLEDs(CRGB::Yellow);
+                // TX pos: 3 o'clock neg: 9 o'clock 
+                // light up the _free_ positions 
+                if ((velocity[TRANSX] > 0) != (INVX == 1))
                 {
-                    setLEDsOnClock(3, CRGB::Red);
+                    set4LEDsOnClock(9, CRGB::Red);
                 }
                 else
                 {
-                    setLEDsOnClock(9, CRGB::Red);
+                    set4LEDsOnClock(3, CRGB::Red);
                 }
                 break;
             case TRANSY:
+                setAllLEDs(CRGB::Yellow);
                 // TY pos: 12 o'clock neg, 6 o'clock
-                if (velocity[TRANSY] > 0)
+                if ((velocity[TRANSY] > 0) != (INVY == 1))
                 {
-                    setLEDsOnClock(12, CRGB::Red);
+                    set4LEDsOnClock(6, CRGB::Red);
                 }
                 else
                 {
-                    setLEDsOnClock(6, CRGB::Red);
+                    set4LEDsOnClock(12, CRGB::Red);
                 }
                 break;
             case TRANSZ:
                 // TZ pos: all white, neg: all dark blue
-                if (velocity[TRANSZ] > 0)
+                if ((velocity[TRANSZ] > 0) != (INVZ == 1))
                 {
                     setAllLEDs(CRGB::AntiqueWhite);
                     FastLED.setBrightness(50);
@@ -82,41 +84,44 @@ void processLED(int16_t *velocity, boolean ledCmd)
                 }
                 break;
             case ROTX:
+                setAllLEDs(CRGB::SkyBlue);
                 // RX pos: red 6 o'clock, neg red 12 o'clock
-                if (velocity[ROTX] > 0)
+                if ((velocity[ROTX] > 0) != (INVRX == 1))
                 {
-                    setLEDsOnClock(6, CRGB::Green);
+                    set4LEDsOnClock(12, CRGB::Green);
                 }
                 else
                 {
-                    setLEDsOnClock(12, CRGB::Green);
+                    set4LEDsOnClock(6, CRGB::Green);
                 }
                 break;
             case ROTY:
+                setAllLEDs(CRGB::SkyBlue);
                 // RY pos: red 3 o'clock, neg red 9 o'clock
-                if (velocity[ROTY] > 0)
+                if ((velocity[ROTY] > 0) != (INVRY == 1))
                 {
-                    setLEDsOnClock(3, CRGB::Green);
+                    set4LEDsOnClock(9, CRGB::Green);
                 }
                 else
                 {
-                    setLEDsOnClock(9, CRGB::Green);
+                    set4LEDsOnClock(3, CRGB::Green);
                 }
                 break;
             case ROTZ:
+                setAllLEDs(CRGB::SkyBlue);
                 // RZ pos: red ring wandering around counterclock wise; neg: clockwise
-                if (velocity[ROTZ] > 0)
+                if ((velocity[ROTZ] > 0) != (INVRZ == 1))
                 {
-                    rotateColor(false, CRGB::Green);
+                    rotateColor(false, CRGB::DarkRed);
                 }
                 else
                 {
-                    rotateColor(true, CRGB::Red);
+                    rotateColor(true, CRGB::DarkRed);
                 }
                 break;
             default: // all very dimm
                 setAllLEDs(CRGB::DarkGrey);
-                FastLED.setBrightness(10);
+                FastLED.setBrightness(5);
                 break;
             }
         }
@@ -161,6 +166,21 @@ void setLEDsOnClock(uint16_t clock, CRGB color)
     pos = (clock * (LEDRING / 12)) % LEDRING;
     pos = (LEDclockOffset + pos) % LEDRING;
     leds[pos] = color;
+}
+
+/// @brief set 4 LEDs on LED ring regarding the ring as a clock
+/// @param clock position of the LED to light up
+/// @param color color to light
+void set4LEDsOnClock(uint16_t clock, CRGB color)
+{
+    uint16_t pos = 0;
+    pos = (clock * (LEDRING / 12)) % LEDRING;
+    pos = (LEDclockOffset + pos) % LEDRING;
+
+    leds[pos] = color;
+    leds[(pos+1)%LEDRING] = color;
+    leds[(LEDRING + pos - 1)%LEDRING] = color;
+    leds[(LEDRING + pos - 2)%LEDRING] = color;
 }
 
 #endif // #if LEDring

@@ -192,11 +192,11 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 */
 
 #define INVX 0   // pan left/right  // 3Dc: 0
-#define INVY 0   // pan up/down     // 3Dc: 1
-#define INVZ 0   // zoom in/out     // 3Dc: 1
+#define INVY 1   // pan up/down     // 3Dc: 1
+#define INVZ 1   // zoom in/out     // 3Dc: 1
 #define INVRX 0  // Rotate around X axis (tilt front/back)  // 3Dc: 0
-#define INVRY 0  // Rotate around Y axis (tilt left/right)  // 3Dc: 1
-#define INVRZ 0  // Rotate around Z axis (twist left/right) // 3Dc: 1
+#define INVRY 1  // Rotate around Y axis (tilt left/right)  // 3Dc: 1
+#define INVRZ 1  // Rotate around Z axis (twist left/right) // 3Dc: 1
 
 //Switch Zooming with Up/Down Movement
 #define SWITCHYZ 0  // change to 1 to switch Y and Z axis
@@ -365,6 +365,9 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
  
 // About how many LEDs must the ring by turned to align?
 #define LEDclockOffset 0
+
+// how often shall the LEDs be updated
+#define LEDUPDATERATE_MS 150
 
 /* Advanced USB HID settings
 ============================
