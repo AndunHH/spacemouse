@@ -8,16 +8,9 @@ void debugOutput5(int* centered, int16_t* velocity);
 void printArray(int arr[], int size);
 void calcMinMax(int* centered);
 
-
-
-// call this function to find out, if a new debug output shall be generated
-// this is used in order to generate a debug line only every DEBUGDELAY ms
-#define DEBUGDELAY 100
 bool isDebugOutputDue();
 
-// update and report the function to learn at what frequency the loop is running
 void updateFrequencyReport();
 
-// Calibrate (=zero) the space mouse
 bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag);
 

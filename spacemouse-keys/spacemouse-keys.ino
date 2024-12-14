@@ -1,4 +1,4 @@
-// This is the arduino source code for the open source space mouse with keys.
+// This is the source code for the open source space mouse with keys.
 // Please read the introduction and history with all contributors here:
 // https://github.com/AndunHH/spacemouse
 
@@ -14,11 +14,10 @@
 
 // header file for calibration output and helper routines
 #include "calibration.h"
+// header to calculate the kinematics of the mouse
 #include "kinematics.h"
-
 // header file for reading the keys
 #include "spaceKeys.h"
-
 // header for HID emulation of the spacemouse
 #include "SpaceMouseHID.h"
 
@@ -35,17 +34,30 @@ void lightSimpleLED(boolean light);
 #include "Arduino.h"
 #endif
 
-// the debug mode can be set during runtime via the serial interface
+// the debug mode can be set during runtime via the serial interface. See config.h for a description of the different debug modes.
 int debug = STARTDEBUG;
 
-// Centerpoint variable to be populated during setup routine.
+// stores the raw analog values from the joysticks
+int rawReads[8];
+
+// Centerpoints store the zero position of the joysticks
 int centerPoints[8];
+
+// stores the values from the joysticks after zeroing and mapping
+int centered[8];
 
 // store raw value of the keys, without debouncing
 int keyVals[NUMKEYS];
+
 // final value of the keys, after debouncing
 uint8_t keyOut[NUMKEYS];
 uint8_t keyState[NUMKEYS];
+
+// Resulting calculated velocities / movements
+// int16_t to match what the HID protocol expects.
+int16_t velocity[6];
+
+int tmpInput; // store the value, the user might input over the serial
 
 void setup()
 {
@@ -76,14 +88,6 @@ void setup()
 #endif
 #endif
 }
-
-int rawReads[8], centered[8];
-
-// Resulting calculated velocities / movements
-// int16_t to match what the HID protocol expects.
-int16_t velocity[6];
-
-int tmpInput; // store the value, the user might input over the serial
 
 void loop()
 {
