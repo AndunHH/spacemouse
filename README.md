@@ -1,3 +1,13 @@
+# New Update: Support for neopixel led ring
+
+December 2024 Update: Support for LED rings like a neopixel! 
+
+![Overview of the spacemouse with neopixel led ring](pictures/neopixel-3dof-mouse.png)
+The adafruit neopixel led ring with an inner diameter of 52.3 mm fits well.
+
+Filming the LEDs "in action" is very hard, maybe you can get an idea:
+![animated LED ring animation](pictures/NeoPixelRing-lightning.gif)
+
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
 Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". (This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll.)
 
@@ -25,6 +35,7 @@ To see all features in place, like the buttons and the encoder, check out the di
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
 - Check out the [config_sample.h](spacemouse-keys/config_sample.h) for more informations about configurable elements and extensive debug outputs
 - LED can be enabled by the PC driver
+- Support for a LED ring, as supported by the FastLED library
 
 Wanted features:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
@@ -131,7 +142,7 @@ Here are some of the remixes or additions that are used with this software:
 
 # Electronics and pin assignment
 
-The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys:
+The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys and the added neopixel ring.
 ![WiringSpaceMouse](pictures/fritzing-electronics.png)
 
 The calculations in the program expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
