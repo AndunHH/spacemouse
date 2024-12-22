@@ -2,14 +2,13 @@
 
 #include <Arduino.h>
 #include "calibration.h"
+#include "kinematics.h"
 #include "config.h"
 
+/// @brief Prints an array to the Serial, in order to copy the output again to C-Code. Example output: {-519, -521, -512, -2, -519, -482, -508, -1}
+/// @param arr array to print
+/// @param size size of the array
 void printArray(int arr[], int size) {
-  /*This functions prints an array to the Serial and you can copy the output the c code again.
-     Example output: int minVals[8] = {-519, -521, -512, -2, -519, -482, -508, -1};
-
-     Before calling this function, you should need to call the following line and change "mValues" with the variable name, you want to be printed
-  */
   Serial.print("{");
   for (int i = 0; i < size; i++) {
     Serial.print(arr[i]);
@@ -54,8 +53,11 @@ void debugOutput2(int* centered) {
   }
 }
 
+/// @brief Report translation and rotation values if enabled. 
+/// @param velocity pointer to velocity array
+/// @param keyOut pointer to keyOut array
 void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
-  // Report translation and rotation values if enabled. Approx -350 to +350 depending on the parameter.
+  // 
   if (isDebugOutputDue()) {
     for (int i = 0; i < 6; i++) {
       Serial.print(velNames[i]);
@@ -97,11 +99,9 @@ int minValue[8];          // Array to store the minimum values
 int maxValue[8];          // Array to store the maximum values
 unsigned long startTime;  // Start time for the measurement
 
+/// @brief This function records the minimum and maximum movement of the joysticks: After initialization, move the mouse for 15s and see the printed output. Replug/reset the mouse, to enable the semi-automatic calibration for a second time.
+/// @param centered pointer to the array with the centered joystick values
 void calcMinMax(int* centered) {
-  // compile the sketch, upload it and wait for confirmation in the serial console.
-  // Move the spacemouse around for 15s to get a min and max value.
-  // copy the output from the console into your config.h
-
   if (minMaxCalcState == 0) {
     delay(2000);
     // Initialize the arrays
@@ -155,11 +155,12 @@ void calcMinMax(int* centered) {
   }
 }
 
-unsigned long lastDebugOutput = 0;  // time from millis(), when the last debug output was given
 
-// call this function to find out, if a new debug output shall be generated
-// this is used in order to generate a debug line only every DEBUGDELAY ms, see calibration.h
+/// @brief Check, if a new debug output shall be generated. This is used in order to generate a debug line only every DEBUGDELAY ms, see config.h
+/// @return true, if debug message is due
 bool isDebugOutputDue() {
+  static unsigned long lastDebugOutput = 0;  // time from millis(), when the last debug output was given
+
   if (millis() - lastDebugOutput > DEBUGDELAY) {
     lastDebugOutput = millis();
     return true;
@@ -171,7 +172,7 @@ bool isDebugOutputDue() {
 uint16_t iterationsPerSecond = 0;       // count the iterations within one second
 unsigned long lastFrequencyUpdate = 0;  // time from millis(), when the last frequency was calculated
 
-// update and report the frequency of the loop function
+/// @brief update and report the function to learn at what frequency the loop is running
 void updateFrequencyReport() {
   // increase iterations counter
   iterationsPerSecond++;
@@ -184,11 +185,11 @@ void updateFrequencyReport() {
   }
 }
 
-// Calibrate (=zero) the space mouse
-// numIterations: How many readings are taken to calculate the mean. Suggestion: 500 iterations, they take approx. 480ms.
-// With debugFlag = true, a suggestion for the dead zone is given on the serial interface to save to the config.h
-// It's blocking other functions in the meantime
-// returns true, if no warnings occured.
+/// @brief Calibrate (=zero) the space mouse. The function is blocking other functions of the spacemouse during zeroing.
+/// @param centerPoints 
+/// @param numIterations How many readings are taken to calculate the mean. Suggestion: 500 iterations, they take approx. 480ms.
+/// @param debugFlag With debugFlag = true, a suggestion for the dead zone is given on the serial interface to save to the config.h
+/// @return returns true, if no warnings occured. Warnings are given if the zero positions are very unlikely
 bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
 {
   bool noWarningsOccured = true;
@@ -294,23 +295,4 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
     Serial.println(F(" iterations."));
   }
   return noWarningsOccured;
-}
-
-// define an array for reading the analog pins of the joysticks, see config.h
-int pinList[8] = PINLIST;
-int invertList[8] = INVERTLIST; 
-
-// Function to read and store analogue voltages for each joystick axis.
-void readAllFromJoystick(int *rawReads)
-{
-  for (int i = 0; i < 8; i++)
-  {
-    if (invertList[i] == 1) {
-      // invert the reading
-      rawReads[i] = 1023 - analogRead(pinList[i]);  
-    }
-    else {
-      rawReads[i] = analogRead(pinList[i]);
-    } 
-  }
 }
