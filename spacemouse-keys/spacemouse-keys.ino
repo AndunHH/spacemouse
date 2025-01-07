@@ -198,7 +198,7 @@ void loop()
   }
 
 #if SWITCHYZ > 0
-  switchXY(velocity);
+  switchYZ(velocity);
 #endif
 
   // get the values to the USB HID driver to send if necessary

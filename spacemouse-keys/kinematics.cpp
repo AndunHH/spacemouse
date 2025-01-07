@@ -184,3 +184,17 @@ void switchXY(int16_t *velocity)
     velocity[ROTX] = velocity[ROTY];
     velocity[ROTY] = tmp;
 }
+
+/// @brief Switch position of Y and Z values
+/// @param velocity pointer to velocity array
+void switchYZ(int16_t *velocity)
+{
+    int16_t tmp = 0;
+    tmp = velocity[TRANSY];
+    velocity[TRANSY] = velocity[TRANSZ];
+    velocity[TRANSZ] = tmp;
+
+    tmp = velocity[ROTY];
+    velocity[ROTY] = velocity[ROTZ];
+    velocity[ROTZ] = tmp;
+}
