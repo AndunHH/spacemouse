@@ -12,7 +12,7 @@ Debugging Instructions
 =========================
 To activate one of the following debugging modes, you can either:
 - Change STARTDEBUG here in the code and compile again or
-- Compile und upload your programm. Change to the serial monitor and type the number and hit enter to select the debug mode.
+- Compile and upload your program. Change to the serial monitor and type the number and hit enter to select the debug mode.
 
 Debug Modes:
 ------------
@@ -20,26 +20,26 @@ Debug Modes:
 0:  Nothing...
 
 1:  Output raw joystick values. 0-1023 raw ADC 10-bit values
-11: Calibrate / Zero the spacemouse and get a dead-zone suggestion (This is also done on every startup in the setup())
+11: Calibrate / Zero the Spacemouse and get a dead-zone suggestion (This is also done on every startup in the setup())
 
-2:  Output centered joystick values. Values should be approx -500 to +500, jitter around 0 at idle.
+2:  Output centered joystick values. Values should be approximately -500 to +500, jitter around 0 at idle.
 20: semi-automatic min-max calibration. (Replug/reset the mouse, to enable the semi-automatic calibration for a second time.)
 
-3:  Output centered joystick values. Filtered for deadzone. Approx -350 to +350, locked to zero at idle, modified with a function.
+3:  Output centered joystick values. Filtered for deadzone. Approximately -350 to +350, locked to zero at idle, modified with a function.
 
-4:  Output translation and rotation values. Approx -350 to +350 depending on the parameter.
+4:  Output translation and rotation values. Approximately -350 to +350 depending on the parameter.
 5:  Output debug 4 and 5 side by side for direct cause and effect reference.
 6:  Report velocity and keys after possible kill-key feature
 7:  Report the frequency of the loop() -> how often is the loop() called in one second?
 8:  Report the bits and bytes send as button codes
 9:  Report details about the encoder wheel, if ROTARY_AXIS > 0
 */
-#define STARTDEBUG 0  // Can also be set over the serial interface, while the programm is running!
+#define STARTDEBUG 0  // Can also be set over the serial interface, while the program is running!
 
 // Generate a debug line only every DEBUGDELAY ms
 #define DEBUGDELAY 100
 
-/* First Calibration: Joystick axis pin assigment
+/* First Calibration: Joystick axis pin assignment
 ==============================================
 Default Assembly when looking from above on top of the space mouse
    back    resulting axis (not from the single joystick)
@@ -86,7 +86,7 @@ If you have the joystick TeachingTech recommended:
  
 /* Second calibration: Tune Deadzone
 ====================================
-Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
+Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too sensitive to subtle movements.
 Semi-automatic: Set debug = 11. Don't touch the mouse and observe the automatic output.
 Manual: Set debug = 2. Don't touch the mouse but observe the values. They should be nearly to zero. Every value around zero which is noise or should be neglected afterwards is in the following deadzone. 
 */
@@ -100,14 +100,14 @@ Semi-automatic (debug=20)
 ------------------------
 1. Compile the sketch and upload it.
 2. Go to the serial monitor type 20 and hit enter. -> debug is set to 20.
-3. Move the spacemouse around for 15s to get a min and max value.
+3. Move the Spacemouse around for 15s to get a min and max value.
 4. Verify, that the minimums are around -400 to -520 and the maxVals around +400 to +520.
 (repeat or check again, if you have too small values!)
 5. Copy the output from the console into your config.h below.
 
 Manual min/max calibration (debug = 2)
 --------------------------------------
-Recommended calibration procedure for min/max adc levels
+Recommended calibration procedure for min/max ADC levels
 1. Compile the sketch and upload it. Go to the serial monitor type 2 and hit enter. -> debug is set to 2.
 2. Get a piece of paper and write the following chart:
  Chart:
@@ -123,7 +123,7 @@ Recommended calibration procedure for min/max adc levels
  DY+:         | DY-:
 
 3. (a) Start out with AX (positive Values)
-   (b) Start moving the your spacemouse and try increasing the Value of AX till you can't get a higher value out of it.
+   (b) Start moving the your Spacemouse and try increasing the Value of AX till you can't get a higher value out of it.
    (c) this is your positive maximum value for AX so write it down for AX
 4. Do the same for AY,BX,BY,....DY
 5. Do the same for your negative Values to populate the minVals
@@ -138,24 +138,24 @@ Insert measured Values like this: {AX,AY,BX,BY,CX,CY,DX,DY}.
 
 /* Fourth calibration: Sensitivity
 ==================================
-Use degbug mode 4 or use for example your cad program to verify changes.
+Use debug mode 4 or use for example your cad program to verify changes.
 E.g. use lower value like 0.5 to make axis more sensitive, use higher value like 5 to make it less sensitive.
 
 Recommended calibration procedure for sensitivity
 -------------------------------------------------
 1. Make sure modFunc is on level 0, see below. Upload the sketch. Then open serial monitor, type 4 for and hit enter. You will see Values TX, TY, TZ, RX, RY, RZ
-2. Start moving your spacemouse. You will notice values changing.
-3. Starting with TX try increasing this value as much as possible by moving your spacemouse around. If you get around 350 thats great. If not change TRANSX_SENSITIVITY and reupload sketch. Repeat until it is around 350 for maximum motion.
+2. Start moving your Spacemouse. You will notice values changing.
+3. Starting with TX try increasing this value as much as possible by moving your Spacemouse around. If you get around 350 thats great. If not change TRANSX_SENSITIVITY and reupload sketch. Repeat until it is around 350 for maximum motion.
 4. Repeat steps 3 for TY, TZ, RX, RY, RZ
-5. Verification: Move the Jockstick in funny ways. All you should get for eather TX,TX,TZ,RX,RY,RZ should be aprox. between -350 to 350.
-6. You have finished sensitivity calibration. You can now test your spacemouse with your favorite program (e.g. Cad software, Slicer)
+5. Verification: Move the Joystick in funny ways. All you should get for either TX,TX,TZ,RX,RY,RZ should be approximately between -350 to 350.
+6. You have finished sensitivity calibration. You can now test your Spacemouse with your favorite program (e.g. Cad software, Slicer)
 7. Aftermath: You notice the movements are hard to control. Try using Modification Functions 
 [Suggestion: ModFunc level 3]
 */
 #define TRANSX_SENSITIVITY 2
 #define TRANSY_SENSITIVITY 2
 #define POS_TRANSZ_SENSITIVITY 0.5
-#define NEG_TRANSZ_SENSITIVITY 5  // I want low sensitiviy for down, therefore a high value.
+#define NEG_TRANSZ_SENSITIVITY 5  // I want low sensitivity for down, therefore a high value.
 #define GATE_NEG_TRANSZ 15        // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
 #define GATE_ROTX 15              // Value under which rotX values will be forced to zero
 #define GATE_ROTY 15              // Value under which roty values will be forced to zero
@@ -167,7 +167,7 @@ Recommended calibration procedure for sensitivity
 
 /* Fifth calibration: Modifier Function
 =======================================
-Modify resulting behaviour of spacemouse outputs to suppres small movements around zero and enforce big movements even more.
+Modify resulting behaviour of Spacemouse outputs to suppress small movements around zero and enforce big movements even more.
 
 Check the README.md for more details and a plot of the different functions.
 (This function is applied on the resulting velocities and not on the direct input from the joysticks)
@@ -176,7 +176,7 @@ This should be at level 0 when starting the calibration!
 0: linear y = x [Standard behaviour: No modification]
 1: squared function y = x^2*sign(x) [altered squared function working in positive and negative direction]
 2: tangent function: y = tan(x) [Results in a linear curve near zero but increases the more you are away from zero]
-3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases alot the more you are away from zero]
+3: squared tangent function: y = tan(x^2*sign(X)) [Results in a flatter curve near zero but increases a lot the more you are away from zero]
 4: cubed tangent function: y = tan(x^3) [Results in a very flat curve near zero but increases drastically the more you are away from zero]
 Recommendation after tuning: MODFUNC 3
 */
@@ -184,7 +184,7 @@ Recommendation after tuning: MODFUNC 3
 
 /* Sixth Calibration: Direction
 ===============================
-Modify the direction of translation/rotation depending on the CAD prorgramm you are using on your PC.
+Modify the direction of translation/rotation depending on the CAD program you are using on your PC.
 This should be done, when you are done with the pin assignment!
 
 If all defines are set to 0 the resulting X, Y and Z axis correspond to the pictures shown in the README.md. 
@@ -198,19 +198,19 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 #define INVRY 1  // Rotate around Y axis (tilt left/right)  // 3Dc: 1
 #define INVRZ 1  // Rotate around Z axis (twist left/right) // 3Dc: 1
 
-//Switch Zooming with Up/Down Movement
+//Switch Zoom direction with Up/Down Movement
 #define SWITCHYZ 0  // change to 1 to switch Y and Z axis
 
 /* Key Support 
 ===============
-If you attached keys to your spacemouse, configure them here. 
+If you attached keys to your Spacemouse, configure them here. 
 You can use the keys to report them via USB HID to the PC or as kill-keys (described below).
 
 How many keys are there in total? (0=no keys, feature disabled)
 */
 #define NUMKEYS 0
 
-// Define the pins for the keys on the arduino
+// Define the pins for the keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
 #define KEYLIST \
   { 15, 14, 16, 10 }
@@ -238,7 +238,7 @@ How many keys reported? */
 #define SM_CTRL     25 // Key "CTRL"
 #define SM_ROT      26 // Key "Rotate" 
 
-// BUTTONLIST must have as many elemets as NUMHIDKEYS
+// BUTTONLIST must have as many elements as NUMHIDKEYS
 // The keys from KEYLIST are assigned to buttons here:
 #define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_RCW }
 
@@ -301,7 +301,7 @@ How many kill keys are there? (disabled: 0; enabled: 2)
 /* Encoder Wheel
 ================
 You can attach an encoder to the mouse, which acts as an input device for one movement.
-Needs the encoder library by Paul Stoffregen.
+Needs the encoder library by Paul Stoffregen (https://www.pjrc.com/teensy/td_libs_Encoder.html).
 */
 
 // Define the encoder pins
@@ -313,8 +313,8 @@ Needs the encoder library by Paul Stoffregen.
 Axis to replace with encoder
 0. None -> disable this feature completely
 1. transX
-2. transY (zoom in "Forward / Backward" Zoom Direction configuration)
-3. transZ (simulates zoom in "Up / Down" Zoom Direction configuration)
+2. transY (zoom in "Forward / Backward" Zoom Direction configuration, see SWITCHYZ)
+3. transZ (simulates zoom in "Up / Down" Zoom Direction configuration , see SWITCHYZ)
 4. rotX
 5. rotY
 6. rotZ
@@ -339,7 +339,7 @@ Recommended strength = 200
 ===============
 You can attach:
 a) a simple LED to the mouse. LED shall be connected to 5V and the controller port.
-b) a fance LED strip, like the nanopixel. Check the FASTLED library for supported chips / led strips.
+b) a fancy LED strip, like the nanopixel. Check the FASTLED library for supported chips / led strips.
 
 Which pin shall be used as LED? This pin is used either as a digital pin (a) or as the data pin (b).
 Change from "//define" to "#define" to activate the LED feature.
@@ -348,7 +348,7 @@ Change from "//define" to "#define" to activate the LED feature.
 
 /* Simple LED
 -------------
-// If you have connected a single LED to the controller port and gnd, invert it by uncommenting this #define
+// If you have connected a single LED to the controller port and GND, invert it by uncommenting this #define
 */
 // #define LEDinvert
 
@@ -377,7 +377,7 @@ The following settings are advanced and don't need to changed for normal windows
 // Definition, how many bits are used in the HID report to encode the keys
  #define HIDMAXBUTTONS 32 // must be multiple of 8!
 
-/* ADV_HID_REL and ADV_HID_JIGGLE change how the values are reported over HID protocoll, see hidInterface.cpp and .h
+/* ADV_HID_REL and ADV_HID_JIGGLE change how the values are reported over HID protocol, see hidInterface.cpp and .h
 
 For windows users: DON'T CHANGE / DON'T ENABLE THIS, if you don't understand what it does.
 
@@ -389,7 +389,7 @@ Relative declaration (may be activated by ADV_HID_REL)
 -------------------------------------------------------
 With linux and spacenavd: If the space mouse didn't return to absolutely zero in one axis this axis will still report movement, when another direction is pushed, because only the changed values are emitted as events by the linux kernel.
 
-Despite that, values events are emited with every report send, even if they didn't changed.
+Despite that, values events are emitted with every report send, even if they didn't changed.
 
 Absolute declaration (default)
 ------------------------------
