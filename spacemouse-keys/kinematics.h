@@ -10,6 +10,7 @@ void FilterAnalogReadOuts(int* centered);
 void calculateKinematic(int* centered, int16_t* velocity);
 
 void switchXY(int16_t *velocity);
+void switchYZ(int16_t *velocity);
 
 // The following constants are here for more readable access to the arrays. You don't need to change this values!
 // Axes in centered or rawValues array
