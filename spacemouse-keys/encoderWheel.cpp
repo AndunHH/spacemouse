@@ -59,10 +59,11 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         velocity[ROTARY_AXIS - 1] = velocity[ROTARY_AXIS - 1] + simpull;
     }
     else
-    { 
+    {
         // fading has ended
         simpull = 0;
     }
+
     if (debug == 9)
     {
         // create debug output
@@ -72,6 +73,39 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         Serial.print(factor);
         Serial.print(", simpull: ");
         Serial.println(simpull);
+    }
+}
+
+/// @brief Read out the encoder and treat as keystroke
+/// @param keyState overwrite some keys with encoder movement
+/// @param debug Generate a debug output if debug=9
+
+void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
+{
+    // read encoder
+    newEncoderValue = myEncoder.read();
+    if (newEncoderValue != previousEncoderValue)
+    {
+        // dirty hack: If the position changed (ignore direction), add this to delta. As long as delta > 0, report the key as pressed
+        delta = abs((newEncoderValue - previousEncoderValue))*30 + delta;
+        previousEncoderValue = newEncoderValue;
+        
+        if (debug == 9)
+        {
+            // create debug output
+            Serial.print("Enc Val: ");
+            Serial.println(newEncoderValue);
+        }
+    }
+
+    if (delta > 0) {
+        // press the button for some small time
+        keyState[0] = 1;
+        delta--;
+    }
+    else
+    {
+        keyState[0] = 0;
     }
 }
 #endif // whole file is only implemented #if ROTARY_AXIS > 0
