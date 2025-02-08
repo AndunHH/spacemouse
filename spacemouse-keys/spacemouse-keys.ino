@@ -49,8 +49,9 @@ int centered[8];
 // store raw value of the keys, without debouncing
 int keyVals[NUMKEYS];
 
-// final value of the keys, after debouncing
+// key event, after debouncing. It is 1 only for a single sample
 uint8_t keyOut[NUMKEYS];
+// state of the key, which stays 1 as long as the key is pressed
 uint8_t keyState[NUMKEYS];
 
 // Resulting calculated velocities / movements
@@ -153,13 +154,18 @@ void loop()
 
   calculateKinematic(centered, velocity);
 
-#if ROTARY_AXIS > 0
+#if (ROTARY_AXIS > 0) && ROTARY_AXIS < 7
   // If an encoder wheel is used, calculate the velocity of the wheel and replace one of the former calculated velocities
   calcEncoderWheel(velocity, debug);
 #endif
 
 #if NUMKEYS > 0
   evalKeys(keyVals, keyOut, keyState);
+#endif
+
+#if ROTARY_AXIS == 7
+ // The encoder wheel shall be treated as a key
+  calcEncoderAsKey(keyState, debug);
 #endif
 
   if (debug == 4)
