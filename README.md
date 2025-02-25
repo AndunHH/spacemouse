@@ -50,12 +50,13 @@ You can use PlatformIO to flash the board with this fast steps.
 PlatformIO is easier than ArduinoIDE, because you don't need to change the board.txt files there.
 
 1. Install [PlatformIO](https://platformio.org/).
-2. Clone this repo and open a terminal in the cloned directory. 
-3. Copy `src/config_sample.h` to `src/config.h` and change the values to whatever suits.
-4. Run `pio run -t upload` or click on the upload arrow in the IDE.
-5. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
-6. [Use your space mouse](#use-the-spacemouse)
-7. Done!
+2. Clone this repo into a folder (hint for windows: network locations are not recommended)
+3. Copy and rename `spacemouse-keys/config_sample.h` to `spacemouse-keys/config.h` and change the values to whatever suits.
+4. Open PlatformIO / vscode and open the newly created folder.
+5. Click on the upload arrow in the IDE in the status bar or run `pio run -t upload`.
+6. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
+6. [Use your space mouse](#use-the-6-dof-mouse)
+8. Done!
 
 # Getting Started with Arduino IDE 
 1. [Create a custom board](#custom-board-to-emulate-the-space-mouse) in your Arduino IDE, that emulates the original space mouse
@@ -63,7 +64,7 @@ PlatformIO is easier than ArduinoIDE, because you don't need to change the board
 3. [Rename the config_sample.h to config.h](#create-your-own-config-file)
 4. [Try to compile and flash your board](#compiling-and-flashing-the-firmware)
 5. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
-6. [Use your space mouse](#use-the-spacemouse)
+6. [Use your space mouse](#use-the-6-dof-mouse)
 7. Done!
    
 ## Custom board to emulate the space mouse
