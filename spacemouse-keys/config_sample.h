@@ -409,3 +409,11 @@ This little extra noise is called "jiggling" and ensures that a value declared a
 // #define ADV_HID_JIGGLE
 
 
+/* Exclusive mode
+=================
+Exclusive mode only permit to send translation OR rotation, but never both at the same time.
+This can solve issues with classic joysticks where you get unwanted translation or rotation at the same time.
+
+it choose to send the one with the biggest absolute value.
+*/
+#define EXCLUSIVEMODE
