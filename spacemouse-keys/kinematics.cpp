@@ -122,7 +122,7 @@ void calculateKinematic(int *centered, int16_t *velocity)
         }
     }
     else
-    {                                                                               // pulling the knob upwards is much heavier... smaller factor
+    {                                                                                                // pulling the knob upwards is much heavier... smaller factor
         velocity[TRANSZ] = constrain(velocity[TRANSZ] / ((float)POS_TRANSZ_SENSITIVITY), -350, 350); // no modifier function, just constrain linear!
     }
 
@@ -197,4 +197,25 @@ void switchYZ(int16_t *velocity)
     tmp = velocity[ROTY];
     velocity[ROTY] = velocity[ROTZ];
     velocity[ROTZ] = tmp;
+}
+
+/// @brief Check if translation or rotation is dominant and set the other values to zero to allow exclusively rotation or translation
+// to avoid issues with classics joysticks
+/// @param velocity
+void exclusiveMode(int16_t *velocity)
+{
+    uint16_t totalRot = abs(velocity[ROTX]) + abs(velocity[ROTY]) + abs(velocity[ROTZ]);
+    uint16_t totalTrans = abs(velocity[TRANSX]) + abs(velocity[TRANSY]) + abs(velocity[TRANSZ]);
+    if (totalRot > totalTrans)
+    {
+        velocity[TRANSX] = 0;
+        velocity[TRANSY] = 0;
+        velocity[TRANSZ] = 0;
+    }
+    else
+    {
+        velocity[ROTX] = 0;
+        velocity[ROTY] = 0;
+        velocity[ROTZ] = 0;
+    }
 }

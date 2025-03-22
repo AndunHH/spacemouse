@@ -30,6 +30,7 @@ Debug Modes:
 4:  Output translation and rotation values. Approximately -350 to +350 depending on the parameter.
 5:  Output debug 4 and 5 side by side for direct cause and effect reference.
 6:  Report velocity and keys after possible kill-key feature
+61: Report velocity and keys after Switch or ExclusiveMode
 7:  Report the frequency of the loop() -> how often is the loop() called in one second?
 8:  Report the bits and bytes send as button codes
 9:  Report details about the encoder wheel, if ROTARY_AXIS > 0
