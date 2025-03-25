@@ -201,7 +201,7 @@ void switchYZ(int16_t *velocity)
 
 /// @brief Check if translation or rotation is dominant and set the other values to zero to allow exclusively rotation or translation
 // to avoid issues with classics joysticks
-/// @param velocity
+/// @param velocity pointer to velocity array
 void exclusiveMode(int16_t *velocity)
 {
     uint16_t totalRot = abs(velocity[ROTX]) + abs(velocity[ROTY]) + abs(velocity[ROTZ]);

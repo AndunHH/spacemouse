@@ -1,12 +1,15 @@
-# New Update: Support for neopixel led ring
+# New Update March 2025: Exclusive Mode
 
-December 2024 Update: Support for LED rings like a neopixel! 
+When the exclusive mode is activated in the config.h only the major movement is transmitted. 
+That means, that the mouse detects, if you want to translate or rotate.
 
-![Overview of the spacemouse with neopixel led ring](pictures/neopixel-3dof-mouse.png)
-The adafruit neopixel led ring with an inner diameter of 52.3 mm fits well.
+When the biggest input is a translation: All rotations are set to zero.
 
-Filming the LEDs "in action" is very hard, maybe you can get an idea:
-![animated LED ring animation](pictures/NeoPixelRing-lightning.gif)
+When the biggest input is a rotation: All translations are set to zero.
+
+This function is the sister of the kill-key feature, where you press a key to decide wether only translations or rotations are transmitted.
+
+Thanks to @mamatt in #73 for this suggestion!
 
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
 Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". (This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocoll.)
@@ -32,10 +35,11 @@ To see all features in place, like the buttons and the encoder, check out the di
 - Debug outputs can be requested over the serial interface during run time, see [config_sample.h](spacemouse-keys/config_sample.h#L36) 
 - Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
 - "Kill-Keys" may disable translation or rotation directly in the mouse
+- Exclusive-Mode: Transmit either translation or rotation and set the other one to zero, depending on what the main motion is.
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
 - Check out the [config_sample.h](spacemouse-keys/config_sample.h) for more informations about configurable elements and extensive debug outputs
 - LED can be enabled by the PC driver
-- Support for a LED ring, as supported by the FastLED library
+- Support for a [LED ring](#support-for-neopixel-led-ring), as supported by the FastLED library
 
 Wanted features:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
@@ -175,7 +179,6 @@ Here are some other projects with regard to space mice. The arrow indicates what
 * [spacemouse with an esp32](https://github.com/horvatkm/space_mouse_esp32s2) -> work in progress -> space mouse pro
 * [Space Fox](https://github.com/pepijndevos/spacefox) -> Joystick based on potentiometers
 * [Orbion The OpenSource 3D Space Mouse](https://github.com/FaqT0tum/Orbion_3D_Space_Mouse) -> Mouse and Keyboard
-* 
 
 
 # History
@@ -194,6 +197,20 @@ The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
 12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA and AndunHH.
 13. Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/) and rewritten by AndunHH.
+
+# Specific features
+
+## Support for neopixel led ring
+
+December 2024 Update: Support for LED rings like a neopixel! 
+
+![Overview of the spacemouse with neopixel led ring](pictures/neopixel-3dof-mouse.png)
+
+The adafruit neopixel led ring with an inner diameter of 52.3 mm fits well.
+
+Filming the LEDs "in action" is very hard, maybe you can get an idea:
+
+![animated LED ring animation](pictures/NeoPixelRing-lightning.gif)
 
 
 # License
