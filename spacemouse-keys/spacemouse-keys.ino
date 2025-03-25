@@ -201,6 +201,19 @@ void loop()
   switchYZ(velocity);
 #endif
 
+#ifdef EXCLUSIVEMODE
+  // exclusive mode
+  // rotation OR translation, but never both at the same time
+  // to avoid issues with classics joysticks
+  exclusiveMode(velocity);
+#endif
+
+  // report velocity and keys after Switch or ExclusiveMode
+  if (debug == 61)
+  {
+    debugOutput4(velocity, keyOut);
+  }
+
   // get the values to the USB HID driver to send if necessary
   SpaceMouseHID.send_command(velocity[ROTX], velocity[ROTY], velocity[ROTZ], velocity[TRANSX], velocity[TRANSY], velocity[TRANSZ], keyState, debug);
 

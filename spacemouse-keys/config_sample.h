@@ -30,6 +30,7 @@ Debug Modes:
 4:  Output translation and rotation values. Approximately -350 to +350 depending on the parameter.
 5:  Output debug 4 and 5 side by side for direct cause and effect reference.
 6:  Report velocity and keys after possible kill-key feature
+61: Report velocity and keys after kill-switch or ExclusiveMode
 7:  Report the frequency of the loop() -> how often is the loop() called in one second?
 8:  Report the bits and bytes send as button codes
 9:  Report details about the encoder wheel, if ROTARY_AXIS > 0
@@ -242,6 +243,15 @@ How many keys reported? */
 // The keys from KEYLIST are assigned to buttons here:
 #define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_RCW }
 
+/* Exclusive mode
+=================
+Exclusive mode only permit to send translation OR rotation, but never both at the same time.
+This can solve issues with classic joysticks where you get unwanted translation or rotation at the same time.
+
+it choose to send the one with the biggest absolute value.
+*/
+#define EXCLUSIVEMODE
+
 /* Kill-Key Feature
 --------------------
 Are there buttons to set the translation or rotation to zero?
@@ -407,5 +417,3 @@ This little extra noise is called "jiggling" and ensures that a value declared a
 
 // Add Jiggling to the value reported, if the following symbol is defined:
 // #define ADV_HID_JIGGLE
-
-
