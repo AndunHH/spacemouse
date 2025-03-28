@@ -4,12 +4,12 @@
  * Therefore, we calculate a filtered derivative from the encoder position and
  * replace the desired velocity from the original space mouse.
  *
- * Based on the idea by JoseLuisGZA, rewritten by Andun HH
+ * Based on the idea by JoseLuisGZA, rewritten by AndunHH
  */
 
 #include <Arduino.h>
 #include "config.h"
-#if ROTARY_AXIS > 0
+#if ROTARY_AXIS > 0 or ROTARY_KEYS > 0
 #include "encoderWheel.h"
 
 // Include Encoder library by Paul Stoffregen
@@ -87,7 +87,7 @@ void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
     if (newEncoderValue != previousEncoderValue)
     {
         // dirty hack: If the position changed (ignore direction), add this to delta. As long as delta > 0, report the key as pressed
-        delta = abs((newEncoderValue - previousEncoderValue))*30 + delta;
+        delta = (newEncoderValue - previousEncoderValue)*30 + delta;
         previousEncoderValue = newEncoderValue;
         
         if (debug == 9)
@@ -100,12 +100,18 @@ void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
 
     if (delta > 0) {
         // press the button for some small time
-        keyState[0] = 1;
+        keyState[ROTARY_KEY_IDX_A] = 1;
         delta--;
+    }
+    else if (delta < 0) {
+        // press the button for some small time
+        keyState[ROTARY_KEY_IDX_B] = 1;
+        delta++;
     }
     else
     {
-        keyState[0] = 0;
+        keyState[ROTARY_KEY_IDX_A] = 0;
+        keyState[ROTARY_KEY_IDX_B] = 0;
     }
 }
 #endif // whole file is only implemented #if ROTARY_AXIS > 0
