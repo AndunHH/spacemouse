@@ -154,7 +154,7 @@ void loop()
 
   calculateKinematic(centered, velocity);
 
-#if ROTARY_AXIS > 0
+#if (ROTARY_AXIS > 0) && ROTARY_AXIS < 7
   // If an encoder wheel is used, calculate the velocity of the wheel and replace one of the former calculated velocities
   calcEncoderWheel(velocity, debug);
 #endif
