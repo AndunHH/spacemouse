@@ -86,7 +86,7 @@ void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
     newEncoderValue = myEncoder.read();
     if (newEncoderValue != previousEncoderValue)
     {
-        // dirty hack: If the position changed (ignore direction), add this to delta. As long as delta > 0, report the key as pressed
+        // If the position changed, add this to delta. As long as delta != 0, report the key as pressed
         delta = (newEncoderValue - previousEncoderValue)*30 + delta;
         previousEncoderValue = newEncoderValue;
         
@@ -114,4 +114,4 @@ void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
         keyState[ROTARY_KEY_IDX_B] = 0;
     }
 }
-#endif // whole file is only implemented #if ROTARY_AXIS > 0
+#endif // whole file is only implemented #if ROTARY_AXIS > 0 or ROTARY_KEYS > 0
