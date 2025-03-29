@@ -33,7 +33,7 @@ Debug Modes:
 61: Report velocity and keys after kill-switch or ExclusiveMode
 7:  Report the frequency of the loop() -> how often is the loop() called in one second?
 8:  Report the bits and bytes send as button codes
-9:  Report details about the encoder wheel, if ROTARY_AXIS > 0
+9:  Report details about the encoder wheel, if ROTARY_AXIS > 0 or ROTARY_KEYS>0
 */
 #define STARTDEBUG 0  // Can also be set over the serial interface, while the program is running!
 
@@ -205,20 +205,21 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 /* Key Support 
 ===============
 If you attached keys to your Spacemouse, configure them here. 
-You can use the keys to report them via USB HID to the PC or as kill-keys (described below).
+You can use the keys to report them via USB HID to the PC (either classically pressed or emulated with an encoder) or as kill-keys (described below).
 
-How many keys are there in total? (0=no keys, feature disabled)
+How many classic keys are there in total? (0=no keys, feature disabled)
 */
 #define NUMKEYS 0
 
-// Define the pins for the keys on the Arduino
+// Define the PINS for the classic keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
 #define KEYLIST \
   { 15, 14, 16, 10 }
 
 /* Report KEYS over USB HID to the PC
  ----------------------------------
-How many keys reported? */
+How many keys reported? Classical + ROTARY_KEYS in total.
+*/
 #define NUMHIDKEYS 0
 
 // In order to define which key is assigned to which button, the following list must be entered in the BUTTONLIST below
@@ -344,6 +345,18 @@ Recommended range: 0 - 350
 Recommended strength = 200
 */
 #define SIMSTRENGTH 200
+
+/* ROTARY_KEY
+=============
+Use the encoder and emulate a key stroke by turning the encoder.
+*/
+#define ROTARY_KEYS 0
+// which key from the BUTTONLIST shall be emulated?
+// direction 1
+#define ROTARY_KEY_IDX_A 2
+// counter direction
+#define ROTARY_KEY_IDX_B 3
+
 
 /* LED support 
 ===============
