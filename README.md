@@ -1,3 +1,13 @@
+# New Update April 2025: Rotary Keys
+
+When you are using the mouse with an encoder wheel, there is a new feature: Rotary Keys. 
+
+When you enable this feature in the config, see _ROTARY_KEYS_, the encoder is not treated as an axis or movement but repeatedly triggers a button. This can be done to e.g. hit the volume+ button while turning the wheel clockwise.
+
+Note: We are still using the emulated USB HID protocoll for the CAD mouse. Therefore, you need to define the pressed button in the config.h and than configure some actions on your PC driver. We are not emulating a standard keyboard. 
+
+See [#68](https://github.com/AndunHH/spacemouse/issues/68) for more details.
+
 # New Update March 2025: Exclusive Mode
 
 When the exclusive mode is activated in the config.h only the major movement is transmitted. 
@@ -28,20 +38,30 @@ To see all features in place, like the buttons and the encoder, check out the di
 ![ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](pictures/ergonomouse.webp)
 
 ## Features of the 6 DOF mouse
+
+### General Features
+
 - Source code for an Arduino Pro Micro to read four joysticks and calculate the kinematics
 - Emulation of the USB identification and the HID interface to behave like an original space mouse
 - Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
 - Semi-Automatic calibration methods to find the correct pin outs and measurement ranges
 - Debug outputs can be requested over the serial interface during run time, see [config_sample.h](spacemouse-keys/config_sample.h#L36) 
-- Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
-- "Kill-Keys" may disable translation or rotation directly in the mouse
 - Exclusive-Mode: Transmit either translation or rotation and set the other one to zero, depending on what the main motion is.
+
+### Buttons 
+- Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
+- Kill-Keys: Press one of two buttons to disable translation or rotation directly in the mouse and transmit just the other one.
+
+### Encoder / Wheel
 - An encoder wheel can be used to replace one axis and allow e.g. zooming
 - Check out the [config_sample.h](spacemouse-keys/config_sample.h) for more informations about configurable elements and extensive debug outputs
+
+### LEDs
+
 - LED can be enabled by the PC driver
 - Support for a [LED ring](#support-for-neopixel-led-ring), as supported by the FastLED library
 
-Wanted features:
+### Wanted features, not jet there:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read a build report in the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build)
@@ -197,6 +217,8 @@ The basis is fdmakara's four joystick movement logic, with jfedor/BennyBWalker's
 11. Moved the Deadzone detection into the inital ADC conversion and calculate every value everytime and use the modifier for better seperation between the access, By Andun_HH.
 12. Added two additional buttons integrated into the knob to kill either translation or rotation at will and prevent unintended movements, by JoseLuisGZA and AndunHH.
 13. Added Encoder to use with a wheel on top of the main knob an simulate pulls on any of the axis (main use is simulating zoom like the mouse wheel), by [JoseLuizGZA](https://github.com/JoseLuisGZA/ErgonoMouse/) and rewritten by AndunHH.
+
+Please check the release history for more recent history...
 
 # Specific features
 
