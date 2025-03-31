@@ -4,12 +4,12 @@
  * Therefore, we calculate a filtered derivative from the encoder position and
  * replace the desired velocity from the original space mouse.
  *
- * Based on the idea by JoseLuisGZA, rewritten by Andun HH
+ * Based on the idea by JoseLuisGZA, rewritten by AndunHH
  */
 
 #include <Arduino.h>
 #include "config.h"
-#if ROTARY_AXIS > 0
+#if ROTARY_AXIS > 0 or ROTARY_KEYS > 0
 #include "encoderWheel.h"
 
 // Include Encoder library by Paul Stoffregen
@@ -59,10 +59,11 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         velocity[ROTARY_AXIS - 1] = velocity[ROTARY_AXIS - 1] + simpull;
     }
     else
-    { 
+    {
         // fading has ended
         simpull = 0;
     }
+
     if (debug == 9)
     {
         // create debug output
@@ -74,4 +75,43 @@ void calcEncoderWheel(int16_t *velocity, int debug)
         Serial.println(simpull);
     }
 }
-#endif // whole file is only implemented #if ROTARY_AXIS > 0
+
+/// @brief Read out the encoder and treat as keystroke
+/// @param keyState overwrite some keys with encoder movement
+/// @param debug Generate a debug output if debug=9
+
+void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
+{
+    // read encoder
+    newEncoderValue = myEncoder.read();
+    if (newEncoderValue != previousEncoderValue)
+    {
+        // If the position changed, add this to delta. As long as delta != 0, report the key as pressed
+        delta = (newEncoderValue - previousEncoderValue)*ROTARY_KEY_STRENGTH + delta;
+        previousEncoderValue = newEncoderValue;
+        
+        if (debug == 9)
+        {
+            // create debug output
+            Serial.print("Enc Val: ");
+            Serial.println(newEncoderValue);
+        }
+    }
+
+    if (delta > 0) {
+        // press the button for some small time
+        keyState[ROTARY_KEY_IDX_A] = 1;
+        delta--;
+    }
+    else if (delta < 0) {
+        // press the button for some small time
+        keyState[ROTARY_KEY_IDX_B] = 1;
+        delta++;
+    }
+    else
+    {
+        keyState[ROTARY_KEY_IDX_A] = 0;
+        keyState[ROTARY_KEY_IDX_B] = 0;
+    }
+}
+#endif // whole file is only implemented #if ROTARY_AXIS > 0 or ROTARY_KEYS > 0
