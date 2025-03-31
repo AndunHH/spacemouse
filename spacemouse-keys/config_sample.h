@@ -240,8 +240,8 @@ How many keys reported? Classical + ROTARY_KEYS in total.
 #define SM_CTRL     25 // Key "CTRL"
 #define SM_ROT      26 // Key "Rotate" 
 
-// BUTTONLIST must have as many elements as NUMHIDKEYS
-// The keys from KEYLIST are assigned to buttons here:
+// BUTTONLIST must have at least as many elements as NUMHIDKEYS
+// The keys from KEYLIST or ROTARY_KEYS are assigned to buttons here:
 #define BUTTONLIST { SM_FIT, SM_T, SM_R, SM_RCW }
 
 /* Exclusive mode
@@ -346,16 +346,18 @@ Recommended strength = 200
 */
 #define SIMSTRENGTH 200
 
-/* ROTARY_KEY
+/* ROTARY_KEYS
 =============
 Use the encoder and emulate a key stroke by turning the encoder.
 */
 #define ROTARY_KEYS 0
 // which key from the BUTTONLIST shall be emulated?
-// direction 1
+// First direction  (0 = first element from BUTTONLIST, 1 = second element, etc.)
 #define ROTARY_KEY_IDX_A 2
 // counter direction
 #define ROTARY_KEY_IDX_B 3
+// duration of simulated key
+#define ROTARY_KEY_STRENGTH 19
 
 
 /* LED support 

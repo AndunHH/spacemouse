@@ -87,7 +87,7 @@ void calcEncoderAsKey(uint8_t keyState[NUMKEYS], int debug)
     if (newEncoderValue != previousEncoderValue)
     {
         // If the position changed, add this to delta. As long as delta != 0, report the key as pressed
-        delta = (newEncoderValue - previousEncoderValue)*30 + delta;
+        delta = (newEncoderValue - previousEncoderValue)*ROTARY_KEY_STRENGTH + delta;
         previousEncoderValue = newEncoderValue;
         
         if (debug == 9)

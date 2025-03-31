@@ -1,4 +1,8 @@
-# New Update April 2025: Rotary Keys
+# New Update April 2025: 
+## Link to support for Onshape under linux
+For linux users: Check out the simple python wrapper by mamatt to use Onshape from ubuntu: https://github.com/mamatt/space2onshape
+
+## Rotary Keys
 
 When you are using the mouse with an encoder wheel, there is a new feature: Rotary Keys. 
 
@@ -143,6 +147,8 @@ If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless w
 
 ## spacenav for linux users
 Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.com/FreeSpacenav/spacenavd.
+
+Onshape is not jet supported by spacenav direclty but there is a simple wrapper here: https://github.com/mamatt/space2onshape 
 
 # Software Main Idea
 1. The software reads the eight ADC values of the four joy sticks
