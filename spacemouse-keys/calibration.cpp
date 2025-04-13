@@ -5,6 +5,10 @@
 #include "kinematics.h"
 #include "config.h"
 
+
+// hold characters to plot them
+char debugOutputBuffer[20];
+
 /// @brief Prints an array to the Serial, in order to copy the output again to C-Code. Example output: {-519, -521, -512, -2, -519, -482, -508, -1}
 /// @param arr array to print
 /// @param size size of the array
@@ -26,9 +30,8 @@ void debugOutput1(int* rawReads, int* keyVals) {
   if (isDebugOutputDue()) {
     // Report back 0-1023 raw ADC 10-bit values if enabled
     for (int i = 0; i < 8; i++) {
-      Serial.print(axisNames[i]);
-      Serial.print(rawReads[i]);
-      Serial.print(", ");
+      sprintf(debugOutputBuffer,"%2.2s: %4d ", axisNames[i],rawReads[i] );
+      Serial.print(debugOutputBuffer);
     }
     for (int i = 0; i < NUMKEYS; i++) {
       Serial.print("K");
@@ -37,7 +40,7 @@ void debugOutput1(int* rawReads, int* keyVals) {
       Serial.print(keyVals[i]);
       Serial.print(", ");
     }
-    Serial.println("");
+    Serial.print(DEBUG_LINE_END); 
   }
 }
 
@@ -45,11 +48,10 @@ void debugOutput2(int* centered) {
   if (isDebugOutputDue()) {
     // this routine creates the output for the former debug = 2 and debug = 3
     for (int i = 0; i < 8; i++) {
-      Serial.print(axisNames[i]);
-      Serial.print(centered[i]);
-      Serial.print(", ");
+      sprintf(debugOutputBuffer,"%2.2s: %4d ", axisNames[i],centered[i] );
+      Serial.print(debugOutputBuffer);
     }
-    Serial.println("");
+    Serial.print(DEBUG_LINE_END); 
   }
 }
 
@@ -60,9 +62,8 @@ void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
   // 
   if (isDebugOutputDue()) {
     for (int i = 0; i < 6; i++) {
-      Serial.print(velNames[i]);
-      Serial.print(velocity[i]);
-      Serial.print(", ");
+      sprintf(debugOutputBuffer,"%2.2s: %4d ", velNames[i],velocity[i] );
+      Serial.print(debugOutputBuffer);
     }
     for (int i = 0; i < NUMKEYS; i++) {
       Serial.print("K");
@@ -71,25 +72,25 @@ void debugOutput4(int16_t* velocity, uint8_t* keyOut) {
       Serial.print(keyOut[i]);
       Serial.print(", ");
     }
-    Serial.println("");
+    Serial.print(DEBUG_LINE_END); 
   }
 }
 
+/// @brief Report single axis and resulting velocities info side by side for direct reference. Very useful if you need to alter which inputs are used in the arithmetic above.
+/// @param centered pointer to arrays of 8 axis
+/// @param velocity pointer to array of 6 velocities
 void debugOutput5(int* centered, int16_t* velocity) {
-  // Report debug 4 and 5 info side by side for direct reference if enabled. Very useful if you need to alter which inputs are used in the arithmetic above.
   if (isDebugOutputDue()) {
     for (int i = 0; i < 8; i++) {
-      Serial.print(axisNames[i]);
-      Serial.print(centered[i]);
-      Serial.print(", ");
+      sprintf(debugOutputBuffer,"%2.2s: %4d ", axisNames[i],centered[i] );
+      Serial.print(debugOutputBuffer);
     }
-    Serial.print("||");
+    Serial.print(" || ");
     for (int i = 0; i < 6; i++) {
-      Serial.print(velNames[i]);
-      Serial.print(velocity[i]);
-      Serial.print(", ");
+      sprintf(debugOutputBuffer,"%2.2s: %4d ", velNames[i],velocity[i] );
+      Serial.print(debugOutputBuffer);
     }
-    Serial.println("");
+    Serial.print(DEBUG_LINE_END); 
   }
 }
 
