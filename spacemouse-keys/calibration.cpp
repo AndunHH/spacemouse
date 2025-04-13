@@ -23,8 +23,12 @@ void printArray(int arr[], int size) {
   Serial.println("}");
 }
 
-char const * axisNames[] = { "AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:" };  // 8
-char const * velNames[] = { "TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:" };                 // 6
+#ifndef HALLEFFECT
+char const *axisNames[] = {"AX:", "AY:", "BX:", "BY:", "CX:", "CY:", "DX:", "DY:"}; // 8
+#else
+char const *axisNames[] = {"HES0:", "HES1:", "HES2:", "HES3:", "HES6:", "HES7:", "HES8:", "HES9:"}; // 8
+#endif
+char const *velNames[] = {"TX:", "TY:", "TZ:", "RX:", "RY:", "RZ:"}; // 6
 
 void debugOutput1(int* rawReads, int* keyVals) {
   if (isDebugOutputDue()) {
@@ -95,10 +99,21 @@ void debugOutput5(int* centered, int16_t* velocity) {
 }
 
 // Variables and function to get the min and maximum value of the centered values
-int minMaxCalcState = 0;  // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
-int minValue[8];          // Array to store the minimum values
-int maxValue[8];          // Array to store the maximum values
-unsigned long startTime;  // Start time for the measurement
+int minMaxCalcState = 0; // little state machine -> setup in 0 -> measure in 1 -> output in 2 ->  end in 3
+int minValue[8];         // Array to store the minimum values
+int maxValue[8];         // Array to store the maximum values
+unsigned long startTime; // Start time for the measurement
+
+#ifndef HALLEFFECT
+#define MINMAX_MINWARNING 250
+#define MINMAX_MAXWARNING 250
+#else
+// The Hall effect sensors aren't centered arount zero, due to the nature of the hardware.
+// In my version of the Spacemouse, the values vary between -425 and 285, the centerpoint is thus around -70
+// The MIN and MAX warning levels have to be shifted accordingly.
+#define MINMAX_MINWARNING (100 - centerPoint)
+#define MINMAX_MAXWARNING (100 + centerPoint)
+#endif
 
 /// @brief This function records the minimum and maximum movement of the joysticks: After initialization, move the mouse for 15s and see the printed output. Replug/reset the mouse, to enable the semi-automatic calibration for a second time.
 /// @param centered pointer to the array with the centered joystick values
@@ -107,11 +122,11 @@ void calcMinMax(int* centered) {
     delay(2000);
     // Initialize the arrays
     for (int i = 0; i < 8; i++) {
-      minValue[i] = 1023;  // Set the min value to the maximum possible value
-      maxValue[i] = 0;     // Set the max value to the minimum possible value
+            minValue[i] = 1023; // Set the min value to the maximum possible value
+            maxValue[i] = 0;    // Set the max value to the minimum possible value
     }
-    startTime = millis();  // Record the current time
-    minMaxCalcState = 1;   // next State: measure!
+        startTime = millis(); // Record the current time
+        minMaxCalcState = 1;  // next State: measure!
     Serial.println(F("Please start moving the spacemouse around for 15 sec!"));
   } else if (minMaxCalcState == 1) {
     if (millis() - startTime < 15000) {
@@ -134,8 +149,26 @@ void calcMinMax(int* centered) {
     printArray(minValue, 8);
     Serial.print(F("#define MAXVALS "));
     printArray(maxValue, 8);
-    for (int i = 0; i < 8; i++) {
-      if (abs(minValue[i]) < 250) {
+#ifdef HALLEFFECT
+        // Calculate and print the ranges for each HALL sensor
+        int minmaxRanges[8];
+        int max = 0;
+        int min = 0;
+        for (uint8_t i = 0; i < 8; i++) {
+            minmaxRanges[i] = abs(minValue[i]) + abs(maxValue[i]);
+            max = (abs(maxValue[i]) > max) ? abs(maxValue[i]) : max;
+            min = (abs(minValue[i]) > min) ? abs(minValue[i]) : min;
+        }
+        Serial.print(F("Ranges are: "));
+        printArray(minmaxRanges, 8);
+        int centerPoint = (max + (min * -1)) / 2;
+        Serial.print(F("Centerpoint: "));
+        Serial.println(centerPoint);
+#endif
+        for (int i = 0; i < 8; i++)
+        {
+            if (abs(minValue[i]) < MINMAX_MINWARNING)
+            {
         Serial.print(F("Warning: minValue["));
         Serial.print(i);
         Serial.print("] ");
@@ -143,7 +176,8 @@ void calcMinMax(int* centered) {
         Serial.print(F(" is small: "));
         Serial.println(minValue[i]);
       }
-      if (abs(maxValue[i]) < 250) {
+            if (abs(maxValue[i]) < MINMAX_MAXWARNING)
+            {
         Serial.print(F("Warning: maxValue["));
         Serial.print(i);
         Serial.print("] ");
@@ -152,7 +186,7 @@ void calcMinMax(int* centered) {
         Serial.println(maxValue[i]);
       }
     }
-    minMaxCalcState = 3;  // no further reporting
+        minMaxCalcState = 3; // no further reporting
   }
 }
 
@@ -195,9 +229,11 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
 {
   bool noWarningsOccured = true;
   if (debugFlag == true)
-  {
+#ifndef HALLEFFECT
     Serial.println(F("Zeroing Joysticks..."));
-  }
+#else
+        Serial.println(F("Zeroing HALL Sensors..."));
+#endif
   int act[8];                                  // actual value
   uint32_t mean[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // Array to count all values during the averaging
   int minValue[8];                             // Array to store the minimum values
@@ -248,9 +284,17 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
     
     // a dead zone above the following value will be warned
     #define DEADZONEWARNING 10
+#ifndef HALLEFFECT
     // a centerpoint below or above those values will be warned (512 +/- 128)
     #define CENTERPOINTWARNINGMIN 384
     #define CENTERPOINTWARNINGMAX 640
+#else
+        // The centerpoint off the Hall effect mouse is not in the center of the ADC range, due to the hardware nature.
+        // According to the height of the base plate, the centerpoint is shifted up or downwards.
+        // a centerpoint below or above those values will be warned (512 +/- 128)
+#define CENTERPOINTWARNINGMIN (720 - 128)
+#define CENTERPOINTWARNINGMAX (720 + 128)
+#endif
 
     if (deadZone[i] > DEADZONEWARNING || centerPoints[i] < CENTERPOINTWARNINGMIN || centerPoints[i] > CENTERPOINTWARNINGMAX)
       {

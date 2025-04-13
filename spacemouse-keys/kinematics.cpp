@@ -99,20 +99,97 @@ void FilterAnalogReadOuts(int *centered)
     }
 }
 
+/**
+ * When using Hall Effect sensors the reading of the sensors has to be translated
+ * to the joystick values
+
+
+ *     7   6              Y+
+ *       |                .
+ *  8    |    3           .
+ *    ---+---        X-...Z+...X+
+ *  9    |    2           .
+ *       |                .
+ *     0   1              Y-
+ *
+ *
+ *
+ * Movement table (expected)
+ *
+ * Movement     Plane           AX  AY  BX  BY  CX  CY  DX  DY  ||  H0  H1  H2  H3  H6  H7  H8  H9
+ * West         Horizontal      0   +   0   0   0   -   0   0   ||  0   0   +   +   0   0   -   -
+ * East         Horizontal      0   -   0   0   0   +   0   0   ||  0   0   -   -   0   0   +   +
+ * North        Horizontal      0   0   0   -   0   0   0   +   ||  +   +   0   0   -   -   0   0
+ * South        Horizontal      0   0   0   +   0   0   0   -   ||  -   -   0   0   +   +   0   0
+ * Top          Vertical        -   0   -   0   -   0   -   0   ||  +   +   +   +   +   +   +   +               (all magnets further away)
+ * Bottom       Vertical        +   0   +   0   +   0   +   0   ||  -   -   -   -   -   -   -   -               (all magnets closer by)
+ * Rotx-fw      Vertical        -   0   0   0   +   0   0   0   ||  +   +   0   0   -   -   0   0
+ * Rotx-bw      Vertical        +   0   0   0   -   0   0   0   ||  -   -   0   0   +   +   0   0
+ * Roty-left    Vertical        0   0   +   0   0   0   -   0   ||  0   0   +   +   0   0   -   -
+ * Roty-right   Vertical        0   0   -   0   0   0   +   0   ||  0   0   -   -   0   0   +   +
+ * Rotz-clock   Horizontal      -   0   -   0   -   0   -   0   ||  +   -   +   -   +   -   +   -
+ * Rotz-cclock  Horizontal      +   0   +   0   +   0   +   0   ||  -   +   -   +   -   +   -   +
+ *
+ */
+
+void _calculateKinematicSensors(int* centered, int16_t* velocity)
+{
+
+#ifndef HALLEFFECT
+    // calculate sensors transX
+    velocity[TRANSX] = (-centered[CY] + centered[AY]);
+
+    // calculate sensors transY
+    velocity[TRANSY] = (-centered[BY] + centered[DY]);
+
+    // calculate sensors transZ
+    velocity[TRANSZ] = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
+
+    // rotX
+    velocity[ROTX] = (-centered[CX] + centered[AX]);
+
+    // rotY
+    velocity[ROTY] = (-centered[BX] + centered[DX]);
+
+    // rotZ
+    velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]);
+#else
+    // calculate sensors transX
+    velocity[TRANSX] = (centered[HES1] - centered[HES0] + centered[HES6] - centered[HES7]) / 2;
+
+    // calculate sensors transY
+    velocity[TRANSY] = (centered[HES2] - centered[HES3] + centered[HES9] - centered[HES8]) / 2;
+
+    // calculate sensors transZ
+    velocity[TRANSZ] = (centered[HES0] + centered[HES1] + centered[HES2] + centered[HES3] + centered[HES6] + centered[HES7] + centered[HES8] + centered[HES9]) / 4;
+
+    // rotX
+    velocity[ROTX] = (centered[HES0] + centered[HES1] - centered[HES6] - centered[HES7]) / 2;
+
+    // rotY
+    velocity[ROTY] = (centered[HES8] + centered[HES9] - centered[HES2] - centered[HES3]) / 2;
+
+    // rotZ
+    velocity[ROTZ] = (centered[HES0] + centered[HES2] + centered[HES6] + centered[HES8] - centered[HES1] - centered[HES3] - centered[HES7] - centered[HES9]) / 4;
+#endif
+}
+
 /// @brief Calculate the kinematic of the three axis from the eight joysticks
 /// @param centered eight values from the four joysticks
 /// @param velocity resulting translational and rotational motions
 void calculateKinematic(int *centered, int16_t *velocity)
 {
+    // Get raw kinematics from sensors
+    _calculateKinematicSensors(centered, velocity);
+
     // transX
-    velocity[TRANSX] = (-centered[CY] + centered[AY]) / ((float)TRANSX_SENSITIVITY);
+    velocity[TRANSX] = velocity[TRANSX] / ((float)TRANSX_SENSITIVITY);
     velocity[TRANSX] = modifierFunction(velocity[TRANSX]); // recalculate with modifier function
 
     // transY
-    velocity[TRANSY] = (-centered[BY] + centered[DY]) / ((float)TRANSY_SENSITIVITY);
+    velocity[TRANSY] = velocity[TRANSY] / ((float)TRANSY_SENSITIVITY);
     velocity[TRANSY] = modifierFunction(velocity[TRANSY]); // recalculate with modifier function
 
-    velocity[TRANSZ] = -centered[AX] - centered[BX] - centered[CX] - centered[DX];
     if (velocity[TRANSZ] < 0)
     {
         velocity[TRANSZ] = modifierFunction(velocity[TRANSZ] / ((float)NEG_TRANSZ_SENSITIVITY)); // recalculate with modifier function
@@ -127,7 +204,7 @@ void calculateKinematic(int *centered, int16_t *velocity)
     }
 
     // rotX
-    velocity[ROTX] = (-centered[CX] + centered[AX]) / ((float)ROTX_SENSITIVITY);
+    velocity[ROTX] = velocity[ROTX] / ((float)ROTX_SENSITIVITY);
     velocity[ROTX] = modifierFunction(velocity[ROTX]); // recalculate with modifier function
     if (abs(velocity[ROTX]) < GATE_ROTX)
     {
@@ -135,7 +212,7 @@ void calculateKinematic(int *centered, int16_t *velocity)
     }
 
     // rotY
-    velocity[ROTY] = (-centered[BX] + centered[DX]) / ((float)ROTY_SENSITIVITY);
+    velocity[ROTY] = velocity[ROTY] / ((float)ROTY_SENSITIVITY);
     velocity[ROTY] = modifierFunction(velocity[ROTY]); // recalculate with modifier function
     if (abs(velocity[ROTY]) < GATE_ROTY)
     {
@@ -143,7 +220,7 @@ void calculateKinematic(int *centered, int16_t *velocity)
     }
 
     // rotZ
-    velocity[ROTZ] = (centered[AY] + centered[BY] + centered[CY] + centered[DY]) / ((float)ROTZ_SENSITIVITY);
+    velocity[ROTZ] = velocity[ROTZ] / ((float)ROTZ_SENSITIVITY);
     velocity[ROTZ] = modifierFunction(velocity[ROTZ]); // recalculate with modifier function
     if (abs(velocity[ROTZ]) < GATE_ROTZ)
     {

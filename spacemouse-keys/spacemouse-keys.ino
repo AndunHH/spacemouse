@@ -73,6 +73,13 @@ void setup()
   Serial.setTimeout(2); // the serial interface will look for new debug values and it will only wait 2ms
   // Read idle/centre positions for joysticks.
 
+#ifdef HALLEFFECT
+    // Set the ADC referencevoltage to 5V if debug=1, 2.56V otherwise.
+    // It is important the reference Voltage is set before the Zeroing of the
+    // sensors is executed.
+    setAnalogReferenceVoltage();
+#endif
+
   // zero the joystick position 500 times (takes approx. 480 ms)
   // during setup() we are not interested in the debug output: debugFlag = false
   busyZeroing(centerPoints, 500, false);
@@ -103,6 +110,10 @@ void loop()
       {
         Serial.println(F("Please enter the debug mode now or while the script is reporting."));
       }
+#ifdef HALLEFFECT
+                // Debug is updated check if the ADC referencevoltage has to be changed.
+                setAnalogReferenceVoltage();
+#endif
     }
   }
 
@@ -263,5 +274,36 @@ void lightSimpleLED(boolean light)
     // false -> LED off -> pull kathode up
     digitalWrite(LEDpin, HIGH); // turn the LED
   }
+}
+#endif
+
+#ifdef HALLEFFECT
+/**
+ * @brief Set the analog reference to 5V for debug 1 and to 2.56V otherwise
+ */
+void setAnalogReferenceVoltage()
+{
+    if (debug == 1)
+    {
+        // Set the reference voltage for the AD Convertor to 5V only for the first calibration step (pinout/inversion calibration).
+        analogReference(DEFAULT);
+        Serial.println(F("Setting analog reference to 5V."));
+    }
+    else
+    {
+        // Set the reference voltage for the AD Convertor to 2.56V in order to get larger sensitivity.
+        analogReference(INTERNAL);
+        Serial.println(F("Setting analog reference to 2.56V."));
+    }
+
+    // The first measurements after changing the reference voltage can be wrong. So take 100ms to let the voltage stabilize and
+    // take some measurements afterwards just to be sure. Performancewise this shouldn't be a problem due to the debug/setup
+    // nature of this function.
+    delay(100);
+    int tempReads[8];
+    for (int i = 0; i <= 8; i++)
+    {
+        readAllFromJoystick(tempReads);
+    }
 }
 #endif
