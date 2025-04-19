@@ -24,6 +24,18 @@ void exclusiveMode(int16_t *velocity);
 #define DX 6
 #define DY 7
 
+// SECTION HALLEFFECT
+// When using HallE sensors in centered or rawValues array
+#define HES0 0
+#define HES1 1
+#define HES2 2
+#define HES3 3
+#define HES6 4
+#define HES7 5
+#define HES8 6
+#define HES9 7
+// !SECTION HALLEFFECT
+
 // Define position in velocity array.
 #define TRANSX 0
 #define TRANSY 1

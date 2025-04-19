@@ -5,7 +5,8 @@ config*.h
 .idea
 
 //this file should be included:
-!config_sample.h
+!config_sample*.h
 
 
 README_tmp.html
+README.pdf
