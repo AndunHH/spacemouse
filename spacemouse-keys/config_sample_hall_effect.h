@@ -41,9 +41,6 @@ Debug Modes:
 */
 #define STARTDEBUG 0 // Can also be set over the serial interface, while the program is running!
 
-// Generate a debug line only every DEBUGDELAY ms
-#define DEBUGDELAY 200
-
 // Hardware uses HallEffect sensors instead of joystick sensors
 #define HALLEFFECT
 
@@ -368,6 +365,7 @@ Recommended strength = 200
 /* ROTARY_KEYS
 =============
 Use the encoder and emulate a key stroke by turning the encoder.
+ROTARY_KEYS 1 = enabled, 0 = disabled
 */
 #define ROTARY_KEYS 0
 // which key from the BUTTONLIST shall be emulated?
@@ -377,6 +375,7 @@ Use the encoder and emulate a key stroke by turning the encoder.
 #define ROTARY_KEY_IDX_B 3
 // duration of simulated key
 #define ROTARY_KEY_STRENGTH 19
+
 
 /* LED support
 ===============
@@ -411,6 +410,20 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
 
 // how often shall the LEDs be updated
 #define LEDUPDATERATE_MS 150
+
+
+/* Advanced debug output settings
+=================================
+The following settings allow customization of debug output behavior */
+
+// Generate a debug line only every DEBUGDELAY ms 
+#define DEBUGDELAY 100
+
+// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
+#define DEBUG_LINE_END "\r"
+// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
+//define DEBUG_LINE_END "\r\n"
+
 
 /* Advanced USB HID settings
 ============================

@@ -108,7 +108,7 @@ unsigned long startTime; // Start time for the measurement
 #define MINMAX_MINWARNING 250
 #define MINMAX_MAXWARNING 250
 #else
-// The Hall effect sensors aren't centered arount zero, due to the nature of the hardware.
+// The Hall effect sensors aren't centered around zero, due to the nature of the hardware.
 // In my version of the Spacemouse, the values vary between -425 and 285, the centerpoint is thus around -70
 // The MIN and MAX warning levels have to be shifted accordingly.
 #define MINMAX_MINWARNING (100 - centerPoint)
@@ -289,11 +289,11 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag)
     #define CENTERPOINTWARNINGMIN 384
     #define CENTERPOINTWARNINGMAX 640
 #else
-        // The centerpoint off the Hall effect mouse is not in the center of the ADC range, due to the hardware nature.
+        // The centerpoint of the Hall effect mouse is not in the center of the ADC range, due to the hardware nature.
         // According to the height of the base plate, the centerpoint is shifted up or downwards.
         // a centerpoint below or above those values will be warned (512 +/- 128)
-#define CENTERPOINTWARNINGMIN (720 - 128)
-#define CENTERPOINTWARNINGMAX (720 + 128)
+    #define CENTERPOINTWARNINGMIN (720 - 128)
+    #define CENTERPOINTWARNINGMAX (720 + 128)
 #endif
 
     if (deadZone[i] > DEADZONEWARNING || centerPoints[i] < CENTERPOINTWARNINGMIN || centerPoints[i] > CENTERPOINTWARNINGMAX)
