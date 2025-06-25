@@ -41,9 +41,7 @@ void evalKeys(int* keyVals, uint8_t* keyOut, uint8_t* keyState) {
         timestamp[i] = millis();     // remember the time, the button was pressed
         Serial.println("");
         Serial.print("Key: ");       // this is always sent over the serial console, and not only in debug
-        Serial.print(i);
-        Serial.println("");
-
+        Serial.println(i);
       } else {  // the button was already pressed and is still pressed (and the event sent in the last loop), don't send the keyOut event again.
         keyOut[i] = 0;
       }
