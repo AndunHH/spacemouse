@@ -45,6 +45,7 @@ int modifierFunction(int x, ParamStorage& par) {
     // sign putting out -1 or 1 depending on sign of x. (Is needed because x^2 will always be positive)
     y = pow(xn, par.slope_at_zero) * sx;
 
+    // modFunc 2: tan is not supported anymore, because squared tangens serves the same purpose
   }else if(par.modFunc == 3){
     // using "squared" tangens function: y = tan(b * (abs(x)^a * sign(x))) / tan(b)
     y = tan(par.slope_at_end * (pow(xn, par.slope_at_zero) * sx)) / tan(par.slope_at_end);
@@ -138,6 +139,7 @@ void FilterAnalogReadOuts(int *centered, ParamStorage& par){
 void _calculateKinematicSensors(int* centered, int16_t* velocity, bool exclusive){
   // resistive joysticks or hall-joysticks
   #ifndef HALLEFFECT
+  _// if exclusive-mode is on, rotations are only calculated, if no z-move is detected
     int cntN = 0;
     int cntP = 0;
     if(centered[AX] < 0){cntN += 1;} if(centered[AX] > 0){cntP += 1;}

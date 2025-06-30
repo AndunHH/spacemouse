@@ -324,7 +324,7 @@ bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag){
   return noWarningsOccured;
 }
 
-/// @brief  Compensate drifts of the joysticks / hall-sensors (SNo)
+/// @brief  Compensate drifts of the joysticks / hall-sensors
 /// @param  raw    raw[]-array of joystick-values (input)
 /// @param  center centerPoints[]-array to determine drift (input)
 /// @param  par    storage of parameters

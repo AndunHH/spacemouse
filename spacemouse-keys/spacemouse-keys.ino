@@ -33,7 +33,6 @@
 
 #ifdef LEDRING
 #include "ledring.h"
-#include "Arduino.h"
 #endif
 
 void setup();
@@ -55,18 +54,14 @@ int centered[8];
 int centerPoints[8];
 
 // Offsets store the drift-compensation values of the joysticks
-int offsets[8];     //SNo
+int offsets[8];
 
 // Resulting calculated velocities / movements
 // int16_t to match what the HID protocol expects.
 int16_t velocity[6];
 
 // global parameters (also stored in EEPROM)
-ParamStorage par;   //SNo
-
-// set the min and maxvals from the config.h into real variables
-//int minVals[8] = MINVALS; //>>> kinematics.cpp???
-//int maxVals[8] = MAXVALS; //>>> kinematics.cpp???
+ParamStorage par;
 
 //store raw value of the keys, without debouncing
 int keyVals[NUMKEYS];
@@ -78,7 +73,7 @@ uint8_t keyOut[NUMKEYS];
 uint8_t keyState[NUMKEYS];
 
 void setup() {
-  // SNo: get parameters from EEPROM
+  // Get parameters from EEPROM
   #if PARAM_IN_EEPROM > 0
   getParametersFromEEPROM(par);
   #endif
@@ -125,7 +120,7 @@ void loop() {
   static bool showMenu  = false;
 
   //--- check if the user entered a debug mode via serial interface
-  if((debug != 20) && (debug != 30)){       //SNo: don't change debug-mode/menu when calcMinMax() or parameterMenu() are running
+  if((debug != 20) && (debug != 30)){  // don't change debug-mode/menu when calcMinMax() or parameterMenu() are running
     double num;
     int state = userInput(num);
     if(state == 1){
@@ -178,7 +173,7 @@ void loop() {
   //--- Read joystick values. 0-1023
   readAllFromJoystick(rawReads);
 
-  //--- LivingTheDream added reading of key presses
+  //--- Reading of key presses
   #if NUMKEYS > 0
   readAllFromKeys(keyVals);
   #endif
@@ -192,10 +187,10 @@ void loop() {
   if (debug == 11) {
     // As this is called in the debug=11, we do more iterations.
     busyZeroing(centerPoints, 2000, true);
-    debug = -1; // after function is done, leave this deug mode to "off" (-1)
+    debug = -1; // after function is done, leave this debug mode to "off" (-1)
   }
 
-  //--- SNo: calculate drift compensation offsets
+  //--- Calculate drift compensation offsets
   if((par.compEnabled == 1) && (debug != 20)){
     compensateDrifts(rawReads, centerPoints, offsets, par);
   }else{
@@ -204,14 +199,14 @@ void loop() {
 
   //--- Subtract centre position from measured position to determine movement.
   for (int i = 0; i < 8; i++) {
-    centered[i] = rawReads[i] - centerPoints[i] + offsets[i]; // SNo: also use drift-offsets
+    centered[i] = rawReads[i] - centerPoints[i] + offsets[i]; // use drift-offsets
   }
 
   //--- calibrate MinMax values
   if (debug == 20) {
-    // SNo: has to be (re-)called, as long as it doesn't signal "done"
-    if(calcMinMax(centered) == 0){  // SNo: when calcMinMax() signals 0="done/idle":
-      debug = -1;                   //        leave this debug-mode 20 to "off" (-1)
+    // has to be (re-)called, as long as it doesn't signal "done"
+    if(calcMinMax(centered) == 0){  // when calcMinMax() signals 0="done/idle":
+      debug = -1;                   // leave this debug-mode 20 to "off" (-1)
     }
   }
 
@@ -344,7 +339,7 @@ void setAnalogReferenceVoltage(int dbg){
   }
 
   // The first measurements after changing the reference voltage can be wrong. So take 100ms to let the voltage stabilize and
-  // take some measurements afterwards just to be sure. Performancewise this isn't be a problem due to the debug/setup
+  // take some measurements afterwards just to be sure. Performancewise this isn't a problem due to the debug/setup
   // nature of this function.
   delay(100);
   int tempReads[8];

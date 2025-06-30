@@ -91,12 +91,10 @@ spacemouse-keys.cpp, parameterMenu.cpp
     - saved to EEPROM on Arduino / retrieved on restart from there
 
 > storage of parameters in EEPROM
-  !!! CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-byte. By manually editing and
-               storing the modified parameters we won't get in trouble - but frequent automated saving of parameters
-               won't be a good idea, the EEPROM may get damaged.
-               The parameters will be stored to the same location all the time - a load-leveling-algorithm would be
-               too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
-               that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
+  !!! CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-byte. By manually editing and storing the modified parameters we won't get in trouble - but frequent automated saving of parameters won't be a good idea, the EEPROM may get damaged.
+  The parameters will be stored to the same location all the time - a load-leveling-algorithm would be
+  too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
+  that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
              
   Principles
   -----------
@@ -104,7 +102,7 @@ spacemouse-keys.cpp, parameterMenu.cpp
        > the struct is initialized by the constants of config.h
     2. defined a variable "par" in "spacemouse-keys.ino"
     3. used the new function "getParametersFromEEPROM()" in setup() to fill in values from EEPROM
-       > only done, if they are are stored there (test by magicNumber)
+       > only done, if they are stored there (test by magicNumber)
     4. passed "par" to all underlying functions of loop() that are using parameters
     5. saving "par" to EEPROM with the new function putParametersToEEPROM() sets the magicNumber valid,
        so on the next boot the parameters will be read from EEPROM instead of using the (initializing) constants
@@ -114,16 +112,14 @@ spacemouse-keys.cpp, parameterMenu.cpp
   ------
     1. initially the parameters hold the #defined values from config.h
     2. with the new parameter-menu "edit parameters" you can edit them - they go to the struct par in RAM
-    3. you can test the modified parameters immediatly without leaving the parameter-menu
+    3. you can test the modified parameters immediately without leaving the parameter-menu
     4. a) if you switch off/reset the SpaceMouse, the parameters are lost because they are only stored in RAM
        b) in the parameter-menu you can save the parameters to EEPROM on the Arduino,
           use menu "write to EEPROM" - from now this parameters survive restarts
-    5. as a backup you can list all parameters with then menu "list parameters as defines", you get a list of #defines
-       that you can copy/paste from your terminal-program to a textfile (for storage/documentation) or into your
-       config.h-file to set them as new initial values
+    5. as a backup you can list all parameters with then menu "list parameters as defines", you get a list of #defines that you can copy/paste from your terminal-program to a textfile (for storage/documentation) or into your config.h-file to set them as new initial values
     5. on restart of the SpaceMouse the parameters will be automatically read from EEPROM if they are flagged as valid.
        They are considered as valid if a correct magicNumber is stored in the EEPROM.
-    6. a) if the parameters are destroyed (why?) or the struct had changed (by modifying the program itself),
+    6. a) if the parameters are destroyed (why?) or the struct had changed (by modifying the program itself), 
           you can invalidate the stored parameters via menu "set EEPROM params invalid" (kills the magicNumber)
        b) as an alternative you can erase the whole EEPROM with "clear EEPROM to 0xFF"
     7. on the next restart the parameters are only filled with the #defined values from config.h
