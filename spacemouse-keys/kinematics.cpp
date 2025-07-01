@@ -157,6 +157,13 @@ void _calculateKinematicSensors(int* centered, int16_t* velocity, bool exclusive
       velocity[ROTY] = (-centered[BX] +centered[DX]);
       velocity[ROTZ] = (+centered[AY] +centered[BY] +centered[CY] +centered[DY]);
     }
+    else // if a z-move is detected, make the rotations zero
+    {
+      velocity[ROTX] = 0;
+      velocity[ROTY] = 0;
+      velocity[ROTZ] = 0;
+    }
+    
   // hall-sensors with magnets
   #else
     velocity[TRANSX] = (centered[HES1] -centered[HES0] +centered[HES6] -centered[HES7]) / 2;
