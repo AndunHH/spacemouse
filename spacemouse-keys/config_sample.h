@@ -481,20 +481,6 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
 // how often shall the LEDs be updated
 #define LEDUPDATERATE_MS 150
 
-
-/* Advanced debug output settings
-=================================
-The following settings allow customization of debug output behavior */
-
-// Generate a debug line only every DEBUGDELAY ms 
-#define DEBUGDELAY 100
-
-// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
-#define DEBUG_LINE_END "\r"
-// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
-//define DEBUG_LINE_END "\r\n"
-
-
 /* Advanced USB HID settings
 =============================
 The following settings are advanced and don't need to changed for normal windows users.
