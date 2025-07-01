@@ -139,7 +139,7 @@ void FilterAnalogReadOuts(int *centered, ParamStorage& par){
 void _calculateKinematicSensors(int* centered, int16_t* velocity, bool exclusive){
   // resistive joysticks or hall-joysticks
   #ifndef HALLEFFECT
-  _// if exclusive-mode is on, rotations are only calculated, if no z-move is detected
+  // if exclusive-mode is on, rotations are only calculated, if no z-move is detected
     int cntN = 0;
     int cntP = 0;
     if(centered[AX] < 0){cntN += 1;} if(centered[AX] > 0){cntP += 1;}
