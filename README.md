@@ -21,7 +21,7 @@ At a glance:
 - drift-compensation for hall-joysticks to stop movements when not touched
 - put non-hardware-dependent parameters into the EEPROM of the SpaceMouse-controller
 - no need to compile/download after hardware is adjusted
-- a menu for editing and handling the parameters on the controller via serial menu
+- a menu for editing and handling the parameters on the controller via serial (debug-)connection
 - generally enhanced serial menu
 
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
