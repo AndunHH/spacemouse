@@ -12,6 +12,18 @@ In this mouse the joysticks are replaced by springs, magnets and linear hall eff
 
 To read the eight linear hall effect sensors instead of the joysticks, use the `HALLEFFECT` definition in the config.h. @JarnoBoks provided a complete example: [config_sample_hall_effect.h](spacemouse-keys/config_sample_hall_effect.h) and proceed with the calibration as described in the config file.
 
+## V2.0.14 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
+This release is built on the V1.1.0 from AndunHH and holds 6 months of development by StefanNouza. 
+
+At a glance:
+- enhancements on exclusive-mode for resistive joysticks
+- new modifierFunction to have better control over the form of the curve
+- drift-compensation for hall-joysticks to stop movements when not touched
+- put non-hardware-dependent parameters into the EEPROM of the SpaceMouse-controller
+- no need to compile/download after hardware is adjusted
+- a menu for editing and handling the parameters on the controller via serial (debug-)connection
+- generally enhanced serial menu
+
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
 Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". 
 (This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocol.)
