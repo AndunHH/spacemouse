@@ -1,22 +1,56 @@
 # Newest Stable Release
 Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for the newest releases and updates!
 
-- 0.9: Exclusive mode and [LED ring support](#neopixel-led-ring)
 - [Version 1.0](https://github.com/AndunHH/spacemouse/releases/tag/v1.0.0): [Rotary encoder triggers keys](#rotary-keys)
 - [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
 - Version 2.0: Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
-## V2.0.0 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
+## V2.0 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
 This release holds 6 months of development by @StefanNouza. 
 
 At a glance:
 - enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE)
 - new modifierFunction to have better control over the form of the curve
 - drift-compensation for hall-joysticks to stop movements when not touched
-- put non-hardware-dependent parameters into the EEPROM of the SpaceMouse-controller
-- no need to compile/download after hardware is adjusted
-- a menu for editing and handling the parameters on the controller via serial (debug-)connection
+- put non-hardware-dependent parameters into the [EEPROM](#storing-parameters-in-the-eeprom) of the SpaceMouse-controller
+- no need to compile/download after hardware is adjusted: a [menu](#serial-interface-menu) for editing and handling the parameters on the controller via serial (debug-)connection
 - generally enhanced serial menu
+
+### Serial interface menu
+The serial interface is showing a menu to list the possible options you may ask.
+
+```
+SpaceMouse FW2.x.y - Debug Modes
+ESC stop running mode, leave menu (ESC, Q)
+  1 raw joystick ADC values 0..1023
+  2 centered values -500..+500
+ 11 auto calibrate centers, show deadzones
+ 20 find min/max-values over 15s (move stick)
+  3 centered values w.deadzones -350..+350
+  4 velocity- (trans-/rot-)values -350..+350
+  5 centered- & velocity-values, (3) and (4)
+  6 velocity after kill-keys and keys
+ 61 velocity after axis-switch, exclusive
+  7 loop-frequency-test
+  8 key-test, button-codes to send
+  9 encoder wheel-test
+ 30 parameters (read, write, edit, view)
+```
+
+### Storing parameters in the EEPROM
+The parameters from the config.h file are initially read and stored in the eeprom of the controller. Despite the hardware related constant definitions, you can edit all the sensitivities on the fly over the menu item 30:
+```
+SpaceMouse FW2.x.y - Parameters
+ESC leave parameter-menu (ESC, Q)
+  1  list parameters
+  2  edit parameters
+  3  read from EEPROM
+  4  write to EEPROM
+  5  clear EEPROM to 0xFF
+  6  set EEPROM params invalid
+  7  list parameters as defines
+```
+
 
 ### PRIO-Z-EXCLUSIVE
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected.
@@ -27,22 +61,27 @@ When pushing or pulling, the knob produced transient rotational components that 
 
 So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
 
+
+
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
 Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". 
 (This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocol.)
 
-![Overview over the 6 DOF mouse](pictures/Ergonomouse-Advertiser.png)
+![Overview over the 6 DOF mouse](pictures/overview.drawio.png)
 
 It is based on four joysticks with additional keys OR an encoder or on springs and linear hall effect sensors, as seen here by [John Crombies space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors)
 
-![overview](pictures/overview.jpg)
+![Inside view of a mouse with hall effect sensors and magnets and joysticks](pictures/insideView.drawio.png)
 
-To see many features in place, like the buttons and the encoder, check out the different versions by Jose L. González, like the 
- [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno): 
+To see many features in place, like the buttons and the encoder with joysticks, check out the different versions by Jose L. González, like the 
+ [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno)
 
-![ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](pictures/ergonomouse.webp)
+The Hall Effect Sensor with magnets are greatly utilized by the [TPU springs  by John Crombie](https://www.printables.com/model/1087923-hall-effect-spacemouse-cad-mouse-with-tpu-springs).
 
-## Features of the 6 DOF mouse
+Other implementations, hardware or mechanic variants are linked below.
+
+
+## Features of this software for the 6 DOF mouse
 
 ### General Features
 
@@ -70,7 +109,6 @@ To see many features in place, like the buttons and the encoder, check out the d
 
 ### Wanted features, not jet there:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
-- Saving settings in the eeprom (instead of compiling newly found parameters).
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read some build reports:
 - In the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build) based on four joysticks
@@ -139,11 +177,18 @@ All debug outputs are described at the top of your config_sample.h.
 4. Adjust sensitivity
 5. Choose modifier function:
 
-Choose a modifier function with the help of the following picture. Note, that the Squared, Squared Tan and Cubed Tan function act like a dead one filter, because small inputs are resulting in nearly zero output, which may reduce unwanted movements. 
-Also note, that some of those functions are already at their maximum output (and therefore limited), before the input reaches 350.
+## Modifier Function
+Choose a modifier function with the help of the following picture. Note, that the Squared Tan function act like a dead zone filter, because small inputs are resulting in a small output, which may reduce unwanted movements. 
 
-![picture illustrating the different modifier functions](pictures/modifierFunctions.svg)
+![picture illustrating the different modifier functions](pictures/modifierFunctions-a115-b115.svg)
 
+The modifier function can also be parametrized with the parameters a (= slope_at_zero) and b (= slope_at_end). 
+ 
+The squared function (modFunc = 1):
+$$y = x^a  \cdot sign(x)$$
+
+For example, the squared tangens function (modFunc = 3):
+$$y = \frac {tan(b \cdot (|x|^a \cdot sign(x)))}{tan(b)}$$
 
 # Use the 6 DOF mouse
 ## Download the 3dconnexion driver on windows and mac
