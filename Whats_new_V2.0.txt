@@ -1,30 +1,5 @@
 Modifications:
 ===============
-> basic enhancements
-  - more information on menu: what does a point show, what to expect
-  - ability to repeatly use menu 20 "find min/max" the need to reboot
-  - more consistent menu navigation
-  - moved some variables from global scope into the using function (setting them static)
-      to clarify things
-
-> the idea of storing config-data into EEPROM of the Arduino-controller:
-  - transferring constants of config.h to a parameter-struct
-  - saving/loading parameter to/from EEPROM
-
-> extend the menu with a parameter-menu to edit/load/save the parameters
-  - new menu-levels (menu 30 and subs)
-  - now all non-hardware-specific parameters can be edited and stored:
-    - 4.calibration (sensitivity), 5. (modifierFuction), 6. (direction, drift comp., exclusive)
-
-> rebuilt modifierFunction to
-  - be more flexible in form of the function (look at new spreadsheet)
-  - get a function that fills the range from 0/0 to 350/350 without truncations
-  - minimize deadzones for resistive- and hall-JOYSTICKS
-
-> restrict rotation-components when doing a transZ-move to get rid of "ghost movements"
-  - helps when using resistive joysticks, enabled by existing EXCLUSIVE-mode
-  - (I had implemented some other "tricks" but the exclusive-mode seems to
-     make them unnessecary, so I left them in my old code)
 
 > implemented a drift-compensation to re-zero the (hall-)joysticks when SpaceMouse is untouched
   - because hall-joystick-readings itself don't show any deadband (resistive joysticks do!),
@@ -35,34 +10,6 @@ Modifications:
       the SpaceMouse is left untouched.
       So this drift-compensation was invented to overcome the slightly unprecise mechanics.
   - the compensation finds out when the SpaceMouse is untouched. Then it sets the readings of the joysticks to 0.
-
-> my hall-effect SpaceMouse will be built over the next weeks. Then I may come up with some modifications
-    to the HALLEFFECT-code
-
-
-
-
-Mods in more detail:
-=====================
-
-kinematics.cpp
-===============
-> _calculateKinematicSensors: detect a Z-(up/down-)movement to mask out rotational artefacts
-    - only on exclusive-mode
-> modifierFunction enhanced
-    - no "deadzones" at maximum (at 350) because of truncated values, all curves end for x=350 at y=350
-    - finer trimmable exponential-function, not only x^2, x^3 -> also broken exponents x^a (example x^2.35) are possible
-
-  Principles
-  -----------
-    1.  first x is normalized, so it runs from -1.0 ... 0 ... +1.0
-    2.  to get rid of sign-problems in the "curve-functions", xn=abs(x) is used to get only positive values xn= +1.0 ... 0 ... +1.0
-    3.  to get the negative values back, the sign sx=sign(x) is multiplied at the right places
-    4a. any exponential function y=(xn^a)*sx (with a=1.0 ... 3.0) with x in 0.0..+1.0 results in a y of 0.0 ... +1.0
-    4b. a tangent function y=tan(b*(xn*sn)) / tan(b) with x in -1.0 ... +1.0 results in a y of -1.0 ... +1.0 when b < pi/2
-    5.  so the tangent() of our exponential() function also results in a y of -1.0 ... +1.0
-    6.  after denormalizing we get a result of -350 ... +350 with the curve always fitting into the used x-/y-range
-    7.  on the new modifierFunctions.ods you can play around with the function by editing the yellow fields for "a" and "b"
 
 calibration.cpp
 ================
