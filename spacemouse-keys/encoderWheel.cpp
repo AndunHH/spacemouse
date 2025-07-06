@@ -21,7 +21,6 @@ int32_t previousEncoderValue = 0;
 int32_t newEncoderValue; // Store encoder readings
 int32_t delta = 0;       // Tracks encoder increments when turned
 
-int zoomIterator = ECHOES; // Counter for echoing the delta through a number of loops for a smoother zoom animation
 float simpull;             // calculated velocity of the encoder wheel
 
 void initEncoderWheel()
@@ -33,9 +32,11 @@ void initEncoderWheel()
 /// @brief Calculate the encoder wheel and update the result in the velocity array
 /// @param velocity Array with the velocity, which gets updated at position ROTARY_AXIS-1
 /// @param debug Generate a debug output if debug=9
-void calcEncoderWheel(int16_t *velocity, int debug)
+/// @param  par:  struct of parameters used by the system at runtime
+void calcEncoderWheel(int16_t *velocity, int debug, ParamStorage& par)
 {
-    static int factor = 100; //
+    static float factor = 1; //
+    static int zoomIterator = par.rotAxisEchos; // Counter for echoing the delta through a number of loops for a smoother zoom animation
     // read encoder
     newEncoderValue = myEncoder.read();
     if (newEncoderValue != previousEncoderValue)
@@ -48,10 +49,10 @@ void calcEncoderWheel(int16_t *velocity, int debug)
 
     // Distribute encoder delta through the echoes in the loop and based on simulated axis chosen by the user
     // Faded intensity for echoing the encoder reading.
-    if (zoomIterator < ECHOES)
+    if (zoomIterator < par.rotAxisEchos)
     {
-        factor = 100 - ((zoomIterator * 100) / ECHOES); // factor shall be percent: between 0 and 100
-        simpull = (factor * SIMSTRENGTH) / 100 * delta;
+        factor = (float) 1 - (((float)zoomIterator) / (float) par.rotAxisEchos); // factor shall be between 1 and 0
+        simpull = (factor * par.rotAxisSimStrength)  * delta;
         zoomIterator++; // iterate
         // add the velocity of the encoder wheel to one of the 6 axis
         // the ROTARY_AXIS definition is one above the array definition used for the velocity array (see calibration.h)
@@ -67,11 +68,11 @@ void calcEncoderWheel(int16_t *velocity, int debug)
     if (debug == 9)
     {
         // create debug output
-        Serial.print("Enc Val: ");
+        Serial.print(F("Enc Val: "));
         Serial.print(newEncoderValue);
-        Serial.print(", factor: ");
+        Serial.print(F(", factor: "));
         Serial.print(factor);
-        Serial.print(", simpull: ");
+        Serial.print(F(", simpull: "));
         Serial.println(simpull);
     }
 }

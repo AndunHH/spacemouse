@@ -77,6 +77,9 @@
     int16_t compWaitTime           = COMP_WAIT_TIME;
     int16_t compMinMaxDiff         = COMP_MIN_MAX_DIFF;
     int16_t compCenterDiff         = COMP_CENTER_DIFF;
+
+    int16_t rotAxisEchos           = ECHOES;
+    int16_t rotAxisSimStrength     = SIMSTRENGTH;    
   };
 
   int    userInput(double& value);

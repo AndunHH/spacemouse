@@ -247,6 +247,8 @@ bool printOneParameter(int i, ParamStorage& par, bool line, bool numbering){
       case 28: Serial.print(F("COMP_WAIT_TIME         ")); break;
       case 29: Serial.print(F("COMP_MIN_MAX_DIFF      ")); break;
       case 30: Serial.print(F("COMP_CENTER_DIFF       ")); break;
+      case 31: Serial.print(F("ECHOES                 ")); break; // for ROTARY_AXIS 
+      case 32: Serial.print(F("SIMSTRENGTH            ")); break; // for ROTARY_AXIS 
     }
     double value = readParameter(i, par);
     if(isInt){Serial.print((int)trunc(value));
@@ -295,6 +297,8 @@ double readParameter(int i, ParamStorage& par){
     case 28: value = par.compWaitTime;            break;
     case 29: value = par.compMinMaxDiff;          break;
     case 30: value = par.compCenterDiff;          break;
+    case 31: value = par.rotAxisEchos;            break; // for ROTARY_AXIS 
+    case 32: value = par.rotAxisSimStrength;      break; // for ROTARY_AXIS 
   }
   return value;
 }
@@ -335,5 +339,7 @@ void writeParameter(int i, double value, ParamStorage& par){
     case 28: par.compWaitTime            = value; break;
     case 29: par.compMinMaxDiff          = value; break;
     case 30: par.compCenterDiff          = value; break;
+    case 31: par.rotAxisEchos            = value; break;
+    case 32: par.rotAxisSimStrength      = value; break;
   }
 }

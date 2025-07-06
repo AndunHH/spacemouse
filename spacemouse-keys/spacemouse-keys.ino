@@ -229,7 +229,7 @@ void loop() {
   //--- if an encoder wheel is used, calculate the velocity of the wheel
   //    and replace one of the former calculated velocities
   #if (ROTARY_AXIS > 0) && (ROTARY_AXIS < 7)
-  calcEncoderWheel(velocity, debug);
+  calcEncoderWheel(velocity, debug, par);
   #endif
 
   //--- if defined, evaluate keys
