@@ -35,9 +35,9 @@
   #define BASE_ADDRESS_PAR   4
 
   #if (ROTARY_AXIS > 0) && (ROTARY_AXIS < 7)
-  #define NUM_PARAMS 31   // total number of parameters in struct ParamStorage
+  #define NUM_PARAMS 32   // total number of parameters in struct ParamStorage
   #else
-  #define NUM_PARAMS 29   // total number of parameters in struct ParamStorage
+  #define NUM_PARAMS 30   // total number of parameters in struct ParamStorage
   #endif
 
   struct ParamStorage {
@@ -70,6 +70,7 @@
     int8_t  switchXY               = SWITCHXY;
     int8_t  switchYZ               = SWITCHYZ;
     int8_t  exclusiveMode          = EXCLUSIVEMODE;
+    int8_t  prioZexclusiveMode     = PRIO_Z_EXCLUSIVEMODE;
 
     int8_t  compEnabled            = COMP_ENABLED;
     int16_t compNoOfPoints         = COMP_NO_OF_POINTS;

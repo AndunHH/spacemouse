@@ -241,11 +241,12 @@ bool printOneParameter(int i, ParamStorage& par, bool line, bool numbering){
       case 22: Serial.print(F("SWITCHXY               ")); break;
       case 23: Serial.print(F("SWITCHYZ               ")); break;
       case 24: Serial.print(F("EXCLUSIVEMODE          ")); break;
-      case 25: Serial.print(F("COMP_ENABLED           ")); break;
-      case 26: Serial.print(F("COMP_NO_OF_POINTS      ")); break;
-      case 27: Serial.print(F("COMP_WAIT_TIME         ")); break;
-      case 28: Serial.print(F("COMP_MIN_MAX_DIFF      ")); break;
-      case 29: Serial.print(F("COMP_CENTER_DIFF       ")); break;
+      case 25: Serial.print(F("PRIO_Z_EXCLUSIVEMODE   ")); break;
+      case 26: Serial.print(F("COMP_ENABLED           ")); break;
+      case 27: Serial.print(F("COMP_NO_OF_POINTS      ")); break;
+      case 28: Serial.print(F("COMP_WAIT_TIME         ")); break;
+      case 29: Serial.print(F("COMP_MIN_MAX_DIFF      ")); break;
+      case 30: Serial.print(F("COMP_CENTER_DIFF       ")); break;
     }
     double value = readParameter(i, par);
     if(isInt){Serial.print((int)trunc(value));
@@ -288,11 +289,12 @@ double readParameter(int i, ParamStorage& par){
     case 22: value = par.switchXY;                break;
     case 23: value = par.switchYZ;                break;
     case 24: value = par.exclusiveMode;           break;
-    case 25: value = par.compEnabled;             break;
-    case 26: value = par.compNoOfPoints;          break;
-    case 27: value = par.compWaitTime;            break;
-    case 28: value = par.compMinMaxDiff;          break;
-    case 29: value = par.compCenterDiff;          break;
+    case 25: value = par.prioZexclusiveMode;      break;
+    case 26: value = par.compEnabled;             break;
+    case 27: value = par.compNoOfPoints;          break;
+    case 28: value = par.compWaitTime;            break;
+    case 29: value = par.compMinMaxDiff;          break;
+    case 30: value = par.compCenterDiff;          break;
   }
   return value;
 }
@@ -327,10 +329,11 @@ void writeParameter(int i, double value, ParamStorage& par){
     case 22: par.switchXY                = value; break;
     case 23: par.switchYZ                = value; break;
     case 24: par.exclusiveMode           = value; break;
-    case 25: par.compEnabled             = value; break;
-    case 26: par.compNoOfPoints          = value; break;
-    case 27: par.compWaitTime            = value; break;
-    case 28: par.compMinMaxDiff          = value; break;
-    case 29: par.compCenterDiff          = value; break;
+    case 25: par.prioZexclusiveMode      = value; break;
+    case 26: par.compEnabled             = value; break;
+    case 27: par.compNoOfPoints          = value; break;
+    case 28: par.compWaitTime            = value; break;
+    case 29: par.compMinMaxDiff          = value; break;
+    case 30: par.compCenterDiff          = value; break;
   }
 }

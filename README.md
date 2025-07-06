@@ -3,26 +3,29 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 
 - 0.9: Exclusive mode and [LED ring support](#neopixel-led-ring)
 - [Version 1.0](https://github.com/AndunHH/spacemouse/releases/tag/v1.0.0): [Rotary encoder triggers keys](#rotary-keys)
-- Version 1.1: Support of Hall Effect Sensors:
+- [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
+- Version 2.0: Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
-## V 1.1.0 Hall effect sensors + Springs
-@JarnoBoks merged the source code by @ChromeBee [space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors) resp. [the github repo](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse) with this repository to integrate the hall effect sensor space mouse approach. The code is especially using the [PCB by Michael Roth](https://www.printables.com/model/1063960-cad-mouse-spacemouse-using-hall-effect-sensors-w-p) or the [PCB by Andun](https://github.com/AndunHH/Hall-Effect-PCB).
-
-In this mouse the joysticks are replaced by springs, magnets and linear hall effect sensors to avoid the mechanical limits of the joystick approach.
-
-To read the eight linear hall effect sensors instead of the joysticks, use the `HALLEFFECT` definition in the config.h. @JarnoBoks provided a complete example: [config_sample_hall_effect.h](spacemouse-keys/config_sample_hall_effect.h) and proceed with the calibration as described in the config file.
-
-## V2.0.14 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
-This release is built on the V1.1.0 from AndunHH and holds 6 months of development by StefanNouza. 
+## V2.0.0 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
+This release holds 6 months of development by @StefanNouza. 
 
 At a glance:
-- enhancements on exclusive-mode for resistive joysticks
+- enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE)
 - new modifierFunction to have better control over the form of the curve
 - drift-compensation for hall-joysticks to stop movements when not touched
 - put non-hardware-dependent parameters into the EEPROM of the SpaceMouse-controller
 - no need to compile/download after hardware is adjusted
 - a menu for editing and handling the parameters on the controller via serial (debug-)connection
 - generally enhanced serial menu
+
+### PRIO-Z-EXCLUSIVE
+If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected.
+
+This feature is recommended for resistive joysticks.
+
+When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
+
+So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
 
 # Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
 Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". 
@@ -237,6 +240,13 @@ When you enable this feature in the config, see _ROTARY_KEYS_, the encoder is no
 Note: We are still using the emulated USB HID protocoll for the CAD mouse. Therefore, you need to define the pressed button in the config.h and than configure some actions on your PC driver. We are not emulating a standard keyboard. 
 
 See [#68](https://github.com/AndunHH/spacemouse/issues/68) for more details.
+
+## Hall effect sensors
+@JarnoBoks merged the source code by @ChromeBee [space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors) resp. [the github repo](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse) with this repository to integrate the hall effect sensor space mouse approach. The code is especially using the [PCB by Michael Roth](https://www.printables.com/model/1063960-cad-mouse-spacemouse-using-hall-effect-sensors-w-p) or the [PCB by Andun](https://github.com/AndunHH/Hall-Effect-PCB). See [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of Hall Effect Sensors.
+
+In this mouse the joysticks are replaced by springs, magnets and linear hall effect sensors to avoid the mechanical limits of the joystick approach.
+
+To read the eight linear hall effect sensors instead of the joysticks, use the `HALLEFFECT` definition in the config.h. @JarnoBoks provided a complete example: [config_sample_hall_effect.h](spacemouse-keys/config_sample_hall_effect.h) and proceed with the calibration as described in the config file.
 
 # See also
 

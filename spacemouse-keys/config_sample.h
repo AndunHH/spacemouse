@@ -278,6 +278,14 @@ This can solve issues with classic joysticks where you get unwanted translation 
 It choose to send the one with the biggest absolute value.
 */
 #define EXCLUSIVEMODE 0             // RJS:1     HJS:0
+/*
+PRIO-Z-EXCLUSIVE MODE:
+If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
+Recommended for resistive joysticks.
+When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
+So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
+*/
+#define PRIO_Z_EXCLUSIVEMODE 0      // RJS:1     HJS:0
 
 
 /* Key Support 

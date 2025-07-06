@@ -136,34 +136,48 @@ void FilterAnalogReadOuts(int *centered, ParamStorage& par){
  *
  */
 
-void _calculateKinematicSensors(int* centered, int16_t* velocity, bool exclusive){
+void _calculateKinematicSensors(int* centered, int16_t* velocity, bool prio_z_exclusive){
   // resistive joysticks or hall-joysticks
   #ifndef HALLEFFECT
-  // if exclusive-mode is on, rotations are only calculated, if no z-move is detected
-    int cntN = 0;
-    int cntP = 0;
-    if(centered[AX] < 0){cntN += 1;} if(centered[AX] > 0){cntP += 1;}
-    if(centered[BX] < 0){cntN += 1;} if(centered[BX] > 0){cntP += 1;}
-    if(centered[CX] < 0){cntN += 1;} if(centered[CX] > 0){cntP += 1;}
-    if(centered[DX] < 0){cntN += 1;} if(centered[DX] > 0){cntP += 1;}
 
-    bool zMove = exclusive && ((cntP >= 3 && cntN == 0) || (cntN >= 3 && cntP == 0));
+  /* PRIO-Z-EXCLUSIVE MODE:
+  If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
+  
+  When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, I get first a rotation then the desired translation.
+
+  So this code sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
+  That should only support the exclusive-logic for smallest signals to surpress little undesired rotations.
+  */
+  int cntN = 0;
+  int cntP = 0;
+  if (centered[AX] < 0)
+  {
+    cntN += 1;
+  } 
+  if(centered[AX] > 0){cntP += 1;}
+  if(centered[BX] < 0){cntN += 1;} if(centered[BX] > 0){cntP += 1;}
+  if(centered[CX] < 0){cntN += 1;} if(centered[CX] > 0){cntP += 1;}
+  if(centered[DX] < 0){cntN += 1;} if(centered[DX] > 0){cntP += 1;}
+
+    bool zMove = ((cntP >= 3 && cntN == 0) || (cntN >= 3 && cntP == 0));
 
     velocity[TRANSX] = (-centered[CY] +centered[AY]);
     velocity[TRANSY] = (-centered[BY] +centered[DY]);
     velocity[TRANSZ] = (-centered[AX] -centered[BX] -centered[CX] -centered[DX]);
-    if(!zMove){
-      velocity[ROTX] = (-centered[CX] +centered[AX]);
-      velocity[ROTY] = (-centered[BX] +centered[DX]);
-      velocity[ROTZ] = (+centered[AY] +centered[BY] +centered[CY] +centered[DY]);
-    }
-    else // if a z-move is detected, make the rotations zero
+
+    if (prio_z_exclusive && zMove) // if a z-move is detected, make the rotations zero
     {
       velocity[ROTX] = 0;
       velocity[ROTY] = 0;
       velocity[ROTZ] = 0;
     }
-    
+    else
+    {
+      velocity[ROTX] = (-centered[CX] + centered[AX]);
+      velocity[ROTY] = (-centered[BX] + centered[DX]);
+      velocity[ROTZ] = (+centered[AY] + centered[BY] + centered[CY] + centered[DY]);
+    }
+
   // hall-sensors with magnets
   #else
     velocity[TRANSX] = (centered[HES1] -centered[HES0] +centered[HES6] -centered[HES7]) / 2;
