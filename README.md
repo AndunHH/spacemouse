@@ -1,20 +1,29 @@
+# Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
+Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". 
+
+This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocol.
+
+![Overview over the 6 DOF mouse](pictures/overview.drawio.png)
+
 # Newest Stable Release
+<!-- This release list should hold the latest three releases. The new feature descriptions are placed up here. When the release is not so new anymore, the paragraphs with the feature should be moved down to the other features. -->
+
 Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for the newest releases and updates!
 
 - [Version 1.0](https://github.com/AndunHH/spacemouse/releases/tag/v1.0.0): [Rotary encoder triggers keys](#rotary-keys)
 - [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
-- Version 2.0: Store parameters in EEPROM, new modifierFunction and Drift-compensation
+- Version 2.0: Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
-## V2.0 General enhancements, Parameters in EEPROM, new modifierFunction, Drift-compensation
-This release holds 6 months of development by @StefanNouza. 
+## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
+This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
 
-At a glance:
-- enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE)
-- new modifierFunction to have better control over the form of the curve
-- drift-compensation for hall-joysticks to stop movements when not touched
-- put non-hardware-dependent parameters into the [EEPROM](#storing-parameters-in-the-eeprom) of the SpaceMouse-controller
-- no need to compile/download after hardware is adjusted: a [menu](#serial-interface-menu) for editing and handling the parameters on the controller via serial (debug-)connection
-- generally enhanced serial menu
+- Generally enhanced [serial menu](#serial-interface-menu) for debug outputs
+- Changing and evaluation of parameters without recompiling and download: editing and handling the parameters on the controller via the serial (debug-)connection
+- Save those parameters permanently into the [EEPROM](#storing-parameters-in-the-eeprom) or print them for the config.h
+- Enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE)
+- [Drift-compensation for hall-joysticks](#drift-compensation-for-hall-joysticks) to stop movements when not touched
+- New [modifier function](#modifier-function) to have better control over the form of the curve
+- CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
 
 ### Serial interface menu
 The serial interface is showing a menu to list the possible options you may ask.
@@ -36,6 +45,15 @@ ESC stop running mode, leave menu (ESC, Q)
   9 encoder wheel-test
  30 parameters (read, write, edit, view)
 ```
+#### Usage of serial interface menu
+
+- all inputs are done by typing a number and press 'enter'. To input floating point-values - and . are allowed.
+- to abort a numerical input, press 'esc', 'q' or another non-numerical char
+- to select a menu / debug-mode, input its number
+- to leave a running debug-mode press 'space', 'esc' or 'q'
+- the active menu-level is shown by its prompt, example "mode::"
+- to leave a menu-level press 'space', 'esc' or 'q'
+- a typed in value will be shown AFTER 'enter' is pressed
 
 ### Storing parameters in the EEPROM
 The parameters from the config.h file are initially read and stored in the eeprom of the controller. Despite the hardware related constant definitions, you can edit all the sensitivities on the fly over the menu item 30:
@@ -51,6 +69,25 @@ ESC leave parameter-menu (ESC, Q)
   7  list parameters as defines
 ```
 
+#### Usage for parameter EEPROM
+
+1. Initially the parameters hold the #defined values from config.h
+2. with the new parameter-menu "edit parameters" you can edit them - they go to the struct par in RAM
+3. you can test the modified parameters immediately without leaving the parameter-menu
+4. 
+    1. If you switch off/reset the SpaceMouse, the parameters are lost because they are only stored in RAM
+    2. In the parameter-menu you can save the parameters to EEPROM on the Arduino, use menu "write to EEPROM" - from now this parameters survive restarts
+5. as a backup you can list all parameters with then menu "list parameters as defines", you get a list of #defines that you can copy/paste from your terminal-program to a textfile (for storage/documentation) or into your config.h-file to set them as new initial values
+5. on restart of the SpaceMouse the parameters will be automatically read from EEPROM if they are flagged as valid.     They are considered as valid if a correct magicNumber is stored in the EEPROM.
+6. 
+    1. if the parameters are destroyed (why?) or the struct had changed (by modifying the program itself), you can invalidate the stored parameters via menu "set EEPROM params invalid" (kills the magicNumber)
+    2. as an alternative you can erase the whole EEPROM with "clear EEPROM to 0xFF"
+7. on the next restart the parameters are only filled with the #defined values from config.h
+
+CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-byte. By manually editing and storing the modified parameters we won't get in trouble - but frequent automated saving of parameters won't be a good idea, the EEPROM may get damaged. 
+
+The parameters will be stored to the same location all the time - a load-leveling-algorithm would be too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
+that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
 
 ### PRIO-Z-EXCLUSIVE
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected.
@@ -61,37 +98,59 @@ When pushing or pulling, the knob produced transient rotational components that 
 
 So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
 
+### Drift compensation for hall-joysticks
 
+@StefanNouza implemented a drift-compensation to re-zero the (hall-)joysticks when the mouse is untouched. This is necessary because hall-joystick-readings don't show any deadzone, like resistive joysticks do.
+  
+He wanted use the small readings possible around zero to get a precise reaction to slight touches. This can be done by setting the DEADZONE to 0 and tune the modifierFunction to output values even at small joystick-readings. But then, it can be seen that the mechanics produce a new random zeropoint everytime the SpaceMouse is left untouched.
 
-# Open Source six degree of freedom (6 DOF) mouse with keys, encoder and more
-Repository for a 3D mouse, which emulates a 3Dconnexion "Space Mouse Pro wireless". 
-(This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocol.)
+So this drift-compensation was invented to overcome the slightly unprecise mechanics.
+The compensation finds out when the SpaceMouse is untouched. Then it sets the readings of the joysticks to 0.
+
+This is implemented in the compensateDrifts() function in calibration.cpp. You can fine tune the drift compensation with those parameters. Check the config_sample.h for more infos.
+| Parameter | Short description |
+| --- | --- |
+| COMP_ENABLED | enable the compensation |
+| COMP_NO_OF_POINTS | number of points to build the mean-value |
+| COMP_WAIT_TIME |  [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves) | 
+| COMP_MIN_MAX_DIFF |  [incr] maximum range of raw-values to be considered as only drift |
+| COMP_CENTER_DIFF | [incr] maximum distance from the center-value to be only drift (never compensates above this offset) |
+
+# Complete description of the project 
+
+This repository contains the software for a 3D mouse with six degrees of freedom (6 DOF), which emulates a 3Dconnexion "Space Mouse Pro wireless". 
+
+This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered the USB protocol.
 
 ![Overview over the 6 DOF mouse](pictures/overview.drawio.png)
 
-It is based on four joysticks with additional keys OR an encoder or on springs and linear hall effect sensors, as seen here by [John Crombies space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors)
+The software in this repo supports two different hardware variants:
+1. The usage of **joysticks** (either resistive joysticks or hall-effect joysticks)
+2. The usage of four **hall-effect sensors** which directly measure the distance two **four magnets**.
 
 ![Inside view of a mouse with hall effect sensors and magnets and joysticks](pictures/insideView.drawio.png)
 
-To see many features in place, like the buttons and the encoder with joysticks, check out the different versions by Jose L. González, like the 
+The joysticks version gained popularity through this [TeachingTech YouTube Video](https://www.youtube.com/watch?v=2xAk-wegS9o). To see many features in place, like the buttons and the encoder with joysticks, check out the different versions by Jose L. González, like the 
  [ErgonoMouse MK XX - 6DOF Controller Knob & Joystick with Wheel, Buttons & Keys](https://www.printables.com/de/model/973725-ergonomouse-mk-xx-free-version-6dof-controller-kno)
 
-The Hall Effect Sensor with magnets are greatly utilized by the [TPU springs  by John Crombie](https://www.printables.com/model/1087923-hall-effect-spacemouse-cad-mouse-with-tpu-springs).
+The Hall-Effect-Sensor + Magnet version is greatly described here by [John Crombies space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors) and improved with [TPU springs](https://www.printables.com/model/1087923-hall-effect-spacemouse-cad-mouse-with-tpu-springs).
 
 Other implementations, hardware or mechanic variants are linked below.
-
 
 ## Features of this software for the 6 DOF mouse
 
 ### General Features
 
 - Source code for an Arduino Pro Micro
-- Read eight analog inputs and calculate the kinematics (either based on four joysticks or eight linear hall effect sensors)
+- Read eight analog inputs and calculate the kinematics (either based on four joysticks or eight linear hall effect sensors) with advanced [modifier function](#modifier-function).
 - Emulation of the USB identification and the HID interface to behave like an original space mouse
 - Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
 - Semi-Automatic calibration methods to find the correct pin outs and measurement ranges
-- Debug outputs can be requested over the serial interface during run time, see [config_sample.h](spacemouse-keys/config_sample.h#L36) 
-- [Exclusive-Mode](#exclusive-mode): Transmit either translation or rotation and set the other one to zero, depending on what the main motion is.
+- Debug outputs can be requested over the serial interface from a [menu](#serial-interface-menu) for debug outputs
+- Changing and evaluation of parameters without recompiling and download: editing and handling the parameters on the controller via the serial (debug-)connection
+- Save those parameters permanently into the [EEPROM](#storing-parameters-in-the-eeprom) or print them for the config.h
+- [Exclusive-Mode](#exclusive-mode): Transmit either translation or rotation and set the other one to zero, depending on what the main motion is.- 
+- [Drift-compensation for hall-joysticks](#drift-compensation-for-hall-joysticks) to stop movements when not touched
 
 ### Buttons 
 - Over ten keys may be reported to the PC via USB and may be evaluated by the original driver software
@@ -109,6 +168,7 @@ Other implementations, hardware or mechanic variants are linked below.
 
 ### Wanted features, not jet there:
 - Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
+- With all features enabled, the pro micro is nearly at the limits of it's flash. Reducing the flash size might be necessary in the future...
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read some build reports:
 - In the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build) based on four joysticks
@@ -163,12 +223,11 @@ Troubleshooting for uploading is explained in detail here:
 
 
 # Calibrate your hardware
-After compiling and uploading the program to your hardware, you can connect via the serial monitor. In the upper line, you can send the desired debug mode to the board and observe the output. "-1" stops the debug output.
+After compiling and uploading the program to your hardware, you can connect via the serial monitor. Hit enter and use the [serial menu](#serial-interface-menu) to select the proper debug outputs. 
 
-Read and follow the instructions throughout the config.h file and write down your results. Recompile after every step.
+Read and follow the instructions throughout the config.h file and write down your results. The initial parameters are hardware dependent and you need to recompile for the changes to take effect. The later parameters for sensitivities can be tuned via the menu and saved to the [EEPROM](#storing-parameters-in-the-eeprom) (and exported back to config.h)
 
-This calibration is supported by various debug outputs which can toggle on or off before compiling or during run time by sending the corresponding number via the serial interface.
-All debug outputs are described at the top of your config_sample.h.
+This calibration is supported by various debug outputs. All debug outputs are described at the top of your config_sample.h.
 
 1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics) section below.
 2. Tune dead zone to avoid jittering
@@ -224,7 +283,8 @@ Here are some of the remixes or additions that may be used with this software:
 * [Hall-Effect-Sensor-CAD-Mouse-Spacemouse](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/tree/main) with TPU springs by JohnCrombie.
 
 
-# Electronics and pin assignment
+# Electronics and pin assignment with joysticks
+  > The following paragraph relates to the joystick hardware variant. A thorough description of the principle behind the hall-effect sensors can be found down here [Hall Effect Sensors](#hall-effect-sensors) and on [ChromeBee GitHub: Hall-Effect-Sensor](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse).
 
 The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys and the added neopixel ring.
 ![WiringSpaceMouse](pictures/fritzing-electronics.png)
@@ -263,8 +323,6 @@ Filming the LEDs "in action" is very hard, maybe you can get an idea:
 ![animated LED ring animation](pictures/NeoPixelRing-lightning.gif)
 
 ## Exclusive Mode
-
-
 When the exclusive mode is activated in the config.h only the major movement is transmitted. 
 That means, that the mouse detects, if you want to translate or rotate.
 
@@ -275,6 +333,8 @@ When the biggest input is a rotation: All translations are set to zero.
 This function is the sister of the kill-key feature, where you press a key to decide wether only translations or rotations are transmitted.
 
 Thanks to @mamatt in #73 for this suggestion which were released in Version 0.9.
+
+Check also the [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE).
 
 ## Rotary Keys
 
