@@ -12,7 +12,7 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 
 - [Version 1.0](https://github.com/AndunHH/spacemouse/releases/tag/v1.0.0): [Rotary encoder triggers keys](#rotary-keys)
 - [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
-- Version 2.0: Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
+- [Version 2.0](https://github.com/AndunHH/spacemouse/releases/tag/v2.0.0): Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
 ## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
