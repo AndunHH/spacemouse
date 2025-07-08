@@ -1,13 +1,15 @@
 // This is the public header for the kinematics.cpp file
 // It contains all functions which can be called from the main application
 
-int modifierFunction(int x);
+#include "parameterMenu.h"
+
+int modifierFunction(int x, ParamStorage& par);
 
 void readAllFromJoystick(int *rawReads);
 
-void FilterAnalogReadOuts(int* centered);
+void FilterAnalogReadOuts(int* centered, ParamStorage& par);
 
-void calculateKinematic(int* centered, int16_t* velocity);
+void calculateKinematic(int* centered, int16_t* velocity, ParamStorage& par);
 
 void switchXY(int16_t *velocity);
 void switchYZ(int16_t *velocity);
