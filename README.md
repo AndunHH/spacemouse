@@ -237,7 +237,9 @@ This calibration is supported by various debug outputs. All debug outputs are de
 5. Choose modifier function:
 
 ## Modifier Function
-Choose a modifier function with the help of the following picture. Note, that the Squared Tan function act like a dead zone filter, because small inputs are resulting in a small output, which may reduce unwanted movements. 
+Choose a modifier function to change the linear relationship between raw and processed data. 
+
+Note, that the Squared Tan function act like a dead zone filter, because small inputs are resulting in a small output, which may reduce unwanted movements. 
 
 ![picture illustrating the different modifier functions](pictures/modifierFunctions-a115-b115.svg)
 
@@ -248,6 +250,8 @@ $$y = x^a  \cdot sign(x)$$
 
 For example, the squared tangens function (modFunc = 3):
 $$y = \frac {tan(b \cdot (|x|^a \cdot sign(x)))}{tan(b)}$$
+
+You can **interactively** change the parameters a and b [on this html page ](modifierFunctions.html) to show the impact of the parameters on the modifier functions.
 
 # Use the 6 DOF mouse
 ## Download the 3dconnexion driver on windows and mac
