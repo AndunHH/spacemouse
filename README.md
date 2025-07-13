@@ -253,6 +253,8 @@ $$y = \frac {tan(b \cdot (|x|^a \cdot sign(x)))}{tan(b)}$$
 
 You can **interactively** change the parameters a and b [on this html page ](modifierFunctions.html) to show the impact of the parameters on the modifier functions.
 
+If you read this page in github and the links brings to the raw html code, open the html file locally on your machine or [here on github pages](https://andunhh.github.io/spacemouse/modifierFunctions.html).
+
 # Use the 6 DOF mouse
 ## Download the 3dconnexion driver on windows and mac
 Download and install the [3DConnexion software](https://3dconnexion.com/us/drivers-application/3dxware-10/)
