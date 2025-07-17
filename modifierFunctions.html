@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Plot of the modifier functions</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    .slider-container { margin-top: 20px; }
+    label { display: block; margin-bottom: 5px; }
+    canvas { margin-bottom: 30px; }
+  </style>
+</head>
+<body>
+  <h1>The modifier functions for the space mouse</h2>
+    <a href="https://andunhh.github.io/spacemouse/"><- Back to the main page</a>
+<p>The squared function (modFunc = 1):<br>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi><mo>=</mo><msup><mi>|x|</mi><mi>a</mi></msup><mo>⋅</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>n</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+  <annotation encoding="application/x-tex">y = x^a  \cdot sign(x)</annotation>
+</semantics></math></span></span></span></p>
+
+
+<p>The squared tangens function (modFunc = 3):<br>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>t</mi><mi>a</mi><mi>n</mi><mo stretchy="false">(</mo><mi>b</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><mi>x</mi><msup><mi mathvariant="normal">∣</mi><mi>a</mi></msup><mo>⋅</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>n</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><mrow><mi>t</mi><mi>a</mi><mi>n</mi><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">y = \frac {tan(b \cdot (|x|^a \cdot sign(x)))}{tan(b)}</annotation></semantics></math></span>
+</span></span></p>
+
+<h2>Visualization</h2>
+
+  <canvas id="functionChart" width="800" height="450"></canvas>
+
+  <div class="slider-container">
+    <label for="aRange">Parameter a - Slope at zero: <br /> From linear y = x to cubic y =  x³. Bigger value flattens the curve more near zero. <br /> a= <span id="aValue">1.15</span></label>
+    <input type="range" id="aRange" min="0.1" max="3" step="0.05" value="1.15">
+  </div>
+
+  <div class="slider-container">
+    <label for="bRange">Parameter b - Slope at end: <br / > Bigger value increases the curve more away from zero (on MODFUNC 3) <br />b = <span id="bValue">1.15</span></label>
+    <input type="range" id="bRange" min="0.1" max="1.57" step="0.025" value="1.15">
+  </div>
+
+  <script>
+    const ctx = document.getElementById('functionChart').getContext('2d');
+    const aSlider = document.getElementById('aRange');
+    const bSlider = document.getElementById('bRange');
+    const aValue = document.getElementById('aValue');
+    const bValue = document.getElementById('bValue');
+
+    function generateData(a, b) {
+      const xValues = [];
+      const yF = [];
+      const yG = [];
+      const tanB = Math.tan(b);
+      for (let x = 0; x <= 350; x += 1) {
+        const xNorm = x / 350;
+        const sign = Math.sign(x);
+        const absXNormPowA = Math.pow(Math.abs(xNorm), a);
+        const fx = sign * absXNormPowA;
+        let gx = NaN;
+        if (Math.abs(tanB) > 1e-6) {
+          gx = Math.tan(b * sign * absXNormPowA) / tanB;
+        }
+        xValues.push(x);
+        yF.push(fx);
+        yG.push(gx);
+      }
+      return { xValues, yF, yG };
+    }
+
+    function updateChart(chart, a, b) {
+      const data = generateData(a, b);
+      chart.data.labels = data.xValues;
+      chart.data.datasets[0].data = data.yF;
+      chart.data.datasets[1].data = data.yG;
+      chart.update();
+    }
+
+    const initialData = generateData(1.15, 1.15);
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: initialData.xValues,
+        datasets: [
+          {
+            label: '1: "Squared" function y(x) = (|x|/350)^a · sign(x)',
+            data: initialData.yF,
+            borderColor: 'blue',
+            fill: false,
+          },
+          {
+            label: '3 "Squared tangent" function y(x) = tan(b · |x/350|^a · sign(x)) / tan(b)',
+            data: initialData.yG,
+            borderColor: 'red',
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Input x' },
+            min: -350,
+            max: 350
+          },
+          y: {
+            title: { display: true, text: 'Function output' }
+          }
+        }
+      }
+    });
+
+    function updateValues() {
+      const a = parseFloat(aSlider.value);
+      const b = parseFloat(bSlider.value);
+      aValue.textContent = a;
+      bValue.textContent = b;
+      updateChart(chart, a, b);
+    }
+
+    aSlider.addEventListener('input', updateValues);
+    bSlider.addEventListener('input', updateValues);
+  </script>
+</body>
+</html>
