@@ -14,6 +14,11 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 - [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
 - [Version 2.0](https://github.com/AndunHH/spacemouse/releases/tag/v2.0.0): Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
+## Upcoming Work
+For the next release already to be found in master:
+
+- The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
+
 ## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
 
@@ -167,8 +172,9 @@ Other implementations, hardware or mechanic variants are linked below.
 - Support for a [LED ring](#neopixel-led-ring), as supported by the FastLED library. E.g. a neopixel
 
 ### Wanted features, not jet there:
-- Reverse Direction and Speed options in 3dConnexion Software is not working, because our spacemouse is not accepting this settings.
+- Reverse Direction and Speed options in the windows 3dConnexion Software is not working, because our spacemouse does not get / understand this settings.
 - With all features enabled, the pro micro is nearly at the limits of it's flash. Reducing the flash size might be necessary in the future...
+- The html page explaining the modifier function would benefit from an additional plot zooming in on zero.
 
 Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read some build reports:
 - In the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build) based on four joysticks
@@ -237,7 +243,9 @@ This calibration is supported by various debug outputs. All debug outputs are de
 5. Choose modifier function:
 
 ## Modifier Function
-Choose a modifier function with the help of the following picture. Note, that the Squared Tan function act like a dead zone filter, because small inputs are resulting in a small output, which may reduce unwanted movements. 
+Choose a modifier function to change the linear relationship between raw and processed data. 
+
+Note, that the Squared Tan function act like a dead zone filter, because small inputs are resulting in a small output, which may reduce unwanted movements. 
 
 ![picture illustrating the different modifier functions](pictures/modifierFunctions-a115-b115.svg)
 
@@ -248,6 +256,10 @@ $$y = x^a  \cdot sign(x)$$
 
 For example, the squared tangens function (modFunc = 3):
 $$y = \frac {tan(b \cdot (|x|^a \cdot sign(x)))}{tan(b)}$$
+
+You can **interactively** change the parameters a and b [on this html page ](modifierFunctions.html) to show the impact of the parameters on the modifier functions.
+
+If you read this page in github and the links brings to the raw html code, open the html file locally on your machine or [here on github pages](https://andunhh.github.io/spacemouse/modifierFunctions.html).
 
 # Use the 6 DOF mouse
 ## Download the 3dconnexion driver on windows and mac
