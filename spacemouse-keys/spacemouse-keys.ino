@@ -10,6 +10,7 @@
 // The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
 // Please open config_sample.h, adjust your settings and save it as config.h
 #include "config.h"
+#include "parameterMenu.h"
 
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID
 #include "HID.h"
@@ -61,7 +62,46 @@ int offsets[8];
 int16_t velocity[6];
 
 // global parameters (also stored in EEPROM)
-ParamStorage par;
+ParamStorage parStorage;
+
+ParamData par = { .values      = &parStorage,
+                  .description = {
+                    {PARAM_TYPE_BOOL,  "",                       NULL                              }, // param 0 is unused
+                    {PARAM_TYPE_INT,   "DEADZONE",               &parStorage.deadzone              }, //       1
+                    {PARAM_TYPE_FLOAT, "TRANSX_SENSITIVITY",     &parStorage.transX_sensitivity    }, //       2
+                    {PARAM_TYPE_FLOAT, "TRANSY_SENSITIVITY",     &parStorage.transY_sensitivity    }, //       3
+                    {PARAM_TYPE_FLOAT, "POS_TRANSZ_SENSITIVITY", &parStorage.pos_transZ_sensitivity}, //       4
+                    {PARAM_TYPE_FLOAT, "NEG_TRANSZ_SENSITIVITY", &parStorage.neg_transZ_sensitivity}, //       5
+                    {PARAM_TYPE_FLOAT, "GATE_NEG_TRANSZ",        &parStorage.gate_neg_transZ       }, //       6
+                    {PARAM_TYPE_INT,   "GATE_ROTX",              &parStorage.gate_rotX             }, //       7
+                    {PARAM_TYPE_INT,   "GATE_ROTY",              &parStorage.gate_rotY             }, //       8
+                    {PARAM_TYPE_INT,   "GATE_ROTZ",              &parStorage.gate_rotZ             }, //       9
+                    {PARAM_TYPE_FLOAT, "ROTX_SENSITIVITY",       &parStorage.rotX_sensitivity      }, //      10
+                    {PARAM_TYPE_FLOAT, "ROTY_SENSITIVITY",       &parStorage.rotY_sensitivity      }, //      11
+                    {PARAM_TYPE_FLOAT, "ROTZ_SENSITIVITY",       &parStorage.rotZ_sensitivity      }, //      12
+                    {PARAM_TYPE_INT,   "MODFUNC",                &parStorage.modFunc               }, //      13
+                    {PARAM_TYPE_FLOAT, "SLOPE_AT_ZERO",          &parStorage.slope_at_zero         }, //      14
+                    {PARAM_TYPE_FLOAT, "SLOPE_AT_END",           &parStorage.slope_at_end          }, //      15
+                    {PARAM_TYPE_BOOL,  "INVX",                   &parStorage.invX                  }, //      16
+                    {PARAM_TYPE_BOOL,  "INVY",                   &parStorage.invY                  }, //      17
+                    {PARAM_TYPE_BOOL,  "INVZ",                   &parStorage.invZ                  }, //      18
+                    {PARAM_TYPE_BOOL,  "INVRX",                  &parStorage.invRX                 }, //      19
+                    {PARAM_TYPE_BOOL,  "INVRY",                  &parStorage.invRY                 }, //      20
+                    {PARAM_TYPE_BOOL,  "INVRZ",                  &parStorage.invRZ                 }, //      21
+                    {PARAM_TYPE_BOOL,  "SWITCHXY",               &parStorage.switchXY              }, //      22
+                    {PARAM_TYPE_BOOL,  "SWITCHYZ",               &parStorage.switchYZ              }, //      23
+                    {PARAM_TYPE_BOOL,  "EXCLUSIVEMODE",          &parStorage.exclusiveMode         }, //      24
+                    {PARAM_TYPE_INT,   "EXCLUSIVEHYSTERESIS",    &parStorage.exclusiveHysteresis   }, //      25
+                    {PARAM_TYPE_BOOL,  "PRIO_Z_EXCLUSIVEMODE",   &parStorage.prioZexclusiveMode    }, //      26
+                    {PARAM_TYPE_BOOL,  "COMP_ENABLED",           &parStorage.compEnabled           }, //      27
+                    {PARAM_TYPE_INT,   "COMP_NO_OF_POINTS",      &parStorage.compNoOfPoints        }, //      28
+                    {PARAM_TYPE_INT,   "COMP_WAIT_TIME",         &parStorage.compWaitTime          }, //      29
+                    {PARAM_TYPE_INT,   "COMP_MIN_MAX_DIFF",      &parStorage.compMinMaxDiff        }, //      30
+                    {PARAM_TYPE_INT,   "COMP_CENTER_DIFF",       &parStorage.compCenterDiff        }, //      31
+                    {PARAM_TYPE_INT,   "ECHOES",                 &parStorage.rotAxisEchos          }, //      32
+                    {PARAM_TYPE_INT,   "SIMSTRENGTH",            &parStorage.rotAxisSimStrength    }  //      33
+                  }
+                };
 
 //store raw value of the keys, without debouncing
 int keyVals[NUMKEYS];
@@ -83,21 +123,21 @@ void setup() {
   setupKeys();
   #endif
 
-  // Begin Serial for debugging
-  Serial.begin(115200);
-  delay(100);
-  Serial.setTimeout(30000);  // the serial interface will wait for new menu number for max.30s
-
   #ifdef HALLEFFECT
   // Set the ADC reference voltage to 2,56V if HALLEFFECT is defined, 5V otherwise.
   // It is important the reference Voltage is set before the Zeroing of the sensors is executed.
   setAnalogReferenceVoltage(0);
   #endif
 
+  // Begin Serial for debugging
+  Serial.begin(115200);
+  Serial.setTimeout(30000);  // the serial interface will wait for new menu number for max.30s
+  while(!Serial){delay(500);}
+
   // Read idle/centre positions for joysticks.
   // zero the joystick position 500 times (takes approx. 480 ms)
   // during setup() we are not interested in the debug output: debugFlag = false
-  busyZeroing(centerPoints, 500, false);
+  busyZeroing(centerPoints, 750, false);
   for(int i=0; i<8; i++){offsets[i] = 0;}
 
   #if ROTARY_AXIS > 0 or ROTARY_KEYS > 0
@@ -120,9 +160,13 @@ void loop() {
   static bool showMenu  = false;
 
   //--- check if the user entered a debug mode via serial interface
-  if((debug != 20) && (debug != 30)){  // don't change debug-mode/menu when calcMinMax() or parameterMenu() are running
+  if((debug != 20) && (debug != 30)){       //SNo: don't change debug-mode/menu when calcMinMax() or parameterMenu() are running
     double num;
+
     int state = userInput(num);
+    #if ENABLE_PROGMODE > 0
+    if(state == 10){executeProgCommand(par); state = 0;}
+    #endif
     if(state == 1){
       debug = (int)num;
       Serial.println(debug);
@@ -137,11 +181,15 @@ void loop() {
     if(showMenu){
       Serial.print(F("\r\n\r\nSpaceMouse FW"));Serial.print(F(FW_RELEASE));Serial.println(F(" - Debug Modes"));
       Serial.println(F("ESC stop running mode, leave menu (ESC, Q)"));
-      Serial.println(F("  1 raw joystick ADC values 0..1023"));
+      Serial.println(F("  1 raw sensors ADC values full range, max. 0..1023"));
+      #ifdef HALLEFFECT
+      Serial.println(F(" 10 raw sensors ADC values used range, max. 0..1023"));
+      #endif
       Serial.println(F("  2 centered values -500..+500"));
       Serial.println(F(" 11 auto calibrate centers, show deadzones"));
-      Serial.println(F(" 20 find min/max-values over 15s (move stick)"));
+      Serial.println(F(" 20 find min/max-values over 20s (move stick)"));
       Serial.println(F("  3 centered values w.deadzones -350..+350"));
+      Serial.println(F(" 31 drift compensation offsets"));
       Serial.println(F("  4 velocity- (trans-/rot-)values -350..+350"));
       Serial.println(F("  5 centered- & velocity-values, (3) and (4)"));
       Serial.println(F("  6 velocity after kill-keys and keys"));
@@ -150,12 +198,12 @@ void loop() {
       Serial.println(F("  8 key-test, button-codes to send"));
       Serial.println(F("  9 encoder wheel-test"));
       #if PARAM_IN_EEPROM > 0
-      Serial.println(F(" 30 parameters (read, write, edit, view)"));
+      Serial.println(F(" 30 parameters (load, save, edit, view)"));
       #endif
       Serial.print(F("mode::"));
       showMenu = false;
-      }
     }
+  }
 
   //--- run parameter-menu
   if(debug == 30){
@@ -179,9 +227,15 @@ void loop() {
   #endif
 
   // Report back 0-1023 raw ADC 10-bit values if enabled
+  #ifdef HALLEFFECT
+  if ((debug == 1) || (debug == 10)) {
+    debugOutput1(rawReads, keyVals);
+  }
+  #else
   if (debug == 1) {
     debugOutput1(rawReads, keyVals);
   }
+  #endif
 
   //--- calibrate the joystick
   if (debug == 11) {
@@ -191,15 +245,20 @@ void loop() {
   }
 
   //--- Calculate drift compensation offsets
-  if((par.compEnabled == 1) && (debug != 20)){
+  if((par.values->compEnabled == 1) && (debug != 20)){  // only when not in debug 20 = find min/max vlaues
     compensateDrifts(rawReads, centerPoints, offsets, par);
   }else{
     for(int i = 0; i < 8; i++){offsets[i] = 0;}
   }
 
-  //--- Subtract centre position from measured position to determine movement.
+  // Report compensation-offset values
+  if (debug == 31) {
+    debugOutput2(offsets);
+  }
+
+  //--- Subtract centre position and drift-offsets from measured position to determine movement.
   for (int i = 0; i < 8; i++) {
-    centered[i] = rawReads[i] - centerPoints[i] + offsets[i]; // use drift-offsets
+    centered[i] = rawReads[i] - centerPoints[i] + offsets[i];
   }
 
   //--- calibrate MinMax values
@@ -229,7 +288,7 @@ void loop() {
   //--- if an encoder wheel is used, calculate the velocity of the wheel
   //    and replace one of the former calculated velocities
   #if (ROTARY_AXIS > 0) && (ROTARY_AXIS < 7)
-  calcEncoderWheel(velocity, debug, par);
+  calcEncoderWheel(velocity, (debug == 9), par);
   #endif
 
   //--- if defined, evaluate keys
@@ -240,7 +299,7 @@ void loop() {
   // The encoder wheel shall be treated as a key
   #if ROTARY_KEYS > 0 
   // The encoder wheel shall be treated as a key
-  calcEncoderAsKey(keyState, debug);
+  calcEncoderAsKey(keyState, (debug == 9));
   #endif
 
   // report translation and rotation values if enabled
@@ -275,12 +334,12 @@ void loop() {
   }
 
   //--- exchange axis if desired
-  if(par.switchYZ == 1) {switchYZ(velocity);}
-  if(par.switchXY == 1) {switchXY(velocity);}
+  if(par.values->switchYZ == 1) {switchYZ(velocity);}
+  if(par.values->switchXY == 1) {switchXY(velocity);}
 
   // exclusive mode: rotation OR translation, but never both at the same time to avoid issues with classics joysticks
-  if(par.exclusiveMode == 1){
-  exclusiveMode(velocity);
+  if(par.values->exclusiveMode == 1){
+    exclusiveMode(velocity, par.values->exclusiveHysteresis);
   }
 
   // report velocity and keys after Switch or ExclusiveMode
@@ -306,6 +365,7 @@ void loop() {
   lightSimpleLED(SpaceMouseHID.getLEDState());
   #endif
   #endif
+
 } //end loop()
 
 #ifdef LEDpin
@@ -334,10 +394,14 @@ void lightSimpleLED(boolean light){
 void setAnalogReferenceVoltage(int dbg){
   if (dbg == 1){  // Set the reference voltage for the AD Convertor to 5V only for the first calibration step (pinout/inversion calibration).
     analogReference(DEFAULT);
-    Serial.println(F("Setting analog reference to 5V."));
+    #ifdef DEBUG_ADC
+      Serial.println(F("Setting analog reference to 5V."));
+    #endif
   }else{          // Set the reference voltage for the AD Convertor to 2.56V in order to get larger sensitivity.
     analogReference(INTERNAL);
-    Serial.println(F("Setting analog reference to 2.56V."));
+    #ifdef DEBUG_ADC
+      Serial.println(F("Setting analog reference to 2.56V."));
+    #endif
   }
 
   // The first measurements after changing the reference voltage can be wrong. So take 100ms to let the voltage stabilize and

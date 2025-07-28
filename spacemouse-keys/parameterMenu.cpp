@@ -4,13 +4,49 @@
 #include <EEPROM.h>
 #include "parameterMenu.h"
 
+/* possible commands in ProgMode:
+
+  Cmd    |function                       |returns (>= 10000 -> NOK)
+  -------|-------------------------------|----------------------------------------------------------------------------
+  >p...   parameter number                <p...   (PE_OK,PE_INVALID_PARAM)
+  >r      read value                      <r...   (<value> or PE_INVALID_PARAM
+  >w...   write value                     <w...   (PE_OK,PE_INVALID_PARAM,PE_INVALID_VALUE "not in [-10000..+10000]")
+  >l      load params from EEPROM         <l0     (PE_OK)
+  >s      save params to EEPROM           <s0     (PE_OK)
+  >c      clear EEPROM                    <c0     (PE_OK)
+  >m      get magic number                <m...   (<magic number>: all values are valid, no fault-codes!)
+  >n      get number of parameters        <n...   (<number of params>)
+  >i      invalidate magic number         <i0     (PE_OK)
+  >t      get type of parameter           <t...   (<type>: 0=bool,1=int,2=float or PE_INVALID_PARAM)
+  >d      get description of parameter    <d...   (<name of parameter> or PE_INVALID_PARAM)
+*/
+
+#if ENABLE_PROGMODE > 0
+ProgCmd prog;
+#endif
+long    invalidNum = 0xFFFFFFFF;
+
 /// @brief  Test for User-input on serial interface. If something is typed in, the input is checked for a (floating point-)number, 'q' or ESC.
-/// @param  value: (output) number entered by user - not valid, if returned state <> 1, so check return first!!!
-/// @return state of the user-input: 0=nothing typed in; 1=new value entered, see "value"; 2=aborted by pressing q or ESC; 3=input timed out; 4=undefined input
+/// @param  value    (output) number entered by user - not valid, if returned state <> 1, so check return first!!!
+/// @return state of the user-input: 0=nothing typed in; 1=new value entered, see "value"; 2=aborted by pressing q or ESC; 3=input timed out; 4=undefined input; 10=received prog-command
 int userInput(double& value){ // returns: 0=nothing  1=new value  2=aborted  3=input timed out  4=undefined
   int state = 0;  // initial "nothing"
 
+  bool   progRuns = false;  // progMode not running
+  #if ENABLE_PROGMODE > 0
+  bool   progMode = false;  // not in prog-mode
+  bool   cmdDone  = false;  // cmd not read
+  bool   valDone  = false;  // val not to be read next
+  bool   crlfDone = false;  // CR/LF not read
+
+  prog.cmd   = '?';
+  prog.value = 0;
+  prog.retval = PE_OK;
+  #endif
+
+  do{
   if(Serial.available()){
+      state = 0;
     char next = toLowerCase(Serial.peek());
     if(isDigit(next) || next == '-'){                             // eine Ziffer oder Vorzeichen ist eingegeben:
       double v = Serial.parseFloat();                             //   Zahl übernehmen, Funktion ausführen
@@ -22,30 +58,114 @@ int userInput(double& value){ // returns: 0=nothing  1=new value  2=aborted  3=i
       }else                               {state = 3;}            //   parseFloat()-Timeout -> "timed out"
       if(state == 1){value = v;}                                  //   bei gültiger Zahleneingabe: Zahlen-Wert übernehmen
     }
-    else if(next == 'q' || next == 27){state = 2; Serial.read();} // 'q' oder ESC           -> "aborted"
-    else if(next ==  13 || next == 10){state = 0; Serial.read();} // CR und LF ausblenden   -> "nothing"
-    else                              {state = 4; Serial.read();} // alles andere           -> "undefined"
-  }
+
+      #if ENABLE_PROGMODE > 0
+      else if(next == '>'                       ){progMode = true;                 progRuns = true; Serial.read();} // '>' beginnt progmode (inits value to 0)
+      else if(progMode && !cmdDone && next =='p'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'p' set parameter-number
+      else if(progMode && !cmdDone && next =='t'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   't' get parameter-type
+      else if(progMode && !cmdDone && next =='d'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'd' get parameter-description
+      else if(progMode && !cmdDone && next =='r'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'r' read parameter-value
+      else if(progMode && !cmdDone && next =='w'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'w' write parameter-value
+      else if(progMode && !cmdDone && next =='l'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'l' load params from EEPRROM
+      else if(progMode && !cmdDone && next =='s'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   's' save params to EEPROM
+      else if(progMode && !cmdDone && next =='c'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'c' clear EEPROM
+      else if(progMode && !cmdDone && next =='m'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'm' get magic number
+      else if(progMode && !cmdDone && next =='n'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'n' get number of parameters
+      else if(progMode && !cmdDone && next =='i'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'i' invalidate magic-number
+
+      else if(next == 'q' || next == 27){state = 2; Serial.read();} // 'q' oder ESC           -> "aborted"
+      else if(next ==  13 || next == 10){state = 5; Serial.read();} // CR und LF ausblenden   -> "nothing"
+      else                              {state = 4; Serial.read();} // alles andere           -> "undefined"
+
+      //--- progMode: handle values and CR/LF, test for complete telegram
+      if(progMode){
+        if     ((state == 1) &&  valDone){                    valDone = false; crlfDone = true;} // value+CR/LF received but not expected
+        else if((state == 1) && !valDone){prog.value = value; valDone = true;  crlfDone = true;} // value+CR/LF received as expected
+        else if( state == 5             ){                                     crlfDone = true;} // CR/LF received
+        else if( state == 4             ){                    cmdDone = false;                 } // invalidate cmd-signal to get cmd-fault
+
+        // test received telegram and end if done or telegram-format is wrong
+        if     ( cmdDone &&  valDone && crlfDone){                              progRuns = false;} // telegram OK (cmd+value+CR/LF or cmd+CR/LF)
+        else if( cmdDone && !valDone && crlfDone){prog.retval = PE_VALUE_FAULT; progRuns = false;} // no value / superflux value
+        else if(!cmdDone             && crlfDone){prog.retval = PE_CMD_FAULT;   progRuns = false;} // no cmd
+
+        state = 10;                                                 // received prog-command
+      }
+      #endif
+      if(state == 5){state = 0;}                                    // for the parameter-menu a CR/LF is interpreted as "nothing"
+    }
+  }while(progRuns);
+
   return state;
 }
 
+#if ENABLE_PROGMODE > 0
+/// @brief  executes a program-command which is stored in the global variable "prog" by userInput()
+/// @param  nothing
+void executeProgCommand(ParamData& par){
+  long m      = 0L;
+  bool intVal = true;
+
+  if(prog.retval == PE_OK){
+    if      (prog.cmd == 'p'){if(prog.value < 1 || prog.value > NUM_PARAMS){prog.retval   = PE_INVALID_PARAM;}
+                              else                                         {prog.paramNo = prog.value;}
+                             }
+
+    else if(prog.cmd == 't'){prog.retval = par.description[prog.paramNo].type;}
+
+    else if(prog.cmd == 'd'){if(prog.paramNo < 1 || prog.paramNo > NUM_PARAMS){prog.retval   = PE_INVALID_PARAM;}
+                             else                                             {Serial.print(F("<d")); printParameterName(prog.paramNo, par, false); Serial.println();
+                                                                               return;}
+                            }
+
+    else if(prog.cmd == 'r'){if(prog.paramNo < 1 || prog.paramNo > NUM_PARAMS){prog.retval = PE_INVALID_PARAM;}
+                             else                                             {prog.retval = readParameter(prog.paramNo, par);
+                                                                               intVal      = (par.description[prog.paramNo].type != PARAM_TYPE_FLOAT);}
+                            }
+
+    else if(prog.cmd == 'w'){if(prog.paramNo < 1 || prog.paramNo > NUM_PARAMS)      {prog.retval = PE_INVALID_VALUE;}
+                             else if(prog.value < -10000.0 || prog.value > +10000.0){prog.retval = PE_INVALID_PARAM;}
+                             else                                                   {writeParameter(prog.paramNo, prog.value, par);}
+                            }
+
+    else if(prog.cmd == 'l'){getParametersFromEEPROM(par);}
+
+    else if(prog.cmd == 's'){putParametersToEEPROM(par);}
+
+    else if(prog.cmd == 'c'){for(unsigned int i=0; i < EEPROM.length(); i++){EEPROM.update(i, 255);}}
+
+    else if(prog.cmd == 'm'){EEPROM.get(BASE_ADDRESS_MAGIC, m);
+                             Serial.print(F("<m")); Serial.println(m);
+                             return;
+                            }
+
+    else if(prog.cmd == 'n'){prog.retval = NUM_PARAMS;}
+
+    else if(prog.cmd == 'i'){EEPROM.put(BASE_ADDRESS_MAGIC, invalidNum);}
+  }
+
+  Serial.print(F("<")); Serial.print(prog.cmd); 
+  if(intVal){Serial.println((int)prog.retval);}
+  else      {Serial.println(     prog.retval, 3);}
+}
+#endif
+
 /// @brief  StateMachine to display the parameters-menu, do the user-interaction and show/edit/read/write the parameters
-/// @param  par: struct of parameters used by the system at runtime
-/// @return state of StateMachine: 0=parameter-menu is off; 1=writeMenu-text to serial; 2=getInput via serial from user; 3=do the requested work
-int parameterMenu(ParamStorage& par) {
+/// @param  par        struct of parameters used by the system at runtime
+/// @return state      of StateMachine: 0=parameter-menu is off; 1=writeMenu-text to serial; 2=getInput via serial from user; 3=do the requested work
+int parameterMenu(ParamData& par) {
   /* this function builds the config-management menu */
   /* state: 0=off, 1=writeMenu, 2=getInput, 3=doWork */
   static int state      = 0;
   static int menuMode   = -1; // mode requested by user input (-1 = nothing)
-  long       invalidNum = 0xFFFFFFFF;
 
   if(state == 0 || state == 1){ // 0 = "off", 1 = "writeMenu"
     Serial.print  (F("\r\nSpaceMouse FW")); Serial.print(F(FW_RELEASE)); Serial.println(F(" - Parameters"));
     Serial.println(F("ESC leave parameter-menu (ESC, Q)"));
     Serial.println(F("  1  list parameters"));
     Serial.println(F("  2  edit parameters"));
-    Serial.println(F("  3  read from EEPROM"));
-    Serial.println(F("  4  write to EEPROM"));
+    Serial.println(F("  3  load from EEPROM"));
+    Serial.println(F("  4  save to EEPROM"));
     Serial.println(F("  5  clear EEPROM to 0xFF"));
     Serial.println(F("  6  set EEPROM params invalid"));
     Serial.println(F("  7  list parameters as defines"));
@@ -75,12 +195,12 @@ int parameterMenu(ParamStorage& par) {
               }
               break;
 
-      case 3: Serial.println(F("reading paramerters from EEPROM"));
+      case 3: Serial.println(F("loading parameters from EEPROM"));
               getParametersFromEEPROM(par);
               state = 1;  // writeMenu
               break;
 
-      case 4: Serial.println(F("writing paramerters to EEPROM"));
+      case 4: Serial.println(F("saving parameters to EEPROM"));
               putParametersToEEPROM(par);
               state = 1;  // writeMenu
               break;
@@ -112,9 +232,9 @@ int parameterMenu(ParamStorage& par) {
 }
 
 /// @brief  StateMachine to edit parameters: list all, let the user select one, let the user input a value, write to selected parameter
-/// @param  par: struct of parameters used by the system at runtime
-/// @return state of StateMachine: 0=edit is off; 1=show list on serial; 2=user-input index; 3=show old value; 4=user-input new value; 5=write new value to parameter
-int editParameters(ParamStorage& par){
+/// @param  par        struct of parameters used by the system at runtime
+/// @return state      of StateMachine: 0=edit is off; 1=show list on serial; 2=user-input index; 3=show old value; 4=user-input new value; 5=write new value to parameter
+int editParameters(ParamData& par){
   static int    state    = 0;
   static bool   isFloat;
   static int    parIndex = 0;
@@ -141,7 +261,7 @@ int editParameters(ParamStorage& par){
     result = userInput(num);
     if(      result == 1){parIndex = (int)num;
                           Serial.println(parIndex);
-                          state = 3;  // new value -> edit selected
+                          state = 3; // new value -> edit selected
     }else if(result == 2){state = 0; // aborted -> end this menu
     }else if(result != 0){state = 1; // others  -> show menu
     }
@@ -177,169 +297,103 @@ int editParameters(ParamStorage& par){
 }
 
 /// @brief  gets all parameters from EEPROM, if the magic number in EEPROM is correct
-/// @param  par: struct of parameters used by the system at runtime, read from EEPROM
-void getParametersFromEEPROM(ParamStorage& par){
+/// @param  par        struct of parameters used by the system at runtime, read from EEPROM
+void getParametersFromEEPROM(ParamData& par){
   long magicNumber = 0L;
   EEPROM.get(BASE_ADDRESS_MAGIC, magicNumber);
   if(magicNumber == MAGIC_NUMBER){
-    EEPROM.get(BASE_ADDRESS_PAR, par);
+    EEPROM.get(BASE_ADDRESS_PAR, *par.values);
   }else{
     Serial.println(F("wrong magic number, no parameters in EEPROM"));
   }
 }
 
 /// @brief  puts all parameters to EEPROM, sets the magic number in EEPROM
-/// @param  par: struct of parameters used by the system at runtime, written to EEPROM
-void putParametersToEEPROM(ParamStorage& par){
+/// @param  par        struct of parameters used by the system at runtime, written to EEPROM
+void putParametersToEEPROM(ParamData& par){
   long magicNumber = MAGIC_NUMBER;
-  EEPROM.put(BASE_ADDRESS_PAR, par);
+  EEPROM.put(BASE_ADDRESS_PAR, *par.values);
   EEPROM.put(BASE_ADDRESS_MAGIC, magicNumber);
 }
 
+/// @brief  prints parameter name of parameter requested by index i. Prints unformatted or left-aligned  >>when defining a new parameter, edit this function<<
+/// @param  i          index of the parameter to print
+/// @param  formatted  true=print name left aligned, false=print only name
+/// @return nothing
+void printParameterName(int i, ParamData& par, bool formatted){
+
+  Serial.print(par.description[i].name);
+
+  if(formatted){
+    int c = MAX_PARAM_NAME_LEN - strlen(par.description[i].name);
+    char spc[MAX_PARAM_NAME_LEN + 1];
+
+    for(int n=0; n<c; n++){spc[n] = ' ';}
+    spc[c] = '\0';
+    Serial.print(spc);
+  }
+}
+
 /// @brief  prints all parameters as a list to Serial
-/// @param  par: struct of parameters used by the system at runtime
-/// @param  num: true=numbers the parameter-lines; false=no numbering
-void printAllParameters(ParamStorage& par, bool num){
+/// @param  par        struct of parameters used by the system at runtime
+/// @param  num        true=numbers the parameter-lines; false=no numbering
+void printAllParameters(ParamData& par, bool num){
   for(int i=1; i<=NUM_PARAMS; i++){
     printOneParameter(i, par, true, num);
   }
 }
 
-/// @brief  prints one parameter with its name to Serial  >>when defining a new parameter, edit this function<<
-/// @param  i:    index of the parameter to print
-/// @param  par:  struct of parameters used by the system at runtime
-/// @param  line: true=outputs lineend-chars at last; false=no lineend
-/// @param  numbering:  true=numbers the lines using the index; false=no numbering
-/// @return isFloat: true=selected parameter is a double; false=selected parameter is an integer
-bool printOneParameter(int i, ParamStorage& par, bool line, bool numbering){
-  bool isInt = true;
+/// @brief  prints one parameter with its name to Serial
+/// @param  i          index of the parameter to print
+/// @param  par        struct of parameters used by the system at runtime
+/// @param  line       true=outputs lineend-chars at last; false=no lineend
+/// @param  numbering  true=numbers the lines using the index; false=no numbering
+/// @return isFloat    true=selected parameter is a double; false=selected parameter is an integer
+bool printOneParameter(int i, ParamData& par, bool line, bool numbering){
+  bool isFloat = false;
 
   if(i >= 1 && i <= NUM_PARAMS){
+    isFloat = (par.description[i].type == PARAM_TYPE_FLOAT);
+
     if(numbering){if(i <= 9){Serial.print(" ");} Serial.print(i); Serial.print(" ");}
-    switch(i){
-      case  1: Serial.print(F("DEADZONE               ")); break;
-      case  2: Serial.print(F("TRANSX_SENSITIVITY     ")); isInt = false; break;
-      case  3: Serial.print(F("TRANSY_SENSITIVITY     ")); isInt = false; break;
-      case  4: Serial.print(F("POS_TRANSZ_SENSITIVITY ")); isInt = false; break;
-      case  5: Serial.print(F("NEG_TRANSZ_SENSITIVITY ")); isInt = false; break;
-      case  6: Serial.print(F("GATE_NEG_TRANSZ        ")); isInt = false; break;
-      case  7: Serial.print(F("GATE_ROTX              ")); break;
-      case  8: Serial.print(F("GATE_ROTY              ")); break;
-      case  9: Serial.print(F("GATE_ROTZ              ")); break;
-      case 10: Serial.print(F("ROTX_SENSITIVITY       ")); isInt = false; break;
-      case 11: Serial.print(F("ROTY_SENSITIVITY       ")); isInt = false; break;
-      case 12: Serial.print(F("ROTZ_SENSITIVITY       ")); isInt = false; break;
-      case 13: Serial.print(F("MODFUNC                ")); break;
-      case 14: Serial.print(F("SLOPE_AT_ZERO          ")); isInt = false; break;
-      case 15: Serial.print(F("SLOPE_AT_END           ")); isInt = false; break;
-      case 16: Serial.print(F("INVX                   ")); break;
-      case 17: Serial.print(F("INVY                   ")); break;
-      case 18: Serial.print(F("INVZ                   ")); break;
-      case 19: Serial.print(F("INVRX                  ")); break;
-      case 20: Serial.print(F("INVRY                  ")); break;
-      case 21: Serial.print(F("INVRZ                  ")); break;
-      case 22: Serial.print(F("SWITCHXY               ")); break;
-      case 23: Serial.print(F("SWITCHYZ               ")); break;
-      case 24: Serial.print(F("EXCLUSIVEMODE          ")); break;
-      case 25: Serial.print(F("PRIO_Z_EXCLUSIVEMODE   ")); break;
-      case 26: Serial.print(F("COMP_ENABLED           ")); break;
-      case 27: Serial.print(F("COMP_NO_OF_POINTS      ")); break;
-      case 28: Serial.print(F("COMP_WAIT_TIME         ")); break;
-      case 29: Serial.print(F("COMP_MIN_MAX_DIFF      ")); break;
-      case 30: Serial.print(F("COMP_CENTER_DIFF       ")); break;
-      case 31: Serial.print(F("ECHOES                 ")); break; // for ROTARY_AXIS 
-      case 32: Serial.print(F("SIMSTRENGTH            ")); break; // for ROTARY_AXIS 
-    }
+    printParameterName(i, par, true);
+
     double value = readParameter(i, par);
-    if(isInt){Serial.print((int)trunc(value));
-    }else    {Serial.print(value);
+    if(isFloat){Serial.print(value);
+    }else      {Serial.print((int)trunc(value));
     }
-    if(line) {Serial.println();}
+    if(line)   {Serial.println();}
   }
-  return isInt;
+  return isFloat;
 }
 
 /// @brief  reads one parameter (selected by index i) out of parameter-set  >>when defining a new parameter, edit this function<<
-/// @param  i:    index of the parameter to print
-/// @param  par:  struct of parameters used by the system at runtime
-/// @return value read from the selected parameter
-double readParameter(int i, ParamStorage& par){
+/// @param  i         index of the parameter to print
+/// @param  par       struct of parameters used by the system at runtime
+/// @return value     read from the selected parameter
+double readParameter(int i, ParamData& par){
   double value = NAN;
 
-  switch(i){
-    case  1: value = par.deadzone;                break;
-    case  2: value = par.transX_sensitivity;      break;
-    case  3: value = par.transY_sensitivity;      break;
-    case  4: value = par.pos_transZ_sensitivity;  break;
-    case  5: value = par.neg_transZ_sensitivity;  break;
-    case  6: value = par.gate_neg_transZ;         break;
-    case  7: value = par.gate_rotX;               break;
-    case  8: value = par.gate_rotY;               break;
-    case  9: value = par.gate_rotZ;               break;
-    case 10: value = par.rotX_sensitivity;        break;
-    case 11: value = par.rotY_sensitivity;        break;
-    case 12: value = par.rotZ_sensitivity;        break;
-    case 13: value = par.modFunc;                 break;
-    case 14: value = par.slope_at_zero;           break;
-    case 15: value = par.slope_at_end;            break;
-    case 16: value = par.invX;                    break;
-    case 17: value = par.invY;                    break;
-    case 18: value = par.invZ;                    break;
-    case 19: value = par.invRX;                   break;
-    case 20: value = par.invRY;                   break;
-    case 21: value = par.invRZ;                   break;
-    case 22: value = par.switchXY;                break;
-    case 23: value = par.switchYZ;                break;
-    case 24: value = par.exclusiveMode;           break;
-    case 25: value = par.prioZexclusiveMode;      break;
-    case 26: value = par.compEnabled;             break;
-    case 27: value = par.compNoOfPoints;          break;
-    case 28: value = par.compWaitTime;            break;
-    case 29: value = par.compMinMaxDiff;          break;
-    case 30: value = par.compCenterDiff;          break;
-    case 31: value = par.rotAxisEchos;            break; // for ROTARY_AXIS 
-    case 32: value = par.rotAxisSimStrength;      break; // for ROTARY_AXIS 
+  if(i >= 1 && i <= NUM_PARAMS){
+    switch(par.description[i].type){
+      case PARAM_TYPE_BOOL:  value =  *(int8_t*)par.description[i].storage; break;
+      case PARAM_TYPE_INT:   value = *(int16_t*)par.description[i].storage; break;
+      case PARAM_TYPE_FLOAT: value =  *(double*)par.description[i].storage; break;
+    }
   }
   return value;
 }
 
 /// @brief  writes one parameter (selected by index i) to the parameter-set  >>when defining a new parameter, edit this function<<
-/// @param  i:     index of the parameter to print
-/// @param  value: value to write into the selected parameter
-/// @param  par:   struct of parameters used by the system at runtime
-void writeParameter(int i, double value, ParamStorage& par){
-  switch(i){
-    case  1: par.deadzone                = value; break;
-    case  2: par.transX_sensitivity      = value; break;
-    case  3: par.transY_sensitivity      = value; break;
-    case  4: par.pos_transZ_sensitivity  = value; break;
-    case  5: par.neg_transZ_sensitivity  = value; break;
-    case  6: par.gate_neg_transZ         = value; break;
-    case  7: par.gate_rotX               = value; break;
-    case  8: par.gate_rotY               = value; break;
-    case  9: par.gate_rotZ               = value; break;
-    case 10: par.rotX_sensitivity        = value; break;
-    case 11: par.rotY_sensitivity        = value; break;
-    case 12: par.rotZ_sensitivity        = value; break;
-    case 13: par.modFunc                 = value; break;
-    case 14: par.slope_at_zero           = value; break;
-    case 15: par.slope_at_end            = value; break;
-    case 16: par.invX                    = value; break;
-    case 17: par.invY                    = value; break;
-    case 18: par.invZ                    = value; break;
-    case 19: par.invRX                   = value; break;
-    case 20: par.invRY                   = value; break;
-    case 21: par.invRZ                   = value; break;
-    case 22: par.switchXY                = value; break;
-    case 23: par.switchYZ                = value; break;
-    case 24: par.exclusiveMode           = value; break;
-    case 25: par.prioZexclusiveMode      = value; break;
-    case 26: par.compEnabled             = value; break;
-    case 27: par.compNoOfPoints          = value; break;
-    case 28: par.compWaitTime            = value; break;
-    case 29: par.compMinMaxDiff          = value; break;
-    case 30: par.compCenterDiff          = value; break;
-    case 31: par.rotAxisEchos            = value; break;
-    case 32: par.rotAxisSimStrength      = value; break;
+/// @param  i         index of the parameter to print
+/// @param  value     value to write into the selected parameter
+/// @param  par       struct of parameters used by the system at runtime
+void writeParameter(int i, double value, ParamData& par){
+  if(i >= 1 && i <= NUM_PARAMS){
+    switch(par.description[i].type){
+      case PARAM_TYPE_BOOL:   *((int8_t*)par.description[i].storage) =  (int8_t)trunc(value); break;
+      case PARAM_TYPE_INT:   *((int16_t*)par.description[i].storage) = (int16_t)trunc(value); break;
+      case PARAM_TYPE_FLOAT:  *((double*)par.description[i].storage) =                value ; break;
+    }
   }
 }

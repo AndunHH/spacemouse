@@ -4,6 +4,10 @@
 #include "release.h"
 
 #define PARAM_IN_EEPROM 1
+#define ENABLE_PROGMODE 1
+
+#undef  DEBUG_KEYS
+#undef  DEBUG_ADC
 
 /* The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
    This file is meant for the << HALL-EFFECT SPACEMOUSE >>
@@ -11,7 +15,7 @@
 */
 
 
-/* Calibration Instructions
+/* Calibration instructions
 ============================
 Follow this file from top to bottom to calibrate your space mouse.
 You can find some pictures for the calibration process here:
@@ -29,7 +33,8 @@ Debug Modes:
 -1: Debugging off. Set to this once everything is working.
 0:  Nothing...
 
-1:  Report raw joystick values. 0-1023 raw ADC 10-bit values
+1:  Report raw joystick values on 5V ref.    0-1023 raw ADC 10-bit values
+10: Report raw joystick values on 2.56V ref. 0-1023 raw ADC 10-bit values
 11: Calibrate / Zero the SpaceMouse and get a dead-zone suggestion (This is also done on every startup in the setup())
 
 2:  Report centered joystick values. Values should be approximately -500 to +500, jitter around 0 at idle.
@@ -277,15 +282,15 @@ This can solve issues with classic joysticks where you get unwanted translation 
 
 It choose to send the one with the biggest absolute value.
 */
-#define EXCLUSIVEMODE 0             // RJS:1     HJS:0
-/*
-PRIO-Z-EXCLUSIVE MODE:
+#define EXCLUSIVEMODE 0
+#define EXCLUSIVEHYSTERESIS   5
+
+/* PRIO-Z-EXCLUSIVE MODE:
+=========================
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
-PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore left out from this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.
+PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore set off in this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.
 */
-#define PRIO_Z_EXCLUSIVEMODE 0      // RJS:1     HJS:0
-
-
+#define PRIO_Z_EXCLUSIVEMODE 0
 
 /* Key Support
 ===============
@@ -442,18 +447,6 @@ ROTARY_KEYS 1 = enabled, 0 = disabled
 // duration of simulated key
 #define ROTARY_KEY_STRENGTH 19
 
-/* Advanced debug output settings
-=================================
-The following settings allow customization of debug output behavior */
-
-// Generate a debug line only every DEBUGDELAY ms 
-#define DEBUGDELAY 100
-
-// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
-#define DEBUG_LINE_END "\r"
-// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
-//define DEBUG_LINE_END "\r\n"
-
 /* LED support
 ===============
 You can attach:
@@ -463,7 +456,7 @@ b) a fancy LED strip, like the nanopixel. Check the FASTLED library for supporte
 Which pin shall be used as LED? This pin is used either as a digital pin (a) or as the data pin (b).
 Change from "//define" to "#define" to activate the LED feature.
 */
-// #define LEDpin 5
+//#define LEDpin 5
 
 /* Simple LED
 -------------
@@ -476,7 +469,7 @@ Change from "//define" to "#define" to activate the LED feature.
 The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring.
 */
 
-// #define LEDRING 24
+//#define LEDRING 24
 //  The LEDpin is used as a data pin
 
 // The LEDs light up, if a certain movement is reached:
@@ -488,6 +481,18 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
 // how often shall the LEDs be updated
 #define LEDUPDATERATE_MS 150
 
+
+/* Advanced debug output settings
+=================================
+The following settings allow customization of debug output behavior */
+
+// Generate a debug line only every DEBUGDELAY ms 
+#define DEBUGDELAY 100
+
+// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
+#define DEBUG_LINE_END "\r"
+// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
+//define DEBUG_LINE_END "\r\n"
 
 /* Advanced USB HID settings
 =============================

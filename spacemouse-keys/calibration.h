@@ -15,4 +15,4 @@ void updateFrequencyReport();
 
 bool busyZeroing(int *centerPoints, uint16_t numIterations, boolean debugFlag);
 
-void compensateDrifts(int *raw, int *center, int *offset, ParamStorage& par);
+void compensateDrifts(int *raw, int *center, int *offset, ParamData& par);

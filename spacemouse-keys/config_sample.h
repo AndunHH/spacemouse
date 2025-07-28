@@ -4,6 +4,10 @@
 #include "release.h"
 
 #define PARAM_IN_EEPROM 1
+#define ENABLE_PROGMODE 1
+
+#undef  DEBUG_KEYS
+#undef  DEBUG_ADC
 
 /* The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
    This file is meant for the << JOYSTICK SPACEMOUSE >>
@@ -30,7 +34,8 @@ Debug Modes:
 -1: Debugging off. Set to this once everything is working.
 0:  Nothing...
 
-1:  Report raw joystick values. 0-1023 raw ADC 10-bit values
+1:  Report raw joystick values on 5V ref.    0-1023 raw ADC 10-bit values
+10: Report raw joystick values on 2.56V ref. 0-1023 raw ADC 10-bit values
 11: Calibrate / Zero the SpaceMouse and get a dead-zone suggestion (This is also done on every startup in the setup())
 
 2:  Report centered joystick values. Values should be approximately -500 to +500, jitter around 0 at idle.
@@ -105,8 +110,7 @@ Semi-automatic: Set debug = 11. Don't touch the mouse and observe the automatic 
 Manual:         Set debug = 2.  Don't touch the mouse but observe the values. They should be nearly to zero.
                                 Every value around zero which is noise or should be neglected afterwards is in the following deadzone. 
 */
-#define DEADZONE 0  // RJS: 0    HJS:3  Recommended to have this as small as possible to allow full range of motion.
-
+#define DEADZONE 0  // Recommended to have this as small as possible to allow full range of motion.
 
 /* Third calibration: Getting MIN and MAX values
 =================================================
@@ -150,8 +154,8 @@ Recommended calibration procedure for min/max ADC levels
 
 // Insert measured Values like this:
 //              {  AX,   AY,   BX,   BY,   CX,   CY,   DX,   DY}
-#define MINVALS {-512, -512, -512, -512, -512, -512, -512, -512}
-#define MAXVALS {+512, +512, +512, +512, +512, +512, +512, +512}
+#define MINVALS {-265, -260, -250, -230, -250, -510, -250, -230}
+#define MAXVALS { 265,  510,  250,  450,  250,  260,  250,  450}
 
 /* Fourth calibration: Sensitivity
 ===================================
@@ -269,7 +273,6 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 #define COMP_MIN_MAX_DIFF  4        // [incr] maximum range of raw-values to be considered as only drift
 #define COMP_CENTER_DIFF   50       // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
 
-
 /* Exclusive mode
 ==================
 Exclusive mode only permit to send translation OR rotation, but never both at the same time.
@@ -278,8 +281,10 @@ This can solve issues with classic joysticks where you get unwanted translation 
 It choose to send the one with the biggest absolute value.
 */
 #define EXCLUSIVEMODE 0             // RJS:1     HJS:0
-/*
-PRIO-Z-EXCLUSIVE MODE:
+#define EXCLUSIVEHYSTERESIS   5
+
+/* PRIO-Z-EXCLUSIVE MODE:
+=========================
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
 Recommended for resistive joysticks.
 When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
@@ -443,18 +448,6 @@ ROTARY_KEYS 1 = enabled, 0 = disabled
 // duration of simulated key
 #define ROTARY_KEY_STRENGTH 19
 
-/* Advanced debug output settings
-=================================
-The following settings allow customization of debug output behavior */
-
-// Generate a debug line only every DEBUGDELAY ms 
-#define DEBUGDELAY 100
-
-// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
-#define DEBUG_LINE_END "\r"
-// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
-//define DEBUG_LINE_END "\r\n"
-
 /* LED support 
 ===============
 You can attach:
@@ -477,7 +470,7 @@ Change from "//define" to "#define" to activate the LED feature.
 The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring. 
 */
 
-//#define LEDRING 24 
+//#define LEDRING 24
 // The LEDpin is used as a data pin
 
 // The LEDs light up, if a certain movement is reached:
@@ -488,6 +481,19 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
 
 // how often shall the LEDs be updated
 #define LEDUPDATERATE_MS 150
+
+
+/* Advanced debug output settings
+=================================
+The following settings allow customization of debug output behavior */
+
+// Generate a debug line only every DEBUGDELAY ms 
+#define DEBUGDELAY 100
+
+// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
+#define DEBUG_LINE_END "\r"
+// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
+//define DEBUG_LINE_END "\r\n"
 
 /* Advanced USB HID settings
 =============================

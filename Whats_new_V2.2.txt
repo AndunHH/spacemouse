@@ -1,0 +1,141 @@
+V2.1:
+======
+# developed a "ProgMode" for "Set settings over serial interface and save them"
+
+V2.2:
+======
+# modified the existing parameter-menu system:
+  - restructured the parameter-data to have their descriptions (name/type) and values at one place
+  - shorter code
+  - no need to edit the parameters-functions anymore
+  - but the RAM-usage is gone up...
+    ...if someone knows how to set up and use a pointer to a string in ProgMem - that would help...
+# more code-improvements to free up more program memory
+# analyzed and optimized the HES code
+# inserted a hysteresis into the exclusive mode to prevent
+  immediate switching back and forth between Trans- and Rot-mode
+  - new parameter "EXCLUSIVEHYSTERESIS", a value of 0 turns it off (old behavior)
+
+ProgMode
+=========
+# the ProgMode and the parameter-menu can be used alternatively over the same serial interface
+# the parameter menu has to be at the base level (debug) for the ProgMode to operate
+# the ProgMode-commands are read by userInput() and are stored in a variable "prog" of struct ProgCmd
+# the ProgMode executes on the loop() as executeProgCommand(). It is located there because it must have access to "par"
+# because of the simple nature of the Serial-API and the restricted mem on the controller, I developed a basic interface:
+  - a command is started by a '>'-character
+  - the command itself is one character long, e.g. 'w' for "write parameter"
+  - after the command may follow _one_ numerical value, e.g. the value to write
+  - the whole command ends with the CR-character
+  
+  # acknowledgement: every command is parsed, checked and executed. After that an acknowledge is sent:
+    - the acknowledge begins with a '<' character
+    - then the command-char follows (to identify the acknowledge)
+    - depending on the command, a numerical cmd-result or the requested value is sent
+    - values range 0/1 for bool, -9999...+9999 for INT and xx.yyy as FLOAT results
+    - because an INT is defined up to 9999, possible result-codes starting from 10000 (result OK)
+
+# implemented commands:
+  Cmd    |function                       |returns (>= 10000 -> NOK)
+  -------|-------------------------------|----------------------------------------------------------------------------
+  >m      get magic number                <m...   (<magic number>: all values are valid, no fault-codes!)
+  >n      get number of parameters        <n...   (<number of params>)
+  >p...   parameter number set            <p...   (PE_OK,PE_INVALID_PARAM)
+  >t      get type of parameter           <t...   (<type>: 0=bool,1=int,2=float or PE_INVALID_PARAM)
+  >d      get description of parameter    <d...   (<name of parameter> or PE_INVALID_PARAM)
+  >r      read value                      <r...   (<value> or PE_INVALID_PARAM
+  >w...   write value                     <w...   (PE_OK,PE_INVALID_PARAM,PE_INVALID_VALUE "not in [-10000..+10000]")
+  >l      load params from EEPROM         <l10000 (PE_OK)
+  >s      save params to EEPROM           <s10000 (PE_OK)
+  >i      invalidate magic number         <i10000 (PE_OK)
+  >c      clear EEPROM                    <c10000 (PE_OK)
+
+# acknowledges (PE=ProgmodeError):
+  PE_OK                 10000
+  PE_INVALID_PARAM      10001
+  PE_INVALID_VALUE      10002
+  PE_VALUE_FAULT        10003
+  PE_CMD_FAULT          10004
+
+# to work with a parameter, first you have to address the parameter with the 'p'-command
+# the following commands that work on parameters use the address set by the last 'p'-command
+# example:
+    cmd:    ack:        description:
+    >p3     <p10000     address parameter 3 -> result OK
+    >t      <t1         get type of parameter -> type is 1=INT
+    >r      <r42        read value -> parameter has value 42
+
+# a suggested workflow would be:
+  >m        if no acknowledge after 500ms, the SpaceMouse is not in base/debug-menu
+            - we can try to send a 'q'-character followed by CR three times to get back in menu-system
+              and send some (up to three) 'm'-commands afterwards to see, if we get in sync with the ProgMode
+  >m        <m1964120905            magic number of EEPROM-data, identifies the data set-version
+  now we are connected and know about the version.
+
+  >n        <n33                    gets the number of parameters
+  now we know about the number of parameters.
+
+  get all parameters with name, type and value:
+  >p1       <10000                  adress parm 1 (ack: OK)
+  >d        <dDEADZONE              description=name of the parameter is "DEADZONE"
+  >t        <t1                     parameter is of type 1 = INT
+  >r        <r16                    parameter has the value 16
+
+  >p2       <10000                  adress parm 2 (ack: OK)
+  >d        <dTRANSX_SENSITIVITY    description=name of the parameter is "TRANSX_SENSITIVITY"
+  >t        <t2                     parameter is of type 2 = FLOAT
+  >r        <r2.500                 parameter has the value 2.5
+  repeat up to param nr.33
+
+  write a new value to a parameter on the device:
+  >p16      <p10000                 adress param 16 (ack OK)
+  >w1       <w10000                 value 1 written to the parameter 16 (ack OK)
+
+  save all parameters to EEPROM as device bootup-configuration:
+  >s        <s10000                 save parameters to EEPROM (ack OK)
+
+# with this workflow we are independend from the number and order of the parameters.
+  A simple list-style programm would automatticaly grow, if the number of parameters grows.
+
+# on the base/debug-menu you can manually test the ProgMode by simply typing in the ProgCmds
+  and you will see the acknowledges on your terminal.
+  
+  ATTENTION: the manually typed in commands are executed and do their work! A >c with CR will
+  really clear the EEPROM of the devioe!
+
+new parameter-structures
+=========================
+# the struct to store the parameters itself is renamed to struct "ParamStorage"
+# to hold the descriptions (names, types) of the parameters, a new struct
+  "ParamDescription" to hold one parameter and "ParamData" to hold all data was invented
+# in spacemouse-keys.ino a variable "parStorage" of ParamStorage is set up to hold all parameter-values
+# in spacemouse-keys.ino a variable "par" of ParamData is set up to hold all descriptions and values
+# all parameter-handling-functions use "par" to get their informations,
+  no need to edit the functions anymore, the functions are getting smaller and constant in program-memory
+
+# to define a new parameter:
+  1. run the "old" system on the controller, login via Serial
+  2. "list parameters as defines" and get them from terminal via COPY to clipboard
+  3. PASTE the parameters in an editor to a text-file or into your new config.h (to use them as initial values)
+  
+  parameterMenu.h
+  4. change the magicNumber to something new to invalidate the actual content of the EEPROM
+  5. insert the new parameter into the struct ParamStorage
+  6. increment the number of parameters in NUM_PARAMS
+
+  spacemouse-keys.ino
+  7. insert a line into the initialization of par (at the right position!!!)
+     example:
+     {PARAM_TYPE_FLOAT, "TEST",          &parStorage.test          }, //      34
+      ^type of param     ^name of param   ^pointer to the variable            ^number as comment
+  
+  because all user-interface handles numbers and the type for the variables is forced now:
+    use int8_T  for PARAM_TYPE_BOOL  [0 , 1]
+    use int16_t for PARAM_TYPE_INT   [-9999 .. 9999]
+    use double  for PARAM_TYPE_FLOAT [-xx.yyy .. 0.000 .. xx.yyy]
+  
+  8. consider putting the values from 3. as initial values into config.h
+  9. compile/download the new program
+  10. check the parameters with "list parameters"
+  11. modify the parameters as needed with "edit parameters"
+  12. store the parameters to the EEPROM with "write to EEPROM"
