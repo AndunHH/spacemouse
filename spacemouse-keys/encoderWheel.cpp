@@ -33,9 +33,9 @@
   /// @param velocity   Array with the velocity, which gets updated at position ROTARY_AXIS-1
   /// @param debugOut   Generate a debug output if true
   /// @param par        struct of parameters used by the system at runtime
-  void calcEncoderWheel(int16_t *velocity, bool debugOut, ParamStorage& par){
+  void calcEncoderWheel(int16_t *velocity, bool debugOut, ParamData& par){
     static float factor = 1.0;
-    static int zoomIterator = par.rotAxisEchos; // Counter for echoing the delta through a number of loops for a smoother zoom animation
+    static int zoomIterator = par.values->rotAxisEchos; // Counter for echoing the delta through a number of loops for a smoother zoom animation
   
     // read encoder
     newEncoderValue = myEncoder.read();
@@ -48,9 +48,9 @@
   
     // Distribute encoder delta through the echoes in the loop and based on simulated axis chosen by the user
     // Faded intensity for echoing the encoder reading.
-    if (zoomIterator < par.rotAxisEchos){
-      factor = 1.0 - (((float)zoomIterator) / (float)par.rotAxisEchos); // factor shall be between 0.0 and 1.0
-      simpull = (factor * par.rotAxisSimStrength) * delta;
+    if (zoomIterator < par.values->rotAxisEchos){
+      factor = 1.0 - (((float)zoomIterator) / (float)par.values->rotAxisEchos); // factor shall be between 0.0 and 1.0
+      simpull = (factor * par.values->rotAxisSimStrength) * delta;
       zoomIterator++; // iterate
       // add the velocity of the encoder wheel to one of the 6 axis
       // the ROTARY_AXIS definition is one above the array definition used for the velocity array (see calibration.h)
