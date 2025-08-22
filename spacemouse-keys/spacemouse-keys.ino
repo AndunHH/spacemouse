@@ -68,20 +68,20 @@ ParamData par = { .values      = &parStorage,
                   .description = {
                     {PARAM_TYPE_BOOL,  "",                       NULL                              }, // param 0 is unused
                     {PARAM_TYPE_INT,   "DEADZONE",               &parStorage.deadzone              }, //       1
-                    {PARAM_TYPE_FLOAT, "TRANSX_SENSITIVITY",     &parStorage.transX_sensitivity    }, //       2
-                    {PARAM_TYPE_FLOAT, "TRANSY_SENSITIVITY",     &parStorage.transY_sensitivity    }, //       3
-                    {PARAM_TYPE_FLOAT, "POS_TRANSZ_SENSITIVITY", &parStorage.pos_transZ_sensitivity}, //       4
-                    {PARAM_TYPE_FLOAT, "NEG_TRANSZ_SENSITIVITY", &parStorage.neg_transZ_sensitivity}, //       5
-                    {PARAM_TYPE_FLOAT, "GATE_NEG_TRANSZ",        &parStorage.gate_neg_transZ       }, //       6
-                    {PARAM_TYPE_INT,   "GATE_ROTX",              &parStorage.gate_rotX             }, //       7
-                    {PARAM_TYPE_INT,   "GATE_ROTY",              &parStorage.gate_rotY             }, //       8
-                    {PARAM_TYPE_INT,   "GATE_ROTZ",              &parStorage.gate_rotZ             }, //       9
-                    {PARAM_TYPE_FLOAT, "ROTX_SENSITIVITY",       &parStorage.rotX_sensitivity      }, //      10
-                    {PARAM_TYPE_FLOAT, "ROTY_SENSITIVITY",       &parStorage.rotY_sensitivity      }, //      11
-                    {PARAM_TYPE_FLOAT, "ROTZ_SENSITIVITY",       &parStorage.rotZ_sensitivity      }, //      12
+                    {PARAM_TYPE_FLOAT, "SENS_TX",                &parStorage.transX_sensitivity    }, //       2
+                    {PARAM_TYPE_FLOAT, "SENS_TY",                &parStorage.transY_sensitivity    }, //       3
+                    {PARAM_TYPE_FLOAT, "SENS_PTZ",               &parStorage.pos_transZ_sensitivity}, //       4
+                    {PARAM_TYPE_FLOAT, "SENS_NTZ",               &parStorage.neg_transZ_sensitivity}, //       5
+                    {PARAM_TYPE_FLOAT, "GATE_NTZ",               &parStorage.gate_neg_transZ       }, //       6
+                    {PARAM_TYPE_INT,   "GATE_RX",                &parStorage.gate_rotX             }, //       7
+                    {PARAM_TYPE_INT,   "GATE_RY",                &parStorage.gate_rotY             }, //       8
+                    {PARAM_TYPE_INT,   "GATE_RZ",                &parStorage.gate_rotZ             }, //       9
+                    {PARAM_TYPE_FLOAT, "SENS_RX",                &parStorage.rotX_sensitivity      }, //      10
+                    {PARAM_TYPE_FLOAT, "SENS_RY",                &parStorage.rotY_sensitivity      }, //      11
+                    {PARAM_TYPE_FLOAT, "SENS_RZ",                &parStorage.rotZ_sensitivity      }, //      12
                     {PARAM_TYPE_INT,   "MODFUNC",                &parStorage.modFunc               }, //      13
-                    {PARAM_TYPE_FLOAT, "SLOPE_AT_ZERO",          &parStorage.slope_at_zero         }, //      14
-                    {PARAM_TYPE_FLOAT, "SLOPE_AT_END",           &parStorage.slope_at_end          }, //      15
+                    {PARAM_TYPE_FLOAT, "MOD_A",                  &parStorage.slope_at_zero         }, //      14
+                    {PARAM_TYPE_FLOAT, "MOD_B",                  &parStorage.slope_at_end          }, //      15
                     {PARAM_TYPE_BOOL,  "INVX",                   &parStorage.invX                  }, //      16
                     {PARAM_TYPE_BOOL,  "INVY",                   &parStorage.invY                  }, //      17
                     {PARAM_TYPE_BOOL,  "INVZ",                   &parStorage.invZ                  }, //      18
@@ -90,16 +90,16 @@ ParamData par = { .values      = &parStorage,
                     {PARAM_TYPE_BOOL,  "INVRZ",                  &parStorage.invRZ                 }, //      21
                     {PARAM_TYPE_BOOL,  "SWITCHXY",               &parStorage.switchXY              }, //      22
                     {PARAM_TYPE_BOOL,  "SWITCHYZ",               &parStorage.switchYZ              }, //      23
-                    {PARAM_TYPE_BOOL,  "EXCLUSIVEMODE",          &parStorage.exclusiveMode         }, //      24
-                    {PARAM_TYPE_INT,   "EXCLUSIVEHYSTERESIS",    &parStorage.exclusiveHysteresis   }, //      25
-                    {PARAM_TYPE_BOOL,  "PRIO_Z_EXCLUSIVEMODE",   &parStorage.prioZexclusiveMode    }, //      26
-                    {PARAM_TYPE_BOOL,  "COMP_ENABLED",           &parStorage.compEnabled           }, //      27
-                    {PARAM_TYPE_INT,   "COMP_NO_OF_POINTS",      &parStorage.compNoOfPoints        }, //      28
-                    {PARAM_TYPE_INT,   "COMP_WAIT_TIME",         &parStorage.compWaitTime          }, //      29
-                    {PARAM_TYPE_INT,   "COMP_MIN_MAX_DIFF",      &parStorage.compMinMaxDiff        }, //      30
-                    {PARAM_TYPE_INT,   "COMP_CENTER_DIFF",       &parStorage.compCenterDiff        }, //      31
-                    {PARAM_TYPE_INT,   "ECHOES",                 &parStorage.rotAxisEchos          }, //      32
-                    {PARAM_TYPE_INT,   "SIMSTRENGTH",            &parStorage.rotAxisSimStrength    }  //      33
+                    {PARAM_TYPE_BOOL,  "EXCLUSIVE",              &parStorage.exclusiveMode         }, //      24
+                    {PARAM_TYPE_INT,   "EXCL_HYST",              &parStorage.exclusiveHysteresis   }, //      25
+                    {PARAM_TYPE_BOOL,  "EXCL_PRIOZ",             &parStorage.prioZexclusiveMode    }, //      26
+                    {PARAM_TYPE_BOOL,  "COMP_EN",                &parStorage.compEnabled           }, //      27
+                    {PARAM_TYPE_INT,   "COMP_NR",                &parStorage.compNoOfPoints        }, //      28
+                    {PARAM_TYPE_INT,   "COMP_WAIT",              &parStorage.compWaitTime          }, //      29
+                    {PARAM_TYPE_INT,   "COMP_MDIFF",             &parStorage.compMinMaxDiff        }, //      30
+                    {PARAM_TYPE_INT,   "COMP_CDIFF",             &parStorage.compCenterDiff        }, //      31
+                    {PARAM_TYPE_INT,   "RAXIS_ECH",              &parStorage.rotAxisEchos          }, //      32
+                    {PARAM_TYPE_INT,   "RAXIS_STR",              &parStorage.rotAxisSimStrength    }  //      33
                   }
                 };
 

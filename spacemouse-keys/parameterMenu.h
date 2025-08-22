@@ -35,7 +35,7 @@
 
   #define NUM_PARAMS         33   // total number of parameters in struct ParamStorage
 
-  #define MAX_PARAM_NAME_LEN 24   // maximum length of any parameter name
+  #define MAX_PARAM_NAME_LEN 10   // maximum length of any parameter name
 
   #define MAGIC_NUMBER       1209196405L
   #define BASE_ADDRESS_MAGIC 0
@@ -48,22 +48,22 @@
   typedef struct _ParamStorage {
     int16_t deadzone               = DEADZONE;
 
-    double  transX_sensitivity     = TRANSX_SENSITIVITY;
-    double  transY_sensitivity     = TRANSY_SENSITIVITY;
-    double  pos_transZ_sensitivity = POS_TRANSZ_SENSITIVITY;
-    double  neg_transZ_sensitivity = NEG_TRANSZ_SENSITIVITY;
-    double  gate_neg_transZ        = GATE_NEG_TRANSZ;
-    int16_t gate_rotX              = GATE_ROTX;
-    int16_t gate_rotY              = GATE_ROTY;
-    int16_t gate_rotZ              = GATE_ROTZ;
+    double  transX_sensitivity     = SENS_TX;
+    double  transY_sensitivity     = SENS_TY;
+    double  pos_transZ_sensitivity = SENS_PTZ;
+    double  neg_transZ_sensitivity = SENS_NTZ;
+    double  gate_neg_transZ        = GATE_NTZ;
+    int16_t gate_rotX              = GATE_RX;
+    int16_t gate_rotY              = GATE_RY;
+    int16_t gate_rotZ              = GATE_RZ;
 
-    double  rotX_sensitivity       = ROTX_SENSITIVITY;
-    double  rotY_sensitivity       = ROTY_SENSITIVITY;
-    double  rotZ_sensitivity       = ROTZ_SENSITIVITY;
+    double  rotX_sensitivity       = SENS_RX;
+    double  rotY_sensitivity       = SENS_RY;
+    double  rotZ_sensitivity       = SENS_RZ;
 
     int16_t modFunc                = MODFUNC;         //SNo: changed to int16_t because all INT-values should be int16
-    double  slope_at_zero          = SLOPE_AT_ZERO;
-    double  slope_at_end           = SLOPE_AT_END;
+    double  slope_at_zero          = MOD_A;
+    double  slope_at_end           = MOD_B;
 
     int8_t  invX                   = INVX;
     int8_t  invY                   = INVY;
@@ -74,18 +74,18 @@
 
     int8_t  switchXY               = SWITCHXY;
     int8_t  switchYZ               = SWITCHYZ;
-    int8_t  exclusiveMode          = EXCLUSIVEMODE;
-    int16_t exclusiveHysteresis    = EXCLUSIVEHYSTERESIS;
-    int8_t  prioZexclusiveMode     = PRIO_Z_EXCLUSIVEMODE;
+    int8_t  exclusiveMode          = EXCLUSIVE;
+    int16_t exclusiveHysteresis    = EXCL_HYST;
+    int8_t  prioZexclusiveMode     = EXCL_PRIOZ;
 
-    int8_t  compEnabled            = COMP_ENABLED;
-    int16_t compNoOfPoints         = COMP_NO_OF_POINTS;
-    int16_t compWaitTime           = COMP_WAIT_TIME;
-    int16_t compMinMaxDiff         = COMP_MIN_MAX_DIFF;
-    int16_t compCenterDiff         = COMP_CENTER_DIFF;
+    int8_t  compEnabled            = COMP_EN;
+    int16_t compNoOfPoints         = COMP_NR;
+    int16_t compWaitTime           = COMP_WAIT;
+    int16_t compMinMaxDiff         = COMP_MDIFF;
+    int16_t compCenterDiff         = COMP_CDIFF;
 
-    int16_t rotAxisEchos           = ECHOES;
-    int16_t rotAxisSimStrength     = SIMSTRENGTH;    
+    int16_t rotAxisEchos           = RAXIS_ECH;
+    int16_t rotAxisSimStrength     = RAXIS_STR;    
   } ParamStorage;
 
   typedef struct _ParamDescription {
