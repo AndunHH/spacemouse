@@ -227,16 +227,16 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		break;
 	case ST_START:
 		// Evaluate everytime, without waiting for 8ms
-		if (countTransZeros < 3 || countRotZeros < 3 || (x != 0 || y != 0 || z != 0 || rx != 0 || ry != 0 || rz != 0))
-		{
+		//if (countTransZeros < 3 || countRotZeros < 3 || (x != 0 || y != 0 || z != 0 || rx != 0 || ry != 0 || rz != 0))
+		//{
 			// if one of the values is not zero,
 			// or not all zero data packages are sent (sent 3 of them)
 			// start sending data
 			nextState = ST_SENDTRANS;
-		}
+		/*}
 		else
 		{
-// if nothing is to be sent, check for keys. If no keys, don't change state
+// if nothing is to be sent, check for keys. If no keys, don't change stat
 #if (NUMKEYS > 0)
 			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
 			// compare key data to previous key data
@@ -251,7 +251,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 				// keep the timestamp for the last sent package nearby
 				lastHIDsentRep = now - HIDUPDATERATE_MS;
 			}
-		}
+		}*/
 		break;
 	case ST_SENDTRANS:
 		// send translation data, if the 8 ms from the last hid report have past
