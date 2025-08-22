@@ -48,19 +48,19 @@ int userInput(double& value){ // returns: 0=nothing  1=new value  2=aborted  3=i
   if(Serial.available()){
       state = 0;
     char next = toLowerCase(Serial.peek());
-    if(isDigit(next) || next == '-'){                             // eine Ziffer oder Vorzeichen ist eingegeben:
-      double v = Serial.parseFloat();                             //   Zahl übernehmen, Funktion ausführen
-      if(Serial.available()){                                     //   ein Zeichen hat die Zahl begrenzt:
-        char next = toLowerCase(Serial.read());                   //     Zeichen holen und prüfen:
-        if(next == 'q' || next == 27)     {state = 2;}            //     'q' oder ESC       -> "aborted"
-        else if(next ==  13 || next == 10){state = 1;}            //     CR und LF          -> "new value"
-        else                              {state = 4;}            //     alles andere       -> "undefined"
+    if(isDigit(next) || next == '-'){                             // A number or sign is entered:
+      double v = Serial.parseFloat();                             //   take that float
+      if(Serial.available()){                                     //   check what the next letter is
+        char next = toLowerCase(Serial.read());                   //     get it and check:
+        if(next == 'q' || next == 27)     {state = 2;}            //     'q' or ESC       -> "aborted"
+        else if(next ==  13 || next == 10){state = 1;}            //     CR + LF          -> "new value"
+        else                              {state = 4;}            //     everything else  -> "undefined"
       }else                               {state = 3;}            //   parseFloat()-Timeout -> "timed out"
-      if(state == 1){value = v;}                                  //   bei gültiger Zahleneingabe: Zahlen-Wert übernehmen
+      if(state == 1){value = v;}                                  //   if valid float: use new value
     }
 
       #if ENABLE_PROGMODE > 0
-      else if(next == '>'                       ){progMode = true;                 progRuns = true; Serial.read();} // '>' beginnt progmode (inits value to 0)
+      else if(next == '>'                       ){progMode = true;                 progRuns = true; Serial.read();} // '>' begins progmode (inits value to 0)
       else if(progMode && !cmdDone && next =='p'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'p' set parameter-number
       else if(progMode && !cmdDone && next =='t'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   't' get parameter-type
       else if(progMode && !cmdDone && next =='d'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'd' get parameter-description
