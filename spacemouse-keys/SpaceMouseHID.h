@@ -46,32 +46,17 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x09, 0x30,       // Usage (X)
     0x09, 0x31,       // Usage (Y)
     0x09, 0x32,       // Usage (Z)
+    0x09, 0x33,       // Usage (RX)
+    0x09, 0x34,       // Usage (RY)
+    0x09, 0x35,       // Usage (RZ)
     0x75, 0x10,       // Report Size (16)
-    0x95, 0x03,       // Report Count (3)
+    0x95, 0x03,       // Report Count (6)
 #ifdef ADV_HID_REL    // see Advanced HID settings in config_sample.h
     0x81, 0x06,       //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
 #else
     0x81, 0x02, // Input (variable,absolute)
 #endif
     0xC0,             // End Collection
-                      // Report 2: Rotation
-    0xa1, 0x00,       // Collection (Physical)
-    0x85, 0x02,       // Report ID (2)
-    0x16, 0xA2, 0xFE, // Logical Minimum (-350)
-    0x26, 0x5E, 0x01, // Logical Maximum (350)
-    0x36, 0x88, 0xFA, // Physical Minimum (-1400)
-    0x46, 0x78, 0x05, // Physical Maximum (1400)
-    0x09, 0x33,       // Usage (RX)
-    0x09, 0x34,       // Usage (RY)
-    0x09, 0x35,       // Usage (RZ)
-    0x75, 0x10,       // Report Size (16)
-    0x95, 0x03,       // Report Count (3)
-#ifdef ADV_HID_REL    // see Advanced HID settings in config_sample.h
-    0x81, 0x06,       //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
-#else
-    0x81, 0x02, // Input (variable,absolute)
-#endif
-    0xC0,                // End Collection
                          // Report 3: Keys  // find #define HIDMAXBUTTONS 32 in config_sample.h
     0xa1, 0x00,          // Collection (Physical)
     0x85, 0x03,          //  Report ID (3)

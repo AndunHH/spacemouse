@@ -257,7 +257,8 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		// send translation data, if the 8 ms from the last hid report have past
 		if (IsNewHidReportDue(now))
 		{
-			uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
+			uint8_t trans[12] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8),
+				(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
 
 #ifdef ADV_HID_JIGGLE
 			jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
@@ -276,7 +277,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			{
 				countTransZeros = 0;
 			}
-			nextState = ST_SENDROT;
+			nextState = ST_START;
 		}
 		break;
 	case ST_SENDROT:
