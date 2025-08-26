@@ -264,7 +264,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
 											  // the toggleValue is toggled after sending the rotations, down below
 #endif
-			SendReport(1, trans, 6); // send new translational values
+			SendReport(1, trans, 12); // send new translational values
 			lastHIDsentRep += HIDUPDATERATE_MS;
 			hasSentNewData = true; // return value
 
