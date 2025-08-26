@@ -91,7 +91,7 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
 #define USBControllerRX USBControllerEndpointOut
 
 // Send a HID report every 8 ms
-#define HIDUPDATERATE_MS 8
+#define HIDUPDATERATE_MS 16
 
 // State machine to track, which report to send next
 enum SpaceMouseHIDStates
