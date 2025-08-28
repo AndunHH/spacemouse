@@ -295,6 +295,8 @@ void loop() {
     updateFrequencyReport();
   }
 
+  SpaceMouseHID.updateLEDState();
+
   #ifdef LEDpin
   #ifdef LEDRING
   processLED(velocity, SpaceMouseHID.updateLEDState());
