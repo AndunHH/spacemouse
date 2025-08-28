@@ -15,6 +15,8 @@ SpaceMouseHID_::SpaceMouseHID_() : PluggableUSBModule(2, 1, endpointTypes)
 {
 	endpointTypes[0] = EP_TYPE_INTERRUPT_IN;
 	endpointTypes[1] = EP_TYPE_INTERRUPT_OUT;
+	static HIDSubDescriptor node(SpaceMouseReportDescriptor, sizeof(SpaceMouseReportDescriptor));
+    HID().AppendDescriptor(&node);
 	PluggableUSB().plug(this);
 	nextState = ST_INIT; // init state machine with init state
 	ledState = false;
