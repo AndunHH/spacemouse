@@ -277,24 +277,6 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			{
 				countTransZeros = 0;
 			}
-			nextState = ST_START;
-		}
-		break;
-	case ST_SENDROT:
-		// send rotational data, if the 8 ms from the last hid report have past
-		if (IsNewHidReportDue(now))
-		{
-			uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
-
-#ifdef ADV_HID_JIGGLE
-			jiggleValues(rot, toggleValue); // jiggle the non-zero values, if toggleValue is true
-			toggleValue ^= true;			// toggle the indicator to jiggle only every second report send
-#endif
-
-			SendReport(2, rot, 6);
-			lastHIDsentRep += HIDUPDATERATE_MS;
-			hasSentNewData = true; // return value
-			// if only zeros where send, increment zero counter, otherwise reset it
 			if (rx == 0 && ry == 0 && rz == 0)
 			{
 				countRotZeros++;
@@ -303,7 +285,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			{
 				countRotZeros = 0;
 			}
-// check if the next state should be keys
+			// check if the next state should be keys
 #if (NUMKEYS > 0)
 			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
 			// compare key data to previous key data
