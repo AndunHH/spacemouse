@@ -125,8 +125,8 @@ private:
     uint8_t bitNumber[NUMHIDKEYS] = BUTTONLIST;
     void prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug);
 #endif
-    uint8_t countTransZeros = 0; // count how many times, the zero data has been sent
-    uint8_t countRotZeros = 0;
+    uint8_t countTransZeros = 10; // count how many times, the zero data has been sent
+    uint8_t countRotZeros = 10;
 
     unsigned long lastHIDsentRep; // time from millis(), when the last HID report was sent
 
