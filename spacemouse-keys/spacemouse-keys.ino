@@ -299,9 +299,9 @@ void loop() {
 
   #ifdef LEDpin
   #ifdef LEDRING
-  processLED(velocity, SpaceMouseHID.updateLEDState());
+  processLED(velocity, SpaceMouseHID.getLEDState());
   #else
-  lightSimpleLED(SpaceMouseHID.updateLEDState());
+  lightSimpleLED(SpaceMouseHID.getLEDState());
   // Check for the LED state by calling updateLEDState.
   // This empties the USB input buffer and checks for the corresponding report.
   #endif
