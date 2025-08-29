@@ -223,7 +223,5 @@ Absolute reports are only evaluated, if they differ from the previous report. Th
 
 > Solution: Change our emulated mouse to Relative Positions, even if this is not "up to date". But it avoids the necessity to jiggle the values.
 
-
-
 ## HID descriptor of a spacemouse wireless
 See [SpaceMouseWireless.md](SpaceMouseWireless.md)
