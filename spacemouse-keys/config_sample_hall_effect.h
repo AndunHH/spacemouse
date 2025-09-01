@@ -277,12 +277,14 @@ This can solve issues with classic joysticks where you get unwanted translation 
 
 It choose to send the one with the biggest absolute value.
 */
-#define EXCLUSIVEMODE 0
-/* 
+#define EXCLUSIVEMODE 0             // RJS:1     HJS:0
+/*
 PRIO-Z-EXCLUSIVE MODE:
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
 PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore left out from this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.
 */
+#define PRIO_Z_EXCLUSIVEMODE 0      // RJS:1     HJS:0
+
 
 
 /* Key Support
