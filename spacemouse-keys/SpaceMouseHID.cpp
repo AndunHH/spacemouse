@@ -208,8 +208,8 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 	bool hasSentNewData = false; // this value will be returned
 
 #if (NUMKEYS > 0)
-	static uint8_t keyData[HIDMAXBUTTONS / 8];	   // key data to be sent via HID
-	static uint8_t prevKeyData[HIDMAXBUTTONS / 8]; // previous key data
+	static uint8_t keyData[4];	   // key data to be sent via HID
+	static uint8_t prevKeyData[4]; // previous key data
 	prepareKeyBytes(keys, keyData, debug);		   // sort the bytes from keys into the bits in keyData
 #endif
 
@@ -240,7 +240,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		{
 // if nothing is to be sent, check for keys. If no keys, don't change state
 #if (NUMKEYS > 0)
-			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
+			if (memcmp(keyData, prevKeyData, 4) != 0)
 			// compare key data to previous key data
 			{
 				nextState = ST_SENDKEYS;
@@ -289,7 +289,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			}
 			// check if the next state should be keys
 #if (NUMKEYS > 0)
-			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
+			if (memcmp(keyData, prevKeyData, 4) != 0)
 			// compare key data to previous key data
 			{
 				nextState = ST_SENDKEYS;
@@ -310,11 +310,11 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		// report the keys, if the 8 ms since the last report have past
 		if (IsNewHidReportDue(now))
 		{
-			SendReport(3, keyData, HIDMAXBUTTONS / 8);
+			SendReport(3, keyData, 4);
 			lastHIDsentRep += HIDUPDATERATE_MS;
-			memcpy(prevKeyData, keyData, HIDMAXBUTTONS / 8); // copy actual keyData to previous keyData
-			hasSentNewData = true;							 // return value
-			nextState = ST_START;							 // go back to start
+			memcpy(prevKeyData, keyData, 4); 			// copy actual keyData to previous keyData
+			hasSentNewData = true;						// return value
+			nextState = ST_START;						// go back to start
 		}
 		break;
 #endif
@@ -360,7 +360,7 @@ bool SpaceMouseHID_::jiggleValues(uint8_t val[6], bool lastBit)
 // Which key from keyData should belong to which byte is defined in bitNumber = BUTTONLIST see config.h
 void SpaceMouseHID_::prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug)
 {
-  for (int i = 0; i < HIDMAXBUTTONS / 8; i++) // init or empty this array
+  for (int i = 0; i < 4; i++) // init or empty this array
   {
     keyData[i] = 0;
   }
