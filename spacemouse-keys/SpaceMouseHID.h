@@ -67,7 +67,7 @@ static const uint8_t SpaceMouseReportDescriptor[] PROGMEM = {
     0x95, 0x20,          //    Report Count (32)
     0x05, 0x09,          //    Usage Page (Button)
     0x19, 0x01,          //    Usage Minimum (Button #1)
-    0x29, 0x20,          //    Usage Maximum (Button #24)
+    0x29, 0x20,          //    Usage Maximum (Button #24, needs 32 bits)
     0x81, 0x02,          //    Input (variable,absolute)
     0xC0,                // End Collection
                          // Report 4: LEDs

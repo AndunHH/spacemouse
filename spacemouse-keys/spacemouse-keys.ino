@@ -295,6 +295,8 @@ void loop() {
     updateFrequencyReport();
   }
 
+  // Check for the LED state by calling updateLEDState.
+  // This empties the USB input buffer and checks for the corresponding report.
   SpaceMouseHID.updateLEDState();
 
   #ifdef LEDpin
@@ -302,8 +304,6 @@ void loop() {
   processLED(velocity, SpaceMouseHID.getLEDState());
   #else
   lightSimpleLED(SpaceMouseHID.getLEDState());
-  // Check for the LED state by calling updateLEDState.
-  // This empties the USB input buffer and checks for the corresponding report.
   #endif
   #endif
 } //end loop()
