@@ -1,5 +1,5 @@
 # SpaceMouse Wireless
-This page contains informations about a 3Dconnexion Space Mouse Wirless, which has been observed via wireshark:
+This page contains informations about a 3Dconnexion Space Mouse Wireless, which has been observed via wireshark:
 
 SpaceMouse Wirelss HID Report
 Recorded with Wireshark. 
