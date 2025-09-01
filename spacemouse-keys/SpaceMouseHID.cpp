@@ -15,8 +15,10 @@ SpaceMouseHID_::SpaceMouseHID_() : PluggableUSBModule(2, 1, endpointTypes)
 {
 	endpointTypes[0] = EP_TYPE_INTERRUPT_IN;
 	endpointTypes[1] = EP_TYPE_INTERRUPT_OUT;
-	static HIDSubDescriptor node(SpaceMouseReportDescriptor, sizeof(SpaceMouseReportDescriptor));
-    HID().AppendDescriptor(&node);
+	// Appending the descriptor here again is usually recommended by other HID projects. We already do this in the getDescriptor() method.
+	// With linux -> spacenav a second descriptor is detected considering this a second device. But only one of the is sending data. Therefore, this is disabled again. Windows driver never needed it.
+	// static HIDSubDescriptor node(SpaceMouseReportDescriptor, sizeof(SpaceMouseReportDescriptor));
+    // HID().AppendDescriptor(&node);
 	PluggableUSB().plug(this);
 	nextState = ST_INIT; // init state machine with init state
 	ledState = false;
