@@ -89,9 +89,9 @@ void setup() {
   Serial.setTimeout(30000);  // the serial interface will wait for new menu number for max.30s
 
   #ifdef HALLEFFECT
-  // Set the ADC reference voltage to 5V if HALLEFFECT is defined, 2.56V otherwise.
+  // Set the ADC reference voltage to 2,56V if HALLEFFECT is defined, 5V otherwise.
   // It is important the reference Voltage is set before the Zeroing of the sensors is executed.
-  setAnalogReferenceVoltage(1);
+  setAnalogReferenceVoltage(0);
   #endif
 
   // Read idle/centre positions for joysticks.
