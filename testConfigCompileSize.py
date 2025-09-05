@@ -1,16 +1,22 @@
 # Build Automation Script for PlatformIO Projects
 # 
 # This script automates building a PlatformIO project with multiple configuration header files.
+# 
 # It works by:
+# 
 # Iterating over all .h files in the testConfig directory.
+# 
 # Copying each config file to the target project’s config.h path.
+# 
 # Running a PlatformIO build (pio run) for each configuration.
+# 
 # Parsing the build output to extract Flash and RAM usage (both bytes and percentages).
+# 
 # Recording whether the build succeeded or failed.
+# 
 # Writing the results into a CSV report (build_report.csv) for easy comparison across configurations.
+# 
 # This makes it easy to test how different configurations affect memory usage and build success.
-#
-# Prerequisite: The location of you pio.exe must be known on your path. E.g. C:\Users\xyz\.platformio\penv\Scripts  on windows
 
 import os
 import shutil
@@ -23,6 +29,10 @@ CONFIG_TARGET = 'spacemouse-keys/config.h'
 PIO_CMD = "pio"              # Adjust if needed, e.g. full path to platformio.exe
 BUILD_ARGS = ["run"]
 REPORT_FILE = 'testConfig/0_build_report.csv'
+
+OK_MARK = "[OK]"
+FAIL_MARK = "[FAIL]"
+BUILD_MARK = "[BUILD]"
 
 def parse_build_output(output):
     flash_used = None
@@ -62,9 +72,10 @@ def run_platformio_capture_output(args):
 def run_automation():
     configs = [f for f in os.listdir(CONFIG_DIR) if f.endswith('.h')]
     results = []
+    all_success = True
 
     for config_file in configs:
-        print(f'\n🛠️  Building with {config_file}...')
+        print(f'\n{BUILD_MARK} Building with {config_file}...')
 
         config_path = os.path.join(CONFIG_DIR, config_file)
         shutil.copyfile(config_path, CONFIG_TARGET)
@@ -73,11 +84,12 @@ def run_automation():
         flash, ram, flash_pct, ram_pct = parse_build_output(output)
 
         if success:
-            print(f"✅ Build succeeded: Flash={flash} bytes ({flash_pct}%), RAM={ram} bytes ({ram_pct}%)")
+            print(f"{OK_MARK} Build succeeded: Flash={flash} bytes ({flash_pct}%), RAM={ram} bytes ({ram_pct}%)")
         else:
-            print(f"❌ Build failed for {config_file}")
+            all_success = False
+            print(f"{FAIL_MARK} Build failed for {config_file}")
             if flash or ram:
-                print(f"   ℹ️ Detected size before failure: Flash={flash} ({flash_pct}%), RAM={ram} ({ram_pct}%)")
+                print(f"   Info: Detected size before failure: Flash={flash} ({flash_pct}%), RAM={ram} ({ram_pct}%)")
             print(output)
 
         results.append({
@@ -89,7 +101,16 @@ def run_automation():
             'Build Success': 'Yes' if success else 'No'
         })
 
-        
+    # Add summary row
+    summary_line = f"{OK_MARK} All builds successful" if all_success else f"{FAIL_MARK} Some builds failed"
+    results.append({
+        'Config': summary_line,
+        'Flash (bytes)': '',
+        'Flash (%)': '',
+        'RAM (bytes)': '',
+        'RAM (%)': '',
+        'Build Success': ''
+    })
 
     with open(REPORT_FILE, 'w', newline='') as csvfile:
         fieldnames = ['Config', 'Flash (bytes)', 'Flash (%)', 'RAM (bytes)', 'RAM (%)', 'Build Success']
@@ -97,7 +118,8 @@ def run_automation():
         writer.writeheader()
         writer.writerows(results)
 
-    print(f'\n📄 Report generated: {REPORT_FILE}')
+    print(f'\nReport generated: {REPORT_FILE}')
+    print(summary_line)
 
 
 if __name__ == '__main__':
