@@ -1,0 +1,10 @@
+Config,Flash (bytes),Flash (%),RAM (bytes),RAM (%),Build Success
+a_test_minimal.h,17118,59.7,676,26.4,Yes
+b_test_resistiveJoystick.h,17118,59.7,676,26.4,Yes
+c1_test_LED.h,20738,72.3,884,34.5,Yes
+c2_test_LEDring.h,17606,61.4,676,26.4,Yes
+d2_test_encoder_key.h,20764,72.4,845,33.0,Yes
+d_test_encoder.h,19216,67.0,750,29.3,Yes
+e_test_ergoMouse.h,28676,100.0,1118,43.7,No
+f_test_hall_effect.h,17502,61.0,676,26.4,Yes
+[FAIL] Some builds failed,,,,,

@@ -17,6 +17,8 @@
 # Writing the results into a CSV report (build_report.csv) for easy comparison across configurations.
 # 
 # This makes it easy to test how different configurations affect memory usage and build success.
+#
+# Prerequisite: The location of you pio.exe must be known on your path. E.g. C:\Users\xyz\.platformio\penv\Scripts  on windows
 
 import os
 import shutil
