@@ -19,6 +19,7 @@ For the next release, already to be found in master:
 
 - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
 - Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
+- Added [testConfigCompileSize.py](testConfigCompileSize.py) to calculate the required program size for different configurations. The results can be seen here: [Build report](testConfig/0_build_report.md). There is no continous integration jet. This page must be created manually.
 
 ## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
