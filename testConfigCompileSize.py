@@ -19,6 +19,7 @@ import shutil
 import re
 import csv
 import subprocess
+from datetime import datetime
 
 CONFIG_DIR = 'testConfig'
 CONFIG_TARGET = 'spacemouse-keys/config.h'
@@ -26,6 +27,15 @@ PIO_CMD = "pio"              # Adjust if needed, e.g. full path to platformio.ex
 BUILD_ARGS = ["run"]
 REPORT_FILE = 'testConfig/0_build_report.csv'
 REPORT_MD_FILE = 'testConfig/0_build_report.md'
+
+# Markdown introduction text (supports multiple lines, Markdown formatting allowed)
+REPORT_MD_INTRO = """# Build Report
+
+This document summarizes the build results for all tested configurations.  
+Each configuration corresponds to a different `config.h` variant.  
+
+The first line of each configuration file is used as its description.
+"""
 
 OK_MARK = "[OK]"
 FAIL_MARK = "[FAIL]"
@@ -131,6 +141,7 @@ def run_automation():
 
     # Write Markdown
     with open(REPORT_MD_FILE, 'w', encoding="utf-8") as mdfile:
+        mdfile.write(REPORT_MD_INTRO.strip() + "\n\n")
         mdfile.write("| Config | Description | Flash (bytes) | Flash (%) | RAM (bytes) | RAM (%) | Build Success |\n")
         mdfile.write("|--------|-------------|---------------|-----------|-------------|---------|---------------|\n")
         for row in results:
@@ -138,6 +149,8 @@ def run_automation():
                 f"| {row['Config']} | {row['Description']} | {row['Flash (bytes)']} | {row['Flash (%)']} "
                 f"| {row['RAM (bytes)']} | {row['RAM (%)']} | {row['Build Success']} |\n"
             )
+        mdfile.write("\n")
+        mdfile.write(f"**Report generated on:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
     print(f'\nReports generated:\n - {REPORT_FILE}\n - {REPORT_MD_FILE}')
     print(summary_line)

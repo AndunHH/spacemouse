@@ -1,3 +1,10 @@
+# Build Report
+
+This document summarizes the build results for all tested configurations.  
+Each configuration corresponds to a different `config.h` variant.  
+
+The first line of each configuration file is used as its description.
+
 | Config | Description | Flash (bytes) | Flash (%) | RAM (bytes) | RAM (%) | Build Success |
 |--------|-------------|---------------|-----------|-------------|---------|---------------|
 | a_test_minimal.h | test file for resistive joystick with now added features | 17034 | 59.4 | 676 | 26.4 | Yes |
@@ -9,3 +16,5 @@
 | e_test_ergoMouse.h | test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder | 28538 | 99.5 | 1118 | 43.7 | Yes |
 | f_test_hall_effect.h | test file for resistive joystick with literally now added features | 17416 | 60.7 | 676 | 26.4 | Yes |
 | [OK] All builds successful |  |  |  |  |  |  |
+
+**Report generated on:** 2025-09-21 17:34:38
