@@ -15,9 +15,10 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 - [Version 2.0](https://github.com/AndunHH/spacemouse/releases/tag/v2.0.0): Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 
 ## Upcoming Work
-For the next release already to be found in master:
+For the next release, already to be found in master:
 
 - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
+- Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
 
 ## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
 This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
@@ -172,7 +173,6 @@ Other implementations, hardware or mechanic variants are linked below.
 - Support for a [LED ring](#neopixel-led-ring), as supported by the FastLED library. E.g. a neopixel
 
 ### Wanted features, not jet there:
-- Reverse Direction and Speed options in the windows 3dConnexion Software is not working, because our spacemouse does not get / understand this settings.
 - With all features enabled, the pro micro is nearly at the limits of it's flash. Reducing the flash size might be necessary in the future...
 - The html page explaining the modifier function would benefit from an additional plot zooming in on zero.
 
@@ -188,7 +188,7 @@ PlatformIO is easier than ArduinoIDE, because you don't need to change the board
 
 1. Install [PlatformIO](https://platformio.org/).
 2. [Download or clone this github repository](#cloning-the-github-repo) (hint for windows: network locations are not recommended)
-3. Copy and rename `spacemouse-keys/config_sample.h` to `spacemouse-keys/config.h` and change the values to whatever suits.
+3. [Rename the config_sample.h to config.h](#create-your-own-config-file)
 4. Open PlatformIO / vscode and open the newly created folder.
 5. Click on the upload arrow in the IDE in the status bar or run `pio run -t upload`.
 6. [Assign the pins of the joysticks and go through the calibration](#calibrate-your-hardware)
@@ -211,8 +211,10 @@ The boards.txt file needs an additional board definition, which tells the microp
 Clone the github repo to your computer: Scroll-Up to the green "<> Code" Button and select, if you wish to clone or just download the code.
 
 ## Create your own config file
-Copy the config_sample.h and rename it to config.h.
-This is done to avoid the personal config file being overwritten when pulling new updates from this repository. You probably have to update the config.h file with new additions from the config_sample.h, but your pin assignment will not stay.
+Copy and rename [config_sample.h](spacemouse-keys/config_sample.h) to `spacemouse-keys/config.h` and change the values to whatever suits.
+If your are using a Hall-Effect-Sensor+Magnet approach start with [config_sample_hall_effect.h](spacemouse-keys/config_sample_hall_effect.h)
+
+This is done to avoid the personal config file being overwritten when pulling new updates from this repository. 
 
 ## Compiling and flashing the firmware
 - Open the Arduino IDE (1.8.19 and 2.3.2 are tested on Ubuntu).
@@ -267,6 +269,8 @@ Download and install the [3DConnexion software](https://3dconnexion.com/us/drive
 
 If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
 
+Changing sensitivity and direction on Windows in the 3Dx Settings works. Tested with `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
+
 ## spacenav for linux users
 Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.com/FreeSpacenav/spacenavd.
 
@@ -280,7 +284,7 @@ Onshape is not jet supported by spacenav directly but there is a simple wrapper 
 5. We calculate the translation and rotation based on this.
 6. Applying the modifiers to minimize very small rotations or translations.
 7. Kill, swap or invert movements
-8. Sending the velocities and keys to the PC, see also  [SpaceNavigator.md](SpaceNavigator.md) for further details about the emulated USB HID.
+8. Sending the velocities and keys to the PC, see also  [SpaceNavigator.md](SpaceNavigator.md) and [SpaceMouseWireless.md](SpaceMouseWireless.md)for further details about the emulated USB HID.
 
 # Printed parts and hardware
 Here are some links for the joystick and the newer, more precise hall-effect + magnet variants (more sophisticated build and requires printing of TPU)

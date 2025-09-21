@@ -15,6 +15,10 @@ SpaceMouseHID_::SpaceMouseHID_() : PluggableUSBModule(2, 1, endpointTypes)
 {
 	endpointTypes[0] = EP_TYPE_INTERRUPT_IN;
 	endpointTypes[1] = EP_TYPE_INTERRUPT_OUT;
+	// Appending the descriptor here again is usually recommended by other HID projects. We already do this in the getDescriptor() method.
+	// With linux -> spacenav a second descriptor is detected considering this a second device. But only one of the is sending data. Therefore, this is disabled again. Windows driver never needed it.
+	// static HIDSubDescriptor node(SpaceMouseReportDescriptor, sizeof(SpaceMouseReportDescriptor));
+    // HID().AppendDescriptor(&node);
 	PluggableUSB().plug(this);
 	nextState = ST_INIT; // init state machine with init state
 	ledState = false;
@@ -206,8 +210,8 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 	bool hasSentNewData = false; // this value will be returned
 
 #if (NUMKEYS > 0)
-	static uint8_t keyData[HIDMAXBUTTONS / 8];	   // key data to be sent via HID
-	static uint8_t prevKeyData[HIDMAXBUTTONS / 8]; // previous key data
+	static uint8_t keyData[4];	   // key data to be sent via HID
+	static uint8_t prevKeyData[4]; // previous key data
 	prepareKeyBytes(keys, keyData, debug);		   // sort the bytes from keys into the bits in keyData
 #endif
 
@@ -238,7 +242,7 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		{
 // if nothing is to be sent, check for keys. If no keys, don't change state
 #if (NUMKEYS > 0)
-			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
+			if (memcmp(keyData, prevKeyData, 4) != 0)
 			// compare key data to previous key data
 			{
 				nextState = ST_SENDKEYS;
@@ -257,13 +261,14 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		// send translation data, if the 8 ms from the last hid report have past
 		if (IsNewHidReportDue(now))
 		{
-			uint8_t trans[6] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8)};
+			uint8_t trans[12] = {(byte)(x & 0xFF), (byte)(x >> 8), (byte)(y & 0xFF), (byte)(y >> 8), (byte)(z & 0xFF), (byte)(z >> 8),
+				(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
 
 #ifdef ADV_HID_JIGGLE
 			jiggleValues(trans, toggleValue); // jiggle the non-zero values, if toggleValue is true
 											  // the toggleValue is toggled after sending the rotations, down below
 #endif
-			SendReport(1, trans, 6); // send new translational values
+			SendReport(1, trans, 12); // send new translational values
 			lastHIDsentRep += HIDUPDATERATE_MS;
 			hasSentNewData = true; // return value
 
@@ -276,24 +281,6 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			{
 				countTransZeros = 0;
 			}
-			nextState = ST_SENDROT;
-		}
-		break;
-	case ST_SENDROT:
-		// send rotational data, if the 8 ms from the last hid report have past
-		if (IsNewHidReportDue(now))
-		{
-			uint8_t rot[6] = {(byte)(rx & 0xFF), (byte)(rx >> 8), (byte)(ry & 0xFF), (byte)(ry >> 8), (byte)(rz & 0xFF), (byte)(rz >> 8)};
-
-#ifdef ADV_HID_JIGGLE
-			jiggleValues(rot, toggleValue); // jiggle the non-zero values, if toggleValue is true
-			toggleValue ^= true;			// toggle the indicator to jiggle only every second report send
-#endif
-
-			SendReport(2, rot, 6);
-			lastHIDsentRep += HIDUPDATERATE_MS;
-			hasSentNewData = true; // return value
-			// if only zeros where send, increment zero counter, otherwise reset it
 			if (rx == 0 && ry == 0 && rz == 0)
 			{
 				countRotZeros++;
@@ -302,9 +289,9 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 			{
 				countRotZeros = 0;
 			}
-// check if the next state should be keys
+			// check if the next state should be keys
 #if (NUMKEYS > 0)
-			if (memcmp(keyData, prevKeyData, HIDMAXBUTTONS / 8) != 0)
+			if (memcmp(keyData, prevKeyData, 4) != 0)
 			// compare key data to previous key data
 			{
 				nextState = ST_SENDKEYS;
@@ -325,11 +312,11 @@ bool SpaceMouseHID_::send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x,
 		// report the keys, if the 8 ms since the last report have past
 		if (IsNewHidReportDue(now))
 		{
-			SendReport(3, keyData, HIDMAXBUTTONS / 8);
+			SendReport(3, keyData, 4);
 			lastHIDsentRep += HIDUPDATERATE_MS;
-			memcpy(prevKeyData, keyData, HIDMAXBUTTONS / 8); // copy actual keyData to previous keyData
-			hasSentNewData = true;							 // return value
-			nextState = ST_START;							 // go back to start
+			memcpy(prevKeyData, keyData, 4); 			// copy actual keyData to previous keyData
+			hasSentNewData = true;						// return value
+			nextState = ST_START;						// go back to start
 		}
 		break;
 #endif
@@ -375,7 +362,7 @@ bool SpaceMouseHID_::jiggleValues(uint8_t val[6], bool lastBit)
 // Which key from keyData should belong to which byte is defined in bitNumber = BUTTONLIST see config.h
 void SpaceMouseHID_::prepareKeyBytes(uint8_t *keys, uint8_t *keyData, int debug)
 {
-  for (int i = 0; i < HIDMAXBUTTONS / 8; i++) // init or empty this array
+  for (int i = 0; i < 4; i++) // init or empty this array
   {
     keyData[i] = 0;
   }
