@@ -10,7 +10,7 @@ This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered t
 
 Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for the newest releases and updates!
 
-- [Version 2.1](https://github.com/AndunHH/spacemouse/releases/tag/v2.1.0): 
+- [Version 2.1](https://github.com/AndunHH/spacemouse/releases/tag/v2.1.2): 
   - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
   - Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
   - Added [testConfigCompileSize.py](testConfigCompileSize.py) to calculate the required program size for different configurations. The results can be seen here: [Build report](testConfig/0_build_report.md). There is no continuous integration jet. This page must be created manually.
