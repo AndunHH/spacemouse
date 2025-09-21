@@ -25,9 +25,28 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 - [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
 
 
-<!-- ## Upcoming Work
+## Upcoming Work
 For the next release, already to be found in master:
-- tbd -->
+
+### ProgMode over Serial, optimized storage of parameters, progmem usage reduced
+New ProgMode and reducing program-memory usage:
+
+- developed a "ProgMode" for "Set settings over serial interface and save them"
+- modified the existing parameter-menu system:
+  - restructured the parameter-data to have their descriptions (name/type) and values at one place
+  - shorter code
+  - no need to edit the parameters-functions anymore
+  - but the RAM-usage is gone up...
+    ...if someone knows how to set up and use a pointer to a string in ProgMem - that would help...
+- more code-improvements to free up more program memory
+- analyzed and optimized the HES code
+- inserted a hysteresis into the exclusive mode to prevent
+  immediate switching back and forth between Trans- and Rot-mode
+  - new parameter "EXCLUSIVEHYSTERESIS", a value of 0 turns it off (old behavior)
+
+To reduce the file size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters.
+As this may be anoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
+
 
 # Complete description of the project 
 
