@@ -10,118 +10,24 @@ This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered t
 
 Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for the newest releases and updates!
 
-- [Version 1.0](https://github.com/AndunHH/spacemouse/releases/tag/v1.0.0): [Rotary encoder triggers keys](#rotary-keys)
-- [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
+- [Version 2.1](https://github.com/AndunHH/spacemouse/releases/tag/v2.1.0): 
+  - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
+  - Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
+  - Added [testConfigCompileSize.py](testConfigCompileSize.py) to calculate the required program size for different configurations. The results can be seen here: [Build report](testConfig/0_build_report.md). There is no continuous integration jet. This page must be created manually.
 - [Version 2.0](https://github.com/AndunHH/spacemouse/releases/tag/v2.0.0): Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
+  - Generally enhanced [serial menu](#serial-interface-menu) for debug outputs
+  - Changing and evaluation of parameters without recompiling and download: editing and handling the parameters on the controller via the serial (debug-)connection
+  - Save those parameters permanently into the [EEPROM](#storing-parameters-in-the-eeprom) or print them for the config.h
+  - Enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#prio-z-exclusive)
+  - [Drift-compensation for hall-joysticks](#drift-compensation-for-hall-joysticks) to stop movements when not touched
+  - New [modifier function](#modifier-function) to have better control over the form of the curve
+  - CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
+- [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
 
-## Upcoming Work
+
+<!-- ## Upcoming Work
 For the next release, already to be found in master:
-
-- The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
-- Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
-- Added [testConfigCompileSize.py](testConfigCompileSize.py) to calculate the required program size for different configurations. The results can be seen here: [Build report](testConfig/0_build_report.md). There is no continous integration jet. This page must be created manually.
-
-## V2.0 Serial Menu, Store parameters in EEPROM, new modifierFunction and Drift-compensation
-This release holds 6 months of development by @StefanNouza. Here is an overview of his great addition to this project:
-
-- Generally enhanced [serial menu](#serial-interface-menu) for debug outputs
-- Changing and evaluation of parameters without recompiling and download: editing and handling the parameters on the controller via the serial (debug-)connection
-- Save those parameters permanently into the [EEPROM](#storing-parameters-in-the-eeprom) or print them for the config.h
-- Enhancements on exclusive-mode for resistive joysticks, like [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE)
-- [Drift-compensation for hall-joysticks](#drift-compensation-for-hall-joysticks) to stop movements when not touched
-- New [modifier function](#modifier-function) to have better control over the form of the curve
-- CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
-
-### Serial interface menu
-The serial interface is showing a menu to list the possible options you may ask.
-
-```
-SpaceMouse FW2.x.y - Debug Modes
-ESC stop running mode, leave menu (ESC, Q)
-  1 raw joystick ADC values 0..1023
-  2 centered values -500..+500
- 11 auto calibrate centers, show deadzones
- 20 find min/max-values over 15s (move stick)
-  3 centered values w.deadzones -350..+350
-  4 velocity- (trans-/rot-)values -350..+350
-  5 centered- & velocity-values, (3) and (4)
-  6 velocity after kill-keys and keys
- 61 velocity after axis-switch, exclusive
-  7 loop-frequency-test
-  8 key-test, button-codes to send
-  9 encoder wheel-test
- 30 parameters (read, write, edit, view)
-```
-#### Usage of serial interface menu
-
-- all inputs are done by typing a number and press 'enter'. To input floating point-values - and . are allowed.
-- to abort a numerical input, press 'esc', 'q' or another non-numerical char
-- to select a menu / debug-mode, input its number
-- to leave a running debug-mode press 'space', 'esc' or 'q'
-- the active menu-level is shown by its prompt, example "mode::"
-- to leave a menu-level press 'space', 'esc' or 'q'
-- a typed in value will be shown AFTER 'enter' is pressed
-
-### Storing parameters in the EEPROM
-The parameters from the config.h file are initially read and stored in the eeprom of the controller. Despite the hardware related constant definitions, you can edit all the sensitivities on the fly over the menu item 30:
-```
-SpaceMouse FW2.x.y - Parameters
-ESC leave parameter-menu (ESC, Q)
-  1  list parameters
-  2  edit parameters
-  3  read from EEPROM
-  4  write to EEPROM
-  5  clear EEPROM to 0xFF
-  6  set EEPROM params invalid
-  7  list parameters as defines
-```
-
-#### Usage for parameter EEPROM
-
-1. Initially the parameters hold the #defined values from config.h
-2. with the new parameter-menu "edit parameters" you can edit them - they go to the struct par in RAM
-3. you can test the modified parameters immediately without leaving the parameter-menu
-4. 
-    1. If you switch off/reset the SpaceMouse, the parameters are lost because they are only stored in RAM
-    2. In the parameter-menu you can save the parameters to EEPROM on the Arduino, use menu "write to EEPROM" - from now this parameters survive restarts
-5. as a backup you can list all parameters with then menu "list parameters as defines", you get a list of #defines that you can copy/paste from your terminal-program to a textfile (for storage/documentation) or into your config.h-file to set them as new initial values
-5. on restart of the SpaceMouse the parameters will be automatically read from EEPROM if they are flagged as valid.     They are considered as valid if a correct magicNumber is stored in the EEPROM.
-6. 
-    1. if the parameters are destroyed (why?) or the struct had changed (by modifying the program itself), you can invalidate the stored parameters via menu "set EEPROM params invalid" (kills the magicNumber)
-    2. as an alternative you can erase the whole EEPROM with "clear EEPROM to 0xFF"
-7. on the next restart the parameters are only filled with the #defined values from config.h
-
-CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-byte. By manually editing and storing the modified parameters we won't get in trouble - but frequent automated saving of parameters won't be a good idea, the EEPROM may get damaged. 
-
-The parameters will be stored to the same location all the time - a load-leveling-algorithm would be too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
-that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
-
-### PRIO-Z-EXCLUSIVE
-If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected.
-
-This feature is recommended for resistive joysticks.
-
-When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
-
-So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
-
-### Drift compensation for hall-joysticks
-
-@StefanNouza implemented a drift-compensation to re-zero the (hall-)joysticks when the mouse is untouched. This is necessary because hall-joystick-readings don't show any deadzone, like resistive joysticks do.
-  
-He wanted use the small readings possible around zero to get a precise reaction to slight touches. This can be done by setting the DEADZONE to 0 and tune the modifierFunction to output values even at small joystick-readings. But then, it can be seen that the mechanics produce a new random zeropoint everytime the SpaceMouse is left untouched.
-
-So this drift-compensation was invented to overcome the slightly unprecise mechanics.
-The compensation finds out when the SpaceMouse is untouched. Then it sets the readings of the joysticks to 0.
-
-This is implemented in the compensateDrifts() function in calibration.cpp. You can fine tune the drift compensation with those parameters. Check the config_sample.h for more infos.
-| Parameter | Short description |
-| --- | --- |
-| COMP_ENABLED | enable the compensation |
-| COMP_NO_OF_POINTS | number of points to build the mean-value |
-| COMP_WAIT_TIME |  [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves) | 
-| COMP_MIN_MAX_DIFF |  [incr] maximum range of raw-values to be considered as only drift |
-| COMP_CENTER_DIFF | [incr] maximum distance from the center-value to be only drift (never compensates above this offset) |
+- tbd -->
 
 # Complete description of the project 
 
@@ -328,6 +234,98 @@ ROTZ = AY + BY + CY + DY
 ```
 # Specific features
 This section gives a deeper look into features that came into the mouse during time with the releases. 
+
+## Serial interface menu
+The serial interface is showing a menu to list the possible options you may ask.
+
+```
+SpaceMouse FW2.x.y - Debug Modes
+ESC stop running mode, leave menu (ESC, Q)
+  1 raw joystick ADC values 0..1023
+  2 centered values -500..+500
+ 11 auto calibrate centers, show deadzones
+ 20 find min/max-values over 15s (move stick)
+  3 centered values w.deadzones -350..+350
+  4 velocity- (trans-/rot-)values -350..+350
+  5 centered- & velocity-values, (3) and (4)
+  6 velocity after kill-keys and keys
+ 61 velocity after axis-switch, exclusive
+  7 loop-frequency-test
+  8 key-test, button-codes to send
+  9 encoder wheel-test
+ 30 parameters (read, write, edit, view)
+```
+### Usage of serial interface menu
+
+- all inputs are done by typing a number and press 'enter'. To input floating point-values - and . are allowed.
+- to abort a numerical input, press 'esc', 'q' or another non-numerical char
+- to select a menu / debug-mode, input its number
+- to leave a running debug-mode press 'space', 'esc' or 'q'
+- the active menu-level is shown by its prompt, example "mode::"
+- to leave a menu-level press 'space', 'esc' or 'q'
+- a typed in value will be shown AFTER 'enter' is pressed
+
+## Storing parameters in the EEPROM
+The parameters from the config.h file are initially read and stored in the eeprom of the controller. Despite the hardware related constant definitions, you can edit all the sensitivities on the fly over the menu item 30:
+```
+SpaceMouse FW2.x.y - Parameters
+ESC leave parameter-menu (ESC, Q)
+  1  list parameters
+  2  edit parameters
+  3  read from EEPROM
+  4  write to EEPROM
+  5  clear EEPROM to 0xFF
+  6  set EEPROM params invalid
+  7  list parameters as defines
+```
+
+### Usage for parameter EEPROM
+
+1. Initially the parameters hold the #defined values from config.h
+2. with the new parameter-menu "edit parameters" you can edit them - they go to the struct par in RAM
+3. you can test the modified parameters immediately without leaving the parameter-menu
+4. 
+    1. If you switch off/reset the SpaceMouse, the parameters are lost because they are only stored in RAM
+    2. In the parameter-menu you can save the parameters to EEPROM on the Arduino, use menu "write to EEPROM" - from now this parameters survive restarts
+5. as a backup you can list all parameters with then menu "list parameters as defines", you get a list of #defines that you can copy/paste from your terminal-program to a textfile (for storage/documentation) or into your config.h-file to set them as new initial values
+5. on restart of the SpaceMouse the parameters will be automatically read from EEPROM if they are flagged as valid.     They are considered as valid if a correct magicNumber is stored in the EEPROM.
+6. 
+    1. if the parameters are destroyed (why?) or the struct had changed (by modifying the program itself), you can invalidate the stored parameters via menu "set EEPROM params invalid" (kills the magicNumber)
+    2. as an alternative you can erase the whole EEPROM with "clear EEPROM to 0xFF"
+7. on the next restart the parameters are only filled with the #defined values from config.h
+
+CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-byte. By manually editing and storing the modified parameters we won't get in trouble - but frequent automated saving of parameters won't be a good idea, the EEPROM may get damaged. 
+
+The parameters will be stored to the same location all the time - a load-leveling-algorithm would be too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
+that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
+
+
+## PRIO-Z-EXCLUSIVE
+If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected.
+
+This feature is recommended for resistive joysticks.
+
+When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
+
+So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
+
+## Drift compensation for hall-joysticks
+
+@StefanNouza implemented a drift-compensation to re-zero the (hall-)joysticks when the mouse is untouched. This is necessary because hall-joystick-readings don't show any deadzone, like resistive joysticks do.
+  
+He wanted use the small readings possible around zero to get a precise reaction to slight touches. This can be done by setting the DEADZONE to 0 and tune the modifierFunction to output values even at small joystick-readings. But then, it can be seen that the mechanics produce a new random zeropoint everytime the SpaceMouse is left untouched.
+
+So this drift-compensation was invented to overcome the slightly unprecise mechanics.
+The compensation finds out when the SpaceMouse is untouched. Then it sets the readings of the joysticks to 0.
+
+This is implemented in the compensateDrifts() function in calibration.cpp. You can fine tune the drift compensation with those parameters. Check the config_sample.h for more infos.
+| Parameter | Short description |
+| --- | --- |
+| COMP_ENABLED | enable the compensation |
+| COMP_NO_OF_POINTS | number of points to build the mean-value |
+| COMP_WAIT_TIME |  [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves) | 
+| COMP_MIN_MAX_DIFF |  [incr] maximum range of raw-values to be considered as only drift |
+| COMP_CENTER_DIFF | [incr] maximum distance from the center-value to be only drift (never compensates above this offset) |
 
 ## Neopixel led ring
 
