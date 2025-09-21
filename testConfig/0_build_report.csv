@@ -1,5 +1,5 @@
 Config,Description,Flash (bytes),Flash (%),RAM (bytes),RAM (%),Build Success
-a_test_minimal.h,test file for resistive joystick with now added features,17034,59.4,676,26.4,Yes
+a_test_minimal.h,test file for resistive joystick with no added features,17034,59.4,676,26.4,Yes
 b_test_resistiveJoystick.h,test file for resistive joystick with modification function enabled,17034,59.4,676,26.4,Yes
 c1_test_LED.h,test file for resistive joystick with LED support,17438,60.8,676,26.4,Yes
 c2_test_LEDring.h,test file for resistive joystick with led ring support,20570,71.7,884,34.5,Yes

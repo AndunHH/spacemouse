@@ -1,13 +1,15 @@
 # Build Report
 
 This document summarizes the build results for all tested configurations.  
-Each configuration corresponds to a different `config.h` variant.  
+Each configuration corresponds to a different `config.h` variant given in folder `testConfig`.
 
 The first line of each configuration file is used as its description.
 
+This file is created manually be calling `testConfigCompileSize.py`.
+
 | Config | Description | Flash (bytes) | Flash (%) | RAM (bytes) | RAM (%) | Build Success |
 |--------|-------------|---------------|-----------|-------------|---------|---------------|
-| a_test_minimal.h | test file for resistive joystick with now added features | 17034 | 59.4 | 676 | 26.4 | Yes |
+| a_test_minimal.h | test file for resistive joystick with no added features | 17034 | 59.4 | 676 | 26.4 | Yes |
 | b_test_resistiveJoystick.h | test file for resistive joystick with modification function enabled | 17034 | 59.4 | 676 | 26.4 | Yes |
 | c1_test_LED.h | test file for resistive joystick with LED support | 17438 | 60.8 | 676 | 26.4 | Yes |
 | c2_test_LEDring.h | test file for resistive joystick with led ring support | 20570 | 71.7 | 884 | 34.5 | Yes |
@@ -17,4 +19,4 @@ The first line of each configuration file is used as its description.
 | f_test_hall_effect.h | test file for resistive joystick with literally now added features | 17416 | 60.7 | 676 | 26.4 | Yes |
 | [OK] All builds successful |  |  |  |  |  |  |
 
-**Report generated on:** 2025-09-21 17:34:38
+**Report generated on:** 2025-09-21 17:37:50

@@ -32,9 +32,11 @@ REPORT_MD_FILE = 'testConfig/0_build_report.md'
 REPORT_MD_INTRO = """# Build Report
 
 This document summarizes the build results for all tested configurations.  
-Each configuration corresponds to a different `config.h` variant.  
+Each configuration corresponds to a different `config.h` variant given in folder `testConfig`.
 
 The first line of each configuration file is used as its description.
+
+This file is created manually be calling `testConfigCompileSize.py`.
 """
 
 OK_MARK = "[OK]"

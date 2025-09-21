@@ -1,4 +1,4 @@
-// test file for resistive joystick with now added features
+// test file for resistive joystick with no added features
 
 #ifndef CONFIG_h
 #define CONFIG_h
