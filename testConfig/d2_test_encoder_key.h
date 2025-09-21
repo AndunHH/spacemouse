@@ -21,21 +21,21 @@
 #define MINVALS {-400, -400, -400, -400, -400, -400, -400, -400}
 #define MAXVALS {+175, +175, +175, +175, +175, +175, +175, +175}
 
-#define TRANSX_SENSITIVITY     0.80
-#define TRANSY_SENSITIVITY     0.99
-#define POS_TRANSZ_SENSITIVITY 2.5
-#define NEG_TRANSZ_SENSITIVITY 1.5
-#define GATE_NEG_TRANSZ        15
-#define GATE_ROTX              15
-#define GATE_ROTY              15
-#define GATE_ROTZ              15
-#define ROTX_SENSITIVITY       1.2
-#define ROTY_SENSITIVITY       1.2
-#define ROTZ_SENSITIVITY       0.90
+#define SENS_TX     0.80
+#define SENS_TY     0.99
+#define SENS_PTZ 2.5
+#define SENS_NTZ 1.5
+#define GATE_NTZ        15
+#define GATE_RX              15
+#define GATE_RY              15
+#define GATE_RZ              15
+#define SENS_RX       1.2
+#define SENS_RY       1.2
+#define SENS_RZ       0.90
 
 #define MODFUNC       0
-#define SLOPE_AT_ZERO 1.15
-#define SLOPE_AT_END  1.15
+#define MOD_A 1.15
+#define MOD_B  1.15
 
 #define INVX  0
 #define INVY  1
@@ -47,14 +47,15 @@
 #define SWITCHYZ 0
 #define SWITCHXY 0
 
-#define COMP_ENABLED       0
-#define COMP_NO_OF_POINTS  50
-#define COMP_WAIT_TIME     200
-#define COMP_MIN_MAX_DIFF  4
-#define COMP_CENTER_DIFF   50
+#define COMP_EN       0
+#define COMP_NR  50
+#define COMP_WAIT     200
+#define COMP_MDIFF  4
+#define COMP_CDIFF   50
 
-#define EXCLUSIVEMODE 0
-#define PRIO_Z_EXCLUSIVEMODE 0
+#define EXCLUSIVE   0
+#define EXCL_HYST   5
+#define EXCL_PRIOZ 0
 
 #define NUMKEYS 3
 #define KEYLIST \
@@ -97,8 +98,8 @@
 #define ENCODER_DT 3
 
 #define ROTARY_AXIS 5
-#define ECHOES 200
-#define SIMSTRENGTH 200
+#define RAXIS_ECH 200
+#define RAXIS_STR 200
 
 #define ROTARY_KEYS 2
 #define ROTARY_KEY_IDX_A 2

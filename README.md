@@ -42,7 +42,7 @@ New ProgMode and reducing program-memory usage:
 - analyzed and optimized the HES code
 - inserted a hysteresis into the exclusive mode to prevent
   immediate switching back and forth between Trans- and Rot-mode
-  - new parameter "EXCLUSIVEHYSTERESIS", a value of 0 turns it off (old behavior)
+  - new parameter "EXCL_HYST", a value of 0 turns it off (old behavior)
 
 To reduce the file size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters.
 As this may be anoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
