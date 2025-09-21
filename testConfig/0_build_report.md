@@ -1,0 +1,11 @@
+| Config | Description | Flash (bytes) | Flash (%) | RAM (bytes) | RAM (%) | Build Success |
+|--------|-------------|---------------|-----------|-------------|---------|---------------|
+| a_test_minimal.h | test file for resistive joystick with now added features | 17034 | 59.4 | 676 | 26.4 | Yes |
+| b_test_resistiveJoystick.h | test file for resistive joystick with modification function enabled | 17034 | 59.4 | 676 | 26.4 | Yes |
+| c1_test_LED.h | test file for resistive joystick with LED support | 17438 | 60.8 | 676 | 26.4 | Yes |
+| c2_test_LEDring.h | test file for resistive joystick with led ring support | 20570 | 71.7 | 884 | 34.5 | Yes |
+| d2_test_encoder_key.h | test file for resistive joystick with encoder and key support (one key is replaced by encoder) | 20700 | 72.2 | 845 | 33.0 | Yes |
+| d_test_encoder.h | test file for resistive joystick with encoder added. | 19122 | 66.7 | 750 | 29.3 | Yes |
+| e_test_ergoMouse.h | test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder | 28538 | 99.5 | 1118 | 43.7 | Yes |
+| f_test_hall_effect.h | test file for resistive joystick with literally now added features | 17416 | 60.7 | 676 | 26.4 | Yes |
+| [OK] All builds successful |  |  |  |  |  |  |

@@ -1,7 +1,7 @@
+// test file for resistive joystick with encoder added.
+
 #ifndef CONFIG_h
 #define CONFIG_h
-
-// test file for resistive joystick with encoder added.
 
 #include "release.h"
 

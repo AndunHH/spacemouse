@@ -1,7 +1,7 @@
+// test file for resistive joystick with led ring support
+
 #ifndef CONFIG_h
 #define CONFIG_h
-
-// test file for resistive joystick with literaly now added features
 
 #include "release.h"
 
@@ -110,7 +110,7 @@
 
 #define VelocityDeadzoneForLED 15
 #define LEDpin 5
-//#define LEDRING 24
+#define LEDRING 24
 #define LEDclockOffset 0
 #define LEDUPDATERATE_MS 150
 

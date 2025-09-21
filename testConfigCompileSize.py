@@ -7,7 +7,7 @@
 # 3. Running a PlatformIO build (pio run) for each configuration.
 # 4. Parsing the build output to extract Flash and RAM usage (both bytes and percentages).
 # 5. Recording whether the build succeeded or failed.
-# 6. Writing the results into a CSV report testConfig/0_build_report.csv for easy comparison across configurations.
+# 6. Writing the results into a CSV report testConfig/0_build_report.csv for easy comparison across configurations. Additionally an easier to read markdown file is generated.
 # 7. This makes it easy to test how different configurations affect memory usage and build success.
 #
 # Prerequisite: The location of you pio.exe must be known on your path. 
@@ -25,6 +25,7 @@ CONFIG_TARGET = 'spacemouse-keys/config.h'
 PIO_CMD = "pio"              # Adjust if needed, e.g. full path to platformio.exe
 BUILD_ARGS = ["run"]
 REPORT_FILE = 'testConfig/0_build_report.csv'
+REPORT_MD_FILE = 'testConfig/0_build_report.md'
 
 OK_MARK = "[OK]"
 FAIL_MARK = "[FAIL]"
@@ -65,6 +66,12 @@ def run_platformio_capture_output(args):
     except subprocess.CalledProcessError as e:
         return e.stdout + "\n" + e.stderr, False
 
+def get_config_description(config_path):
+    """Read first line of config file, strip leading // if present."""
+    with open(config_path, "r", encoding="utf-8") as f:
+        first_line = f.readline().strip()
+    return first_line.lstrip("/ ").strip()
+
 def run_automation():
     configs = [f for f in os.listdir(CONFIG_DIR) if f.endswith('.h')]
     results = []
@@ -75,6 +82,8 @@ def run_automation():
 
         config_path = os.path.join(CONFIG_DIR, config_file)
         shutil.copyfile(config_path, CONFIG_TARGET)
+
+        description = get_config_description(config_path)
 
         output, success = run_platformio_capture_output(BUILD_ARGS)
         flash, ram, flash_pct, ram_pct = parse_build_output(output)
@@ -90,6 +99,7 @@ def run_automation():
 
         results.append({
             'Config': config_file,
+            'Description': description,
             'Flash (bytes)': flash if flash is not None else 'N/A',
             'Flash (%)': flash_pct if flash_pct is not None else 'N/A',
             'RAM (bytes)': ram if ram is not None else 'N/A',
@@ -97,10 +107,14 @@ def run_automation():
             'Build Success': 'Yes' if success else 'No'
         })
 
-    # Add summary row
+    # Sort alphabetically by Config name
+    results.sort(key=lambda x: x['Config'])
+
+    # Add summary row (always at bottom)
     summary_line = f"{OK_MARK} All builds successful" if all_success else f"{FAIL_MARK} Some builds failed"
     results.append({
         'Config': summary_line,
+        'Description': '',
         'Flash (bytes)': '',
         'Flash (%)': '',
         'RAM (bytes)': '',
@@ -108,13 +122,24 @@ def run_automation():
         'Build Success': ''
     })
 
-    with open(REPORT_FILE, 'w', newline='') as csvfile:
-        fieldnames = ['Config', 'Flash (bytes)', 'Flash (%)', 'RAM (bytes)', 'RAM (%)', 'Build Success']
+    # Write CSV
+    with open(REPORT_FILE, 'w', newline='', encoding="utf-8") as csvfile:
+        fieldnames = ['Config', 'Description', 'Flash (bytes)', 'Flash (%)', 'RAM (bytes)', 'RAM (%)', 'Build Success']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results)
 
-    print(f'\nReport generated: {REPORT_FILE}')
+    # Write Markdown
+    with open(REPORT_MD_FILE, 'w', encoding="utf-8") as mdfile:
+        mdfile.write("| Config | Description | Flash (bytes) | Flash (%) | RAM (bytes) | RAM (%) | Build Success |\n")
+        mdfile.write("|--------|-------------|---------------|-----------|-------------|---------|---------------|\n")
+        for row in results:
+            mdfile.write(
+                f"| {row['Config']} | {row['Description']} | {row['Flash (bytes)']} | {row['Flash (%)']} "
+                f"| {row['RAM (bytes)']} | {row['RAM (%)']} | {row['Build Success']} |\n"
+            )
+
+    print(f'\nReports generated:\n - {REPORT_FILE}\n - {REPORT_MD_FILE}')
     print(summary_line)
 
 

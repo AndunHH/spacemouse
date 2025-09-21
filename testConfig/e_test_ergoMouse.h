@@ -1,7 +1,7 @@
+// test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder
+
 #ifndef CONFIG_h
 #define CONFIG_h
-
-// test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder
 
 #include "release.h"
 

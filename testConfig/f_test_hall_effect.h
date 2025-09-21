@@ -1,7 +1,7 @@
+// test file for resistive joystick with literally now added features
+
 #ifndef CONFIG_h
 #define CONFIG_h
-
-// test file for resistive joystick with literaly now added features
 
 #include "release.h"
 
