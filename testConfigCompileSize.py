@@ -1,24 +1,18 @@
-# Build Automation Script for PlatformIO Projects
-# 
+# Build Automation Script  
 # This script automates building a PlatformIO project with multiple configuration header files.
 # 
 # It works by:
-# 
-# Iterating over all .h files in the testConfig directory.
-# 
-# Copying each config file to the target project’s config.h path.
-# 
-# Running a PlatformIO build (pio run) for each configuration.
-# 
-# Parsing the build output to extract Flash and RAM usage (both bytes and percentages).
-# 
-# Recording whether the build succeeded or failed.
-# 
-# Writing the results into a CSV report (build_report.csv) for easy comparison across configurations.
-# 
-# This makes it easy to test how different configurations affect memory usage and build success.
+# 1. Iterating over all .h files in the testConfig directory.
+# 2. Copying each config file to the target project’s config.h path.
+# 3. Running a PlatformIO build (pio run) for each configuration.
+# 4. Parsing the build output to extract Flash and RAM usage (both bytes and percentages).
+# 5. Recording whether the build succeeded or failed.
+# 6. Writing the results into a CSV report testConfig/0_build_report.csv for easy comparison across configurations.
+# 7. This makes it easy to test how different configurations affect memory usage and build success.
 #
-# Prerequisite: The location of you pio.exe must be known on your path. E.g. C:\Users\xyz\.platformio\penv\Scripts  on windows
+# Prerequisite: The location of you pio.exe must be known on your path. 
+# E.g. On Windows: C:\Users\xyz\.platformio\penv\Scripts
+# On Linux: nano ~/.bashrc  -   export PATH="$HOME/.platformio/penv/bin:$PATH"
 
 import os
 import shutil
