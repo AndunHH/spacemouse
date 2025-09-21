@@ -1,49 +1,29 @@
-# Space Navigator
-This page contains informations about a 3Dconnexion SpaceNavigator, which has been observed via wireshark:
+# SpaceMouse Wireless
+This page contains informations about a 3Dconnexion Space Mouse Wireless, which has been observed via wireshark:
 
-`sudo modprobe usbmon` 
-`sudo wireshark`
+SpaceMouse Wirelss HID Report
+Recorded with Wireshark. 
+Decoded with https://eleccelerator.com/usbdescreqparser/
 
-Test on update rate of the spacemouse with wireshark and spacenavd on ubuntu. src 1.8.1
 
-## Data transmitted by Space Navigator
-First package: (no translation seen here)
-`01 00 00 00 00 00 00`
+## Update Rate
+In move_and_rot.pcapng:
+The translation and rotation seem to be sent at a speed of 12.5 packets each 200 ms = 62,5 packets/s = 16 ms update rate.
 
-Second package: (rotation around "right down" = "second axis")
-`02 00 00 e2 ff 00 00`
+## Buttons and LEDs
+Not further analysed jet, but seems to conform to [SpaceNavigator.](SpaceNavigator.md). I.e.: Report 3 rot keys, Report 4 for LED.
 
-Pushing Button 1:
-`03 01 00`
 
-Releasing Button 1:
-`03 00 00`
+## Other findings
+From other records: Report 0x17 reports the battery
 
-Pushing Button 2:
-`03 02 00`
+    Report ID: 0x17
+    0110 0100 = Usage: Battery Strength: 100 
+    Vendor Data: 01
+    Padding: 00
 
-Release Button 2:
-`03 00 00`
 
-Pushing both buttons at the same time: 
-`03 03 00`
-
-If in spnavcfg the LED is turned on, the host sends to 1.8.2
-`04 01`
-
-Turning LED off:
-`04 00`
-
-## Timing of the data sent by Space Navigator
-Report Id 1 for translation is sent.
-8 ms later Report Id 2 for rotation is sent.
-If keys are pressed: After 8 ms Report Id 3 is sent. Otherwise this is skipped and after 8 ms it restarts with Report Id 1.
-
-This leads to a constant rate of 125 packages per second with alternating report id, as long there non-zero data.
-
-After the last package with non-zero data, translation and rotation and sent three times with only zeros and in the steady 8 ms intervall.
-
-## Device Descriptor of Space Navigator
+## Device Descriptor
 ```
 DEVICE DESCRIPTOR
     bLength: 18
@@ -52,20 +32,17 @@ DEVICE DESCRIPTOR
     bDeviceClass: Device (0x00)
     bDeviceSubClass: 0
     bDeviceProtocol: 0 (Use class code info from Interface Descriptors)
-    bMaxPacketSize0: 8
-    idVendor: Logitech, Inc. (0x046d)
-    idProduct: 3Dconnexion Space Navigator 3D Mouse (0xc626)
-    bcdDevice: 0x0435
+    bMaxPacketSize0: 32
+    idVendor: 3Dconnexion (0x256f)
+    idProduct: SpaceMouse Wireless (cabled) (0xc62e)
+    bcdDevice: 0x0441
     iManufacturer: 1
     iProduct: 2
     iSerialNumber: 0
     bNumConfigurations: 1
 ```
 
-## HID Report of Space Navigator
-See also [the wireshark protocoll](Reverse-Engineering-Docs/SpaceNavigator-Connected-Calibrate.pcapng) for a SpaceNavigator connected and pressed "calibrate" in the windows driver.
-
-The HID following HID descriptor has been decoded with https://eleccelerator.com/usbdescreqparser/ 
+## HID Report of SpaceMouse Wireless
 ```
 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 0x09, 0x08,        // Usage (Multi-axis Controller)
@@ -81,18 +58,12 @@ The HID following HID descriptor has been decoded with https://eleccelerator.com
 0x09, 0x30,        //     Usage (X)
 0x09, 0x31,        //     Usage (Y)
 0x09, 0x32,        //     Usage (Z)
-0x75, 0x10,        //     Report Size (16)
-0x95, 0x03,        //     Report Count (3)
-0x81, 0x06,        //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
-0xC0,              //   End Collection
-0xA1, 0x00,        //   Collection (Physical)
-0x85, 0x02,        //     Report ID (2)
 0x09, 0x33,        //     Usage (Rx)
 0x09, 0x34,        //     Usage (Ry)
 0x09, 0x35,        //     Usage (Rz)
 0x75, 0x10,        //     Report Size (16)
-0x95, 0x03,        //     Report Count (3)
-0x81, 0x06,        //     Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
+0x95, 0x06,        //     Report Count (6)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
 0xC0,              //   End Collection
 0xA1, 0x02,        //   Collection (Logical)
 0x85, 0x03,        //     Report ID (3)
@@ -122,6 +93,27 @@ The HID following HID descriptor has been decoded with https://eleccelerator.com
 0x95, 0x01,        //     Report Count (1)
 0x75, 0x07,        //     Report Size (7)
 0x91, 0x03,        //     Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0xC0,              //   End Collection
+0xA1, 0x02,        //   Collection (Logical)
+0x85, 0x17,        //     Report ID (23)
+0x15, 0x00,        //     Logical Minimum (0)
+0x25, 0x64,        //     Logical Maximum (100)
+0x55, 0x00,        //     Unit Exponent (0)
+0x65, 0x00,        //     Unit (None)
+0x05, 0x06,        //     Usage Page (Generic Dev Ctrls)
+0x09, 0x20,        //     Usage (Battery Strength)
+0x75, 0x08,        //     Report Size (8)
+0x95, 0x01,        //     Report Count (1)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x15, 0x00,        //     Logical Minimum (0)
+0x25, 0x01,        //     Logical Maximum (1)
+0x06, 0x00, 0xFF,  //     Usage Page (Vendor Defined 0xFF00)
+0x09, 0x27,        //     Usage (0x27)
+0x75, 0x01,        //     Report Size (1)
+0x95, 0x01,        //     Report Count (1)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x75, 0x07,        //     Report Size (7)
+0x81, 0x03,        //     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
 0xC0,              //   End Collection
 0x06, 0x00, 0xFF,  //   Usage Page (Vendor Defined 0xFF00)
 0x09, 0x01,        //   Usage (0x01)
@@ -178,50 +170,19 @@ The HID following HID descriptor has been decoded with https://eleccelerator.com
 0x95, 0x01,        //       Report Count (1)
 0xB1, 0x02,        //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
 0xC0,              //     End Collection
+0xA1, 0x02,        //     Collection (Logical)
+0x85, 0x19,        //       Report ID (25)
+0x09, 0x31,        //       Usage (0x31)
+0x95, 0x04,        //       Report Count (4)
+0xB1, 0x02,        //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0xC0,              //     End Collection
+0xA1, 0x02,        //     Collection (Logical)
+0x85, 0x1A,        //       Report ID (26)
+0x09, 0x32,        //       Usage (0x32)
+0x95, 0x07,        //       Report Count (7)
+0xB1, 0x02,        //       Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0xC0,              //     End Collection
 0xC0,              //   End Collection
 0xC0,              // End Collection
-
-// 217 bytes
-
-0000   05 01 09 08 a1 01 a1 00 85 01 16 a2 fe 26 5e 01   .............&^.
-0010   36 88 fa 46 78 05 55 0c 65 11 09 30 09 31 09 32   6..Fx.U.e..0.1.2
-0020   75 10 95 03 81 06 c0 a1 00 85 02 09 33 09 34 09   u...........3.4.
-0030   35 75 10 95 03 81 06 c0 a1 02 85 03 05 01 05 09   5u..............
-0040   19 01 29 02 15 00 25 01 35 00 45 01 75 01 95 02   ..)...%.5.E.u...
-0050   81 02 95 0e 81 03 c0 a1 02 85 04 05 08 09 4b 15   ..............K.
-0060   00 25 01 95 01 75 01 91 02 95 01 75 07 91 03 c0   .%...u.....u....
-0070   06 00 ff 09 01 a1 02 15 80 25 7f 75 08 09 3a a1   .........%.u..:.
-0080   02 85 05 09 20 95 01 b1 02 c0 a1 02 85 06 09 21   .... ..........!
-0090   95 01 b1 02 c0 a1 02 85 07 09 22 95 01 b1 02 c0   ..........".....
-00a0   a1 02 85 08 09 23 95 07 b1 02 c0 a1 02 85 09 09   .....#..........
-00b0   24 95 07 b1 02 c0 a1 02 85 0a 09 25 95 07 b1 02   $..........%....
-00c0   c0 a1 02 85 0b 09 26 95 01 b1 02 c0 a1 02 85 13   ......&.........
-00d0   09 2e 95 01 b1 02 c0 c0 c0                        .........
+// 270 bytes
 ```
-
-# Other related stuff
-## Device List for other devices
-Check [ANTz wiki](https://github.com/openantz/antz/wiki/3D-Mouse#device-list) for a device list. 
-Interestingly, our code is not fully compliant with this list, as we use event#1 and event#2 with 6 byte, despite we are suggesting to be a SpaceMouse Pro Wireless (cabled), which has only one 12 byte event#1.
-This seems to be no problem, as our HID descriptor is declaring the values with report id#1 and id#2.
-
-## About relative and absolute input data
-[Full discussion](https://github.com/FreeSpacenav/spacenavd/issues/108)
-> When I wrote the first version of spacenavd, I only had a space navigator, and the first version of spacenavd only worked with "relative" inputs because that was what the space navigator emitted. I'm saying "relative" in quotes because they weren't really relative, they were just reported as such, but the values were always absolute displacements per axis. 3Dconnexion probably realized at some stage that reporting them as "relative" is incorrect, and changed to absolute in newer devices. 
->
-> I'm pretty sure all modern 3Dconnexion devices report absolute axis usage.
-
-> The original Space Navigator reports it's data as relative positions. The original Space Navigator is very sensitive and is jiggling a lot i.e. the same value is only send repeatedly very for some milli-seconds.
->
-> My emulated "SpaceMouse Pro Wireless (cabled)" (or at least our inherited) hid report descriptor reports absolute values
-Our emulation is very sturdy and if you hold it in position, the same value are easily calculate for a second.
->
-> When using spacenavd and the simple example, cube or even in FreeCAD:
->
->Relative reports are evaluated with every event, even if they are the same as before.
-Absolute reports are only evaluated, if they differ from the previous report. This is merely visible with the SpaceNavigator, but is very annoying for our emulation, as it is reporting same values very often. I didn't figured out, if this dropping of events is done by spacenavd or linux itself...
-
-> Solution: Change our emulated mouse to Relative Positions, even if this is not "up to date". But it avoids the necessity to jiggle the values.
-
-## HID descriptor of a spacemouse wireless
-See [SpaceMouseWireless.md](SpaceMouseWireless.md)
