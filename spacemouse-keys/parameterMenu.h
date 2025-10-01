@@ -15,50 +15,55 @@
   // 4. change the magicNumber to something new to invalidate the actual content of the EEPROM
   // 5. insert the new parameter into the struct ParamStorage
   // 6. increment the number of parameters in NUM_PARAMS
-  // parameterMenu.cpp
-  // 7. edit printOneParameter() to get an user-readable output on Serial
-  // 8. edit readParameter() to read the parameter-value out of ParamStorage
-  // 9. edit writeParameter() to write a value to the parameter in ParamStorage
+  // spacemouse-keys.ino
+  // 7. insert a line into the initialization of par (at the right position!!!)
+  //    example:
+  //    {PARAM_TYPE_FLOAT, "TEST",          &parStorage.test      }, //      34
+  //     ^type of param     ^name of param   ^pointer to the variable        ^number as comment
   //
-  // because all user-interface handles numbers, use int8_T for boolean
-  // for numbers double, int, int8_t, int16_t, int32_t are OK
+  // because all user-interface handles numbers and the type for the variables is forced now:
+  //   use int8_T  for PARAM_TYPE_BOOL  [0 , 1]
+  //   use int16_t for PARAM_TYPE_INT   [-9999 .. 9999]
+  //   use double  for PARAM_TYPE_FLOAT [-xx.yyy .. 0.000 .. xx.yyy]
   //
-  // 10. consider putting the values from 3. as initial values into config.h
-  // 11. compile/download the new program
-  // 12. check the parameters with "list parameters"
-  // 13. modify the parameters as needed with "edit parameters"
-  // 14. store the parameters to the EEPROM with "write to EEPROM"
+  // 8. consider putting the values from 3. as initial values into config.h
+  // 9. compile/download the new program
+  // 10. check the parameters with "list parameters"
+  // 11. modify the parameters as needed with "edit parameters"
+  // 12. store the parameters to the EEPROM with "write to EEPROM"
   //---------------------------------------------------------
 
-  #define MAGIC_NUMBER       1209196403L
+  #define NUM_PARAMS         33   // total number of parameters in struct ParamStorage
+
+  #define MAX_PARAM_NAME_LEN 10   // maximum length of any parameter name
+
+  #define MAGIC_NUMBER       1209196405L
   #define BASE_ADDRESS_MAGIC 0
   #define BASE_ADDRESS_PAR   4
 
-  #if (ROTARY_AXIS > 0) && (ROTARY_AXIS < 7)
-  #define NUM_PARAMS 32   // total number of parameters in struct ParamStorage
-  #else
-  #define NUM_PARAMS 30   // total number of parameters in struct ParamStorage
-  #endif
+  #define PARAM_TYPE_BOOL    1
+  #define PARAM_TYPE_INT     2
+  #define PARAM_TYPE_FLOAT   3
 
-  struct ParamStorage {
+  typedef struct _ParamStorage {
     int16_t deadzone               = DEADZONE;
 
-    double  transX_sensitivity     = TRANSX_SENSITIVITY;
-    double  transY_sensitivity     = TRANSY_SENSITIVITY;
-    double  pos_transZ_sensitivity = POS_TRANSZ_SENSITIVITY;
-    double  neg_transZ_sensitivity = NEG_TRANSZ_SENSITIVITY;
-    double  gate_neg_transZ        = GATE_NEG_TRANSZ;
-    int16_t gate_rotX              = GATE_ROTX;
-    int16_t gate_rotY              = GATE_ROTY;
-    int16_t gate_rotZ              = GATE_ROTZ;
+    double  transX_sensitivity     = SENS_TX;
+    double  transY_sensitivity     = SENS_TY;
+    double  pos_transZ_sensitivity = SENS_PTZ;
+    double  neg_transZ_sensitivity = SENS_NTZ;
+    double  gate_neg_transZ        = GATE_NTZ;
+    int16_t gate_rotX              = GATE_RX;
+    int16_t gate_rotY              = GATE_RY;
+    int16_t gate_rotZ              = GATE_RZ;
 
-    double  rotX_sensitivity       = ROTX_SENSITIVITY;
-    double  rotY_sensitivity       = ROTY_SENSITIVITY;
-    double  rotZ_sensitivity       = ROTZ_SENSITIVITY;
+    double  rotX_sensitivity       = SENS_RX;
+    double  rotY_sensitivity       = SENS_RY;
+    double  rotZ_sensitivity       = SENS_RZ;
 
-    int8_t  modFunc                = MODFUNC;
-    double  slope_at_zero          = SLOPE_AT_ZERO;
-    double  slope_at_end           = SLOPE_AT_END;
+    int16_t modFunc                = MODFUNC;         //SNo: changed to int16_t because all INT-values should be int16
+    double  slope_at_zero          = MOD_A;
+    double  slope_at_end           = MOD_B;
 
     int8_t  invX                   = INVX;
     int8_t  invY                   = INVY;
@@ -69,26 +74,57 @@
 
     int8_t  switchXY               = SWITCHXY;
     int8_t  switchYZ               = SWITCHYZ;
-    int8_t  exclusiveMode          = EXCLUSIVEMODE;
-    int8_t  prioZexclusiveMode     = PRIO_Z_EXCLUSIVEMODE;
+    int8_t  exclusiveMode          = EXCLUSIVE;
+    int16_t exclusiveHysteresis    = EXCL_HYST;
+    int8_t  prioZexclusiveMode     = EXCL_PRIOZ;
 
-    int8_t  compEnabled            = COMP_ENABLED;
-    int16_t compNoOfPoints         = COMP_NO_OF_POINTS;
-    int16_t compWaitTime           = COMP_WAIT_TIME;
-    int16_t compMinMaxDiff         = COMP_MIN_MAX_DIFF;
-    int16_t compCenterDiff         = COMP_CENTER_DIFF;
+    int8_t  compEnabled            = COMP_EN;
+    int16_t compNoOfPoints         = COMP_NR;
+    int16_t compWaitTime           = COMP_WAIT;
+    int16_t compMinMaxDiff         = COMP_MDIFF;
+    int16_t compCenterDiff         = COMP_CDIFF;
 
-    int16_t rotAxisEchos           = ECHOES;
-    int16_t rotAxisSimStrength     = SIMSTRENGTH;    
-  };
+    int16_t rotAxisEchos           = RAXIS_ECH;
+    int16_t rotAxisSimStrength     = RAXIS_STR;    
+  } ParamStorage;
+
+  typedef struct _ParamDescription {
+    int   type;
+    char  name[MAX_PARAM_NAME_LEN+1];
+    void* storage;
+  } ParamDescription;
+
+  typedef struct _ParamData {
+    ParamStorage*     values;
+    ParamDescription  description[NUM_PARAMS+1];
+  } ParamData;
+
+  #if ENABLE_PROGMODE > 0
+    typedef struct _ProgCmd {
+      char    cmd;
+      double  value;
+      double  retval;
+      int16_t paramNo;
+    } ProgCmd;
+
+    #define PE_OK            10000
+    #define PE_INVALID_PARAM 10001
+    #define PE_INVALID_VALUE 10002
+    #define PE_VALUE_FAULT   10003
+    #define PE_CMD_FAULT     10004
+  #endif
 
   int    userInput(double& value);
-  double readParameter(int i, ParamStorage& par);
-  void   writeParameter(int i, double value, ParamStorage& par);
-  void   getParametersFromEEPROM(ParamStorage& par);
-  void   putParametersToEEPROM(ParamStorage& par);
-  bool   printOneParameter(int i, ParamStorage& par, bool line, bool num);
-  void   printAllParameters(ParamStorage& par, bool num);
-  int    editParameters(ParamStorage& par);
-  int    parameterMenu(ParamStorage& par);
+  double readParameter(int i, ParamData& par);
+  void   writeParameter(int i, double value, ParamData& par);
+  void   getParametersFromEEPROM(ParamData& par);
+  void   putParametersToEEPROM(ParamData& par);
+  void   printParameterName(int i, ParamData& par, bool formatted);
+  bool   printOneParameter(int i, ParamData& par, bool line, bool num);
+  void   printAllParameters(ParamData& par, bool num);
+  int    editParameters(ParamData& par);
+  int    parameterMenu(ParamData& par);
+  #if ENABLE_PROGMODE > 0
+    void executeProgCommand(ParamData& par);
+  #endif
 #endif

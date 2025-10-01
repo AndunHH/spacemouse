@@ -1,13 +1,15 @@
 // Every file (except, "config_sample.h") will be ignored by git!
 config*.h
+*.bak
 .pio
-.vscode
+.vscode/*
 .idea
 
 //this file should be included:
 !config_sample*.h
-
+!.vscode/settings.json
 
 README_tmp.html
 README.pdf
 README.html
+spacemouse-keys/testConfigs/readme.pdf

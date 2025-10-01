@@ -4,6 +4,10 @@
 #include "release.h"
 
 #define PARAM_IN_EEPROM 1
+#define ENABLE_PROGMODE 1
+
+#undef  DEBUG_KEYS
+#undef  DEBUG_ADC
 
 /* The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
    This file is meant for the << JOYSTICK SPACEMOUSE >>
@@ -12,13 +16,13 @@
 */
 
 
-/* Calibration instructions
+/* Calibration Instructions
 ============================
 Follow this file from top to bottom to calibrate your space mouse.
 You can find some pictures for the calibration process here:
 https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build#calibration
 
-Debugging Instructions 
+Debugging Instructions
 =========================
 To activate one of the following debugging modes, you can either:
 - Change STARTDEBUG here in the code and compile/download again
@@ -97,16 +101,15 @@ If you have the joystick TeachingTech recommended:
 #define INVERTLIST \
   { 0, 0,  0,  0,  0,  0,  0,  0}
 // AX, AY, BX, BY, CX, CY, DX, DY
- 
+
 /* Second calibration: Tune Deadzone
 =====================================
 Deadzone to filter out unintended movements. Increase if the mouse has small movements when it should be idle or the mouse is too sensitive to subtle movements.
 Semi-automatic: Set debug = 11. Don't touch the mouse and observe the automatic output.
 Manual:         Set debug = 2.  Don't touch the mouse but observe the values. They should be nearly to zero.
-                                Every value around zero which is noise or should be neglected afterwards is in the following deadzone. 
+                                Every value around zero which is noise or should be neglected afterwards is in the following deadzone.
 */
-#define DEADZONE 0  // RJS: 0    HJS:3  Recommended to have this as small as possible to allow full range of motion.
-
+#define DEADZONE 0  // Recommended to have this as small as possible to allow full range of motion.
 
 /* Third calibration: Getting MIN and MAX values
 =================================================
@@ -150,8 +153,8 @@ Recommended calibration procedure for min/max ADC levels
 
 // Insert measured Values like this:
 //              {  AX,   AY,   BX,   BY,   CX,   CY,   DX,   DY}
-#define MINVALS {-512, -512, -512, -512, -512, -512, -512, -512}
-#define MAXVALS {+512, +512, +512, +512, +512, +512, +512, +512}
+#define MINVALS {-265, -260, -250, -230, -250, -510, -250, -230}
+#define MAXVALS { 265,  510,  250,  450,  250,  260,  250,  450}
 
 /* Fourth calibration: Sensitivity
 ===================================
@@ -171,7 +174,7 @@ NEW: you can use a parameter menu on the serial interface,
    You will see Values TX, TY, TZ, RX, RY, RZ
 2. Start moving your SpaceMouse. You will notice values changing.
 3. Starting with TX try increasing this value as much as possible by moving your Spacemouse around. If you get around 350 thats great.
-   If not change parameter TRANSX_SENSITIVITY. Repeat until it is around 350 for maximum motion.
+   If not change parameter SENS_TX. Repeat until it is around 350 for maximum motion.
 4. Repeat steps 3 for TY, TZ, RX, RY, RZ
 5. Verification: Move the Joystick in funny ways. All you should get for either TX,TX,TZ,RX,RY,RZ should be approximately between -350 to 350.
 6. save your settings to the devices EEPROM have them permanently on the SpaceMouse
@@ -181,17 +184,17 @@ NEW: you can use a parameter menu on the serial interface,
 [Suggestion: ModFunc level 3]
 */
 
-#define TRANSX_SENSITIVITY      2.50  // RJS:2.50  HJS:5.00
-#define TRANSY_SENSITIVITY      2.50  // RJS:2.50  HJS:5.00
-#define POS_TRANSZ_SENSITIVITY 15.00  // RJS:15.0  HJS:8.00
-#define NEG_TRANSZ_SENSITIVITY  7.00  // RJS:7.00  HJS:6.00  I want low sensitivity for down, therefore a high value.
-#define GATE_NEG_TRANSZ         0.01  // RJS:0.01  HJS:8.00  gate value, which negative z movements will be ignored (like an additional deadzone for -z).
-#define GATE_ROTX               1     // RJS:1     HJS:2     value under which rotX values will be forced to zero
-#define GATE_ROTY               1     // RJS:1     HJS:2     value under which roty values will be forced to zero
-#define GATE_ROTZ               1     // RJS:1     HJS:2     value under which rotz values will be forced to zero
-#define ROTX_SENSITIVITY        0.75  // RJS:0.75  HJS:1.50
-#define ROTY_SENSITIVITY        0.75  // RJS:0.75  HJS:1.50
-#define ROTZ_SENSITIVITY        2.00  // RJS:2.00  HJS:3.00
+#define SENS_TX     2.50  // RJS:2.50  HJS:5.00
+#define SENS_TY     2.50  // RJS:2.50  HJS:5.00
+#define SENS_PTZ    15.00 // RJS:15.0  HJS:8.00  // sensitivity for positive translation z
+#define SENS_NTZ    7.00  // RJS:7.00  HJS:6.00  // sensitivity for negative translation z
+#define GATE_NTZ    0.01  // RJS:0.01  HJS:8.00  // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
+#define GATE_RX     1     // RJS:1     HJS:2     // Value under which rotX values will be forced to zero
+#define GATE_RY     1     // RJS:1     HJS:2     // Value under which roty values will be forced to zero
+#define GATE_RZ     1     // RJS:1     HJS:2     // Value under which rotz values will be forced to zero
+#define SENS_RX     0.75  // RJS:0.75  HJS:1.50
+#define SENS_RY     0.75  // RJS:0.75  HJS:1.50
+#define SENS_RZ     2.00  // RJS:2.00  HJS:3.00
 
 
 /* Fifth calibration: Modifier Function
@@ -209,23 +212,22 @@ This should be at level 0 when starting the calibration!
 0: linear                      y = x                                     [Standard behaviour: No modification]
 
 1: "squared" function:         y = abs(x)^a * sign(x)                    [altered squared function working in positive and negative direction]
-	-> SLOPE_AT_ZERO is the exponent "a": 1 is linear, 2 is squared, 3 is cubed - anything between is permitted, you can fine-tune the shape of the curve
+	-> MOD_A is the exponent "a": 1 is linear, 2 is squared, 3 is cubed - anything between is permitted, you can fine-tune the shape of the curve
 
    tangent function:           y = tan(b * x) / tan(b)                   [results in a flat curve near zero but increases the more you are away from zero]
-    -> use modFunc = 3 and set SLOPE_AT_ZERO = 1.0 to get this
+    -> use modFunc = 3 and set MOD_A = 1.0 to get this
 
 3: "squared" tangent function: y = tan(b * (abs(x)^a *sign(X))) / tan(b) [results in a flatter curve near zero but increases alot the more you are away from zero]
-	-> SLOPE_AT_END is factor "b" and tunes the form of the tangens-function
+	-> MOD_B is factor "b" and tunes the form of the tangens-function
 
    cubed tangent function:     y = tan(b * (abs(x)^3 *sign(X))) / tan(b) [results in a flatter curve near zero but increases extreme the more you are away from zero]
-    -> set SLOPE_AT_ZERO = 3.0 to get this
+    -> set MOD_A = 3.0 to get this
 Recommendation after tuning: MODFUNC 3
 */
 
-#define MODFUNC       0     // RJS:3     HJS:3     used as default value as long as the data hasn't been saved in the EEPROM
-#define SLOPE_AT_ZERO 1.15  // RJS:1.15  HJS:1.10  exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
-#define SLOPE_AT_END  1.15  // RJS:1.15  HJS:1.15  factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
-
+#define MODFUNC   0     // Used as default value as long as the data hasn't been saved in the EEPROM
+#define MOD_A     1.15  // exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
+#define MOD_B     1.15  // factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
 
 /* Sixth Calibration: Direction
 ================================
@@ -236,17 +238,17 @@ NEW: you can use a parameter menu on the serial interface,
 Modify the direction of translation/rotation depending on the CAD program you are using on your PC.
 This should be done, when you are done with the pin assignment!
 
-If all defines are set to 0 the resulting X, Y and Z axis correspond to the pictures shown in the README.md. 
+If all defines are set to 0 the resulting X, Y and Z axis correspond to the pictures shown in the README.md.
 The suggestion in the comments for "3Dc" are often needed on windows PCs with 3dconnexion driver to get expected behavior.
 */
 
 // Switch between 0 or 1 as desired
-#define INVX  1  // pan left/right                           RJS:1     HJS:0
-#define INVY  0  // pan up/down                              RJS:0     HJS:1
-#define INVZ  0  // zoom in/out                              RJS:0     HJS:1
-#define INVRX 0  // Rotate around X axis (tilt front/back)   RJS:0     HJS:1
-#define INVRY 1  // Rotate around Y axis (tilt left/right)   RJS:1     HJS:0
-#define INVRZ 1  // Rotate around Z axis (twist left/right)  RJS:1     HJS:0
+#define INVX  1 // pan left/right                          RJS:1     HJS:0
+#define INVY  1 // pan up/down                             RJS:0     HJS:1
+#define INVZ  1	// zoom in/out                           RJS:0     HJS:1
+#define INVRX 1 // Rotate around X axis (tilt front/back)  RJS:0     HJS:1
+#define INVRY 1 // Rotate around Y axis (tilt left/right)  RJS:1     HJS:0
+#define INVRZ 1 // Rotate around Z axis (twist left/right) RJS:1     HJS:0
 
 // Switch Zoom direction with Up/Down Movement
 #define SWITCHYZ 0  // change to 1 to switch Y and Z axis
@@ -257,18 +259,17 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 //   Compensates drifting zero-position (drifting electronics, unprecise mechanics)
 //   All values may be edited in the parameter-menu.
 //
-//   check the following conditions for the duration of COMP_WAIT_TIME:
-//     - raw-value doesn't move more than COMP_CENTER_DIFF from the center-value
-//     - raw-value doesn't move more than COMP_MIN_MAX_DIFF itself
+//   check the following conditions for the duration of COMP_WAIT:
+//     - raw-value doesn't move more than COMP_CDIFF from the center-value
+//     - raw-value doesn't move more than COMP_MDIFF itself
 //   if they were not violated, we consider the SpaceMouse is not touched, so we do:
-//     > take the mean-value of the next COMP_NO_OF_POINTS raw-values for each joystick-axis
+//     > take the mean-value of the next COMP_NR raw-values for each joystick-axis
 //     > calculate offsets for each axis to bring the axis mean-value to the axis center-value (re-center the joysticks)
-#define COMP_ENABLED       0        // enable the compensation    RJS:0     HJS:1
-#define COMP_NO_OF_POINTS  50       // number of points to build the mean-value
-#define COMP_WAIT_TIME     200      // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
-#define COMP_MIN_MAX_DIFF  4        // [incr] maximum range of raw-values to be considered as only drift
-#define COMP_CENTER_DIFF   50       // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
-
+#define COMP_EN      1   // enable the compensation
+#define COMP_NR     50   // number of points to build the mean-value
+#define COMP_WAIT  200   // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
+#define COMP_MDIFF   4   // [incr] maximum range of raw-values to be considered as only drift
+#define COMP_CDIFF  50   // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
 
 /* Exclusive mode
 ==================
@@ -277,20 +278,21 @@ This can solve issues with classic joysticks where you get unwanted translation 
 
 It choose to send the one with the biggest absolute value.
 */
-#define EXCLUSIVEMODE 0             // RJS:1     HJS:0
-/*
-PRIO-Z-EXCLUSIVE MODE:
+#define EXCLUSIVE   0             // RJS:1     HJS:0
+#define EXCL_HYST   5
+
+/* PRIO-Z-EXCLUSIVE MODE:
+=========================
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
 Recommended for resistive joysticks.
 When pushing or pulling, the knob produced transient rotational components that stops when the z-translation gets the priority. So when pulling, we get first a rotation then the desired translation.
 So this mode sees that min. 3 of 4 joysticks all move up (or down) and use it as an indicator that the knob is mainly pushed/pulled. So before any (ghost-)rotational component can be calculated, it is sorted out.
 */
-#define PRIO_Z_EXCLUSIVEMODE 0      // RJS:1     HJS:0
+#define EXCL_PRIOZ 0      // RJS:1     HJS:0
 
-
-/* Key Support 
+/* Key Support
 ===============
-If you attached keys to your Spacemouse, configure them here. 
+If you attached keys to your Spacemouse, configure them here.
 You can use the keys to report them via USB HID to the PC (either classically pressed or emulated with an encoder)
 or as kill-keys (described below).
 */
@@ -301,7 +303,7 @@ or as kill-keys (described below).
 // Define the PINS for the classic keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
 #define KEYLIST \
-  { 15, 14, 16, 10 }
+    { 15, 14, 16, 10 }
 
 /* Report KEYS over USB HID to the PC
  -------------------------------------
@@ -329,7 +331,7 @@ or as kill-keys (described below).
 
 // BUTTONLIST must have at least as many elements as NUMHIDKEYS
 // The keys from KEYLIST or ROTARY_KEYS are assigned to buttons here:
-#define BUTTONLIST {SM_T, SM_R, SM_F, SM_FIT}
+#define BUTTONLIST {SM_T, SM_R, SM_F}
 
 /* Kill-Key Feature
 --------------------
@@ -389,7 +391,7 @@ How many kill keys are there? (disabled: 0; enabled: 2)
 #endif
 
 // time in ms which is needed to allow a new button press
-#define DEBOUNCE_KEYS_MS 200  
+#define DEBOUNCE_KEYS_MS 200
 
 /* Encoder Wheel
 ================
@@ -415,19 +417,19 @@ Axis to replace with encoder
 */
 #define ROTARY_AXIS 0
 
-/* To calculate a velocity from the encoder position, the output is faded over so many loop() iterations, as defined in #ECHOES
+/* To calculate a velocity from the encoder position, the output is faded over so many loop() iterations, as defined in #RAXIS_ECH
 Small number = short duration of zooming <-> Big Number = longer duration of zooming
 Compare this number with the update frequency of the script, reported by debug=7:
-  If ECHOES = frequency: the zoom is faded for 1 second.
+  If RAXIS_ECH = frequency: the zoom is faded for 1 second.
 */
-#define ECHOES 200      
+#define RAXIS_ECH 200
 
 /* Strength of the simulated pull
 Recommended range: 0 - 350
-  Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h 
+  Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h
 Recommended strength = 200
 */
-#define SIMSTRENGTH 200
+#define RAXIS_STR 200
 
 /* ROTARY_KEYS
 ===============
@@ -443,6 +445,41 @@ ROTARY_KEYS 1 = enabled, 0 = disabled
 // duration of simulated key
 #define ROTARY_KEY_STRENGTH 19
 
+/* LED support
+===============
+You can attach:
+a) a simple LED to the mouse. LED shall be connected to 5V and the controller port.
+b) a fancy LED strip, like the nanopixel. Check the FASTLED library for supported chips / led strips.
+
+Which pin shall be used as LED? This pin is used either as a digital pin (a) or as the data pin (b).
+Change from "//define" to "#define" to activate the LED feature.
+*/
+// #define LEDpin 5
+
+/* Simple LED
+-------------
+// If you have connected a single LED to the controller port and GND, invert it by uncommenting this #define
+*/
+// #define LEDinvert
+
+/* LED strip with data pin
+---------------------------
+The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring.
+*/
+
+// #define LEDRING 24
+//  The LEDpin is used as a data pin
+
+// The LEDs light up, if a certain movement is reached:
+#define VelocityDeadzoneForLED 15
+
+// About how many LEDs must the ring by turned to align?
+#define LEDclockOffset 0
+
+// how often shall the LEDs be updated
+#define LEDUPDATERATE_MS 150
+
+
 /* Advanced debug output settings
 =================================
 The following settings allow customization of debug output behavior */
@@ -454,40 +491,6 @@ The following settings allow customization of debug output behavior */
 #define DEBUG_LINE_END "\r"
 // If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
 //define DEBUG_LINE_END "\r\n"
-
-/* LED support 
-===============
-You can attach:
-a) a simple LED to the mouse. LED shall be connected to 5V and the controller port.
-b) a fancy LED strip, like the nanopixel. Check the FASTLED library for supported chips / led strips.
-
-Which pin shall be used as LED? This pin is used either as a digital pin (a) or as the data pin (b).
-Change from "//define" to "#define" to activate the LED feature.
-*/
-//#define LEDpin 5
-
-/* Simple LED
--------------
-// If you have connected a single LED to the controller port and GND, invert it by uncommenting this #define
-*/
-// #define LEDinvert
-
-/* LED strip with data pin 
----------------------------
-The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring. 
-*/
-
-//#define LEDRING 24 
-// The LEDpin is used as a data pin
-
-// The LEDs light up, if a certain movement is reached:
-#define VelocityDeadzoneForLED 15
- 
-// About how many LEDs must the ring by turned to align?
-#define LEDclockOffset 0
-
-// how often shall the LEDs be updated
-#define LEDUPDATERATE_MS 150
 
 /* Advanced USB HID settings
 =============================

@@ -3,17 +3,17 @@
 
 #include "parameterMenu.h"
 
-int modifierFunction(int x, ParamStorage& par);
+int modifierFunction(int x, ParamData& par);
 
 void readAllFromJoystick(int *rawReads);
 
-void FilterAnalogReadOuts(int* centered, ParamStorage& par);
+void FilterAnalogReadOuts(int* centered, ParamData& par);
 
-void calculateKinematic(int* centered, int16_t* velocity, ParamStorage& par);
+void calculateKinematic(int* centered, int16_t* velocity, ParamData& par);
 
 void switchXY(int16_t *velocity);
 void switchYZ(int16_t *velocity);
-void exclusiveMode(int16_t *velocity);
+void exclusiveMode(int16_t *velocity, int16_t hysteresis);
 
 // The following constants are here for more readable access to the arrays. You don't need to change this values!
 // Axes in centered or rawValues array
@@ -42,6 +42,6 @@ void exclusiveMode(int16_t *velocity);
 #define TRANSX 0
 #define TRANSY 1
 #define TRANSZ 2
-#define ROTX 3
-#define ROTY 4
-#define ROTZ 5
+#define ROTX   3
+#define ROTY   4
+#define ROTZ   5

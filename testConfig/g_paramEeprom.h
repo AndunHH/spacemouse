@@ -1,45 +1,44 @@
-// test file for resistive joystick with encoder added.
+// Test PARAM_IN_EEPROM + PROGMODE
 
 #ifndef CONFIG_h
 #define CONFIG_h
 
 #include "release.h"
 
-#define PARAM_IN_EEPROM 0
+#define PARAM_IN_EEPROM 1
+#define ENABLE_PROGMODE 1
 
 #define STARTDEBUG 0
 #undef HALLEFFECT
 
-#define PINLIST \
-  { A0,   A1,   A2,   A3,   A6,   A7,   A8,   A9 }
+#define PINLIST {A0, A1, A2, A3, A6, A7, A8, A9}
 
-#define INVERTLIST \
-  {  0,    0,    0,    0,    0,    0,    0,    0 }
+#define INVERTLIST {0, 0, 0, 0, 0, 0, 0, 0}
 
 #define DEADZONE 15
 
 #define MINVALS {-400, -400, -400, -400, -400, -400, -400, -400}
 #define MAXVALS {+175, +175, +175, +175, +175, +175, +175, +175}
 
-#define SENS_TX     0.80
-#define SENS_TY     0.99
+#define SENS_TX 0.80
+#define SENS_TY 0.99
 #define SENS_PTZ 2.5
 #define SENS_NTZ 1.5
-#define GATE_NTZ        15
-#define GATE_RX              15
-#define GATE_RY              15
-#define GATE_RZ              15
-#define SENS_RX       1.2
-#define SENS_RY       1.2
-#define SENS_RZ       0.90
+#define GATE_NTZ 15
+#define GATE_RX 15
+#define GATE_RY 15
+#define GATE_RZ 15
+#define SENS_RX 1.2
+#define SENS_RY 1.2
+#define SENS_RZ 0.90
 
-#define MODFUNC       0
+#define MODFUNC 0
 #define MOD_A 1.15
-#define MOD_B  1.15
+#define MOD_B 1.15
 
-#define INVX  0
-#define INVY  1
-#define INVZ  1
+#define INVX 0
+#define INVY 1
+#define INVZ 1
 #define INVRX 0
 #define INVRY 1
 #define INVRZ 1
@@ -47,19 +46,18 @@
 #define SWITCHYZ 0
 #define SWITCHXY 0
 
-#define COMP_EN       0
-#define COMP_NR  50
-#define COMP_WAIT     200
-#define COMP_MDIFF  4
-#define COMP_CDIFF   50
+#define COMP_EN 0
+#define COMP_NR 50
+#define COMP_WAIT 200
+#define COMP_MDIFF 4
+#define COMP_CDIFF 50
 
-#define EXCLUSIVE   0
-#define EXCL_HYST   5
+#define EXCLUSIVE 0
+#define EXCL_HYST 5
 #define EXCL_PRIOZ 0
 
 #define NUMKEYS 0
-#define KEYLIST \
-    {0, 1, 2}
+#define KEYLIST {0, 1, 2}
 
 #define NUMHIDKEYS 0
 
@@ -97,7 +95,7 @@
 #define ENCODER_CLK 2
 #define ENCODER_DT 3
 
-#define ROTARY_AXIS 5
+#define ROTARY_AXIS 0
 #define RAXIS_ECH 200
 #define RAXIS_STR 200
 
@@ -110,8 +108,8 @@
 #define DEBUG_LINE_END "\r"
 
 #define VelocityDeadzoneForLED 15
-//#define LEDpin 5
-//#define LEDRING 24
+// #define LEDpin 5
+// #define LEDRING 24
 #define LEDclockOffset 0
 #define LEDUPDATERATE_MS 150
 

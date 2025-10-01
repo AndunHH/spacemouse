@@ -4,6 +4,10 @@
 #include "release.h"
 
 #define PARAM_IN_EEPROM 1
+#define ENABLE_PROGMODE 1
+
+#undef  DEBUG_KEYS
+#undef  DEBUG_ADC
 
 /* The user specific settings, like pin mappings or special configuration variables and sensitivities are stored in config.h.
    This file is meant for the << HALL-EFFECT SPACEMOUSE >>
@@ -29,7 +33,8 @@ Debug Modes:
 -1: Debugging off. Set to this once everything is working.
 0:  Nothing...
 
-1:  Report raw joystick values. 0-1023 raw ADC 10-bit values
+1:  Report raw joystick values on 5V ref.    0-1023 raw ADC 10-bit values
+10: Report raw joystick values on 2.56V ref. 0-1023 raw ADC 10-bit values
 11: Calibrate / Zero the SpaceMouse and get a dead-zone suggestion (This is also done on every startup in the setup())
 
 2:  Report centered joystick values. Values should be approximately -500 to +500, jitter around 0 at idle.
@@ -174,7 +179,7 @@ NEW: you can use a parameter menu on the serial interface,
    You will see Values TX, TY, TZ, RX, RY, RZ, the configured keys and the current status of the sensitivity parameters.
 2. Start moving your SpaceMouse. You will notice values changing.
 3. Starting with TX try increasing this value as much as possible by moving your Spacemouse around. If you get around 350 thats great.
-   If not change parameter TRANSX_SENSITIVITY. Repeat until it is around 350 for maximum motion.
+   If not change parameter SENS_TX. Repeat until it is around 350 for maximum motion.
 4. Repeat steps 3 for TY, TZ, RX, RY, RZ
 5. Verification: Move the Joystick in funny ways. All you should get for either TX,TX,TZ,RX,RY,RZ should be approximately between -350 to 350.
 6. save your settings to the devices EEPROM have them permanently on the SpaceMouse
@@ -184,17 +189,17 @@ NEW: you can use a parameter menu on the serial interface,
 [Suggestion: ModFunc level 3]
 */
 
-#define TRANSX_SENSITIVITY     0.80
-#define TRANSY_SENSITIVITY     0.99
-#define POS_TRANSZ_SENSITIVITY 2.5
-#define NEG_TRANSZ_SENSITIVITY 1.5
-#define GATE_NEG_TRANSZ        15   // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
-#define GATE_ROTX              15   // Value under which rotX values will be forced to zero
-#define GATE_ROTY              15   // Value under which roty values will be forced to zero
-#define GATE_ROTZ              15   // Value under which rotz values will be forced to zero
-#define ROTX_SENSITIVITY       1.2
-#define ROTY_SENSITIVITY       1.2
-#define ROTZ_SENSITIVITY       0.90
+#define SENS_TX     0.80
+#define SENS_TY     0.99
+#define SENS_PTZ    2.5  // sensitivity for positive translation z
+#define SENS_NTZ    1.5  // sensitivity for negative translation z
+#define GATE_NTZ    15   // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
+#define GATE_RX     15   // Value under which rotX values will be forced to zero
+#define GATE_RY     15   // Value under which roty values will be forced to zero
+#define GATE_RZ     15   // Value under which rotz values will be forced to zero
+#define SENS_RX     1.2
+#define SENS_RY     1.2
+#define SENS_RZ     0.90
 
 /* Fifth calibration: Modifier Function
 ========================================
@@ -211,22 +216,22 @@ This should be at level 0 when starting the calibration!
 0: linear                      y = x                                     [Standard behaviour: No modification]
 
 1: "squared" function:         y = abs(x)^a * sign(x)                    [altered squared function working in positive and negative direction]
-	-> SLOPE_AT_ZERO is the exponent "a": 1 is linear, 2 is squared, 3 is cubed - anything between is permitted, you can fine-tune the shape of the curve
+	-> MOD_A is the exponent "a": 1 is linear, 2 is squared, 3 is cubed - anything between is permitted, you can fine-tune the shape of the curve
 
    tangent function:           y = tan(b * x) / tan(b)                   [results in a flat curve near zero but increases the more you are away from zero]
-    -> use modFunc = 3 and set SLOPE_AT_ZERO = 1.0 to get this
+    -> use modFunc = 3 and set MOD_A = 1.0 to get this
 
 3: "squared" tangent function: y = tan(b * (abs(x)^a *sign(X))) / tan(b) [results in a flatter curve near zero but increases alot the more you are away from zero]
-	-> SLOPE_AT_END is factor "b" and tunes the form of the tangens-function
+	-> MOD_B is factor "b" and tunes the form of the tangens-function
 
    cubed tangent function:     y = tan(b * (abs(x)^3 *sign(X))) / tan(b) [results in a flatter curve near zero but increases extreme the more you are away from zero]
-    -> set SLOPE_AT_ZERO = 3.0 to get this
+    -> set MOD_A = 3.0 to get this
 Recommendation after tuning: MODFUNC 3
 */
 
 #define MODFUNC       0     // Used as default value as long as the data hasn't been saved in the EEPROM
-#define SLOPE_AT_ZERO 1.15  // exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
-#define SLOPE_AT_END  1.15  // factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
+#define MOD_A         1.15  // exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
+#define MOD_B         1.15  // factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
 
 /* Sixth Calibration: Direction
 ================================
@@ -258,17 +263,17 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 //   Compensates drifting zero-position (drifting electronics, unprecise mechanics)
 //   All values may be edited in the parameter-menu.
 //
-//   check the following conditions for the duration of COMP_WAIT_TIME:
-//     - raw-value doesn't move more than COMP_CENTER_DIFF from the center-value
-//     - raw-value doesn't move more than COMP_MIN_MAX_DIFF itself
+//   check the following conditions for the duration of COMP_WAIT:
+//     - raw-value doesn't move more than COMP_CDIFF from the center-value
+//     - raw-value doesn't move more than COMP_MDIFF itself
 //   if they were not violated, we consider the SpaceMouse is not touched, so we do:
-//     > take the mean-value of the next COMP_NO_OF_POINTS raw-values for each joystick-axis
+//     > take the mean-value of the next COMP_NR raw-values for each joystick-axis
 //     > calculate offsets for each axis to bring the axis mean-value to the axis center-value (re-center the joysticks)
-#define COMP_ENABLED       1        // enable the compensation
-#define COMP_NO_OF_POINTS  50       // number of points to build the mean-value
-#define COMP_WAIT_TIME     200      // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
-#define COMP_MIN_MAX_DIFF  4        // [incr] maximum range of raw-values to be considered as only drift
-#define COMP_CENTER_DIFF   50       // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
+#define COMP_EN     1        // enable the compensation
+#define COMP_NR     50       // number of points to build the mean-value
+#define COMP_WAIT   200      // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
+#define COMP_MDIFF  4        // [incr] maximum range of raw-values to be considered as only drift
+#define COMP_CDIFF  50       // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
 
 /* Exclusive mode
 ==================
@@ -277,15 +282,15 @@ This can solve issues with classic joysticks where you get unwanted translation 
 
 It choose to send the one with the biggest absolute value.
 */
-#define EXCLUSIVEMODE 0             // RJS:1     HJS:0
-/*
-PRIO-Z-EXCLUSIVE MODE:
+#define EXCLUSIVE   0
+#define EXCL_HYST   5
+
+/* Prio-Z-Exclusive mode
+=========================
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
-PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore left out from this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.
+PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore set off in this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.
 */
-#define PRIO_Z_EXCLUSIVEMODE 0      // RJS:1     HJS:0
-
-
+#define EXCL_PRIOZ 0
 
 /* Key Support
 ===============
@@ -414,19 +419,19 @@ Axis to replace with encoder
 */
 #define ROTARY_AXIS 0
 
-/* To calculate a velocity from the encoder position, the output is faded over so many loop() iterations, as defined in #ECHOES
+/* To calculate a velocity from the encoder position, the output is faded over so many loop() iterations, as defined in #RAXIS_ECH
 Small number = short duration of zooming <-> Big Number = longer duration of zooming
 Compare this number with the update frequency of the script, reported by debug=7:
-  If ECHOES = frequency: the zoom is faded for 1 second.
+  If RAXIS_ECH = frequency: the zoom is faded for 1 second.
 */
-#define ECHOES 200
+#define RAXIS_ECH 200
 
 /* Strength of the simulated pull
 Recommended range: 0 - 350
   Reason for max=350: The HID Interface reports logical max as +350, see hidInterface.h
 Recommended strength = 200
 */
-#define SIMSTRENGTH 200
+#define RAXIS_STR 200
 
 /* ROTARY_KEYS
 ===============
@@ -442,18 +447,6 @@ ROTARY_KEYS 1 = enabled, 0 = disabled
 // duration of simulated key
 #define ROTARY_KEY_STRENGTH 19
 
-/* Advanced debug output settings
-=================================
-The following settings allow customization of debug output behavior */
-
-// Generate a debug line only every DEBUGDELAY ms 
-#define DEBUGDELAY 100
-
-// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
-#define DEBUG_LINE_END "\r"
-// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
-//define DEBUG_LINE_END "\r\n"
-
 /* LED support
 ===============
 You can attach:
@@ -463,7 +456,7 @@ b) a fancy LED strip, like the nanopixel. Check the FASTLED library for supporte
 Which pin shall be used as LED? This pin is used either as a digital pin (a) or as the data pin (b).
 Change from "//define" to "#define" to activate the LED feature.
 */
-// #define LEDpin 5
+//#define LEDpin 5
 
 /* Simple LED
 -------------
@@ -476,7 +469,7 @@ Change from "//define" to "#define" to activate the LED feature.
 The connected LED is not just a stupid LED, but an intelligent one, like a neopixel controlled by FASTLED library. If set, the LEDRING gives the number of LEDs on the ring.
 */
 
-// #define LEDRING 24
+//#define LEDRING 24
 //  The LEDpin is used as a data pin
 
 // The LEDs light up, if a certain movement is reached:
@@ -488,6 +481,18 @@ The connected LED is not just a stupid LED, but an intelligent one, like a neopi
 // how often shall the LEDs be updated
 #define LEDUPDATERATE_MS 150
 
+
+/* Advanced debug output settings
+=================================
+The following settings allow customization of debug output behavior */
+
+// Generate a debug line only every DEBUGDELAY ms 
+#define DEBUGDELAY 100
+
+// The standard behavior "\r" for the debug output is, that the values are always written into the same line to get a clean output. Easy readable for the human.
+#define DEBUG_LINE_END "\r"
+// If you need to report some debug outputs to trace errors, you can change the debug output to "\r\n" to get a newline with each debug output. (old behavior)
+//define DEBUG_LINE_END "\r\n"
 
 /* Advanced USB HID settings
 =============================
