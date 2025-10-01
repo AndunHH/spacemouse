@@ -14,5 +14,5 @@
         "spacenav"
     ],
     "editor.formatOnSave": true,
-    "C_Cpp.clang_format_style": "file" // tells VS Code to use the .clang-format in repo
+    "C_Cpp.clang_format_style": "file"
 }
