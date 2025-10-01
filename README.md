@@ -28,13 +28,17 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 ## Upcoming Work
 For the next release, already to be found in master:
 
+### Shortened config parameters
+To reduce the program size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters. As a conversion is necessary, this is named release version 3.
+
+As this may be annoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
+
 ### ProgMode over Serial, optimized storage of parameters, progmem usage reduced
 New ProgMode and reducing program-memory usage:
 
-- developed a "ProgMode" for "Set settings over serial interface and save them"
+- developed a [ProgMode](#progmode) for "Set settings over serial interface and save them"
 - modified the existing parameter-menu system:
   - restructured the parameter-data to have their descriptions (name/type) and values at one place
-  - shorter code
   - no need to edit the parameters-functions anymore
   - but the RAM-usage is gone up...
     ...if someone knows how to set up and use a pointer to a string in ProgMem - that would help...
@@ -43,10 +47,6 @@ New ProgMode and reducing program-memory usage:
 - inserted a hysteresis into the exclusive mode to prevent
   immediate switching back and forth between Trans- and Rot-mode
   - new parameter "EXCL_HYST", a value of 0 turns it off (old behavior)
-
-To reduce the file size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters.
-As this may be anoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
-
 
 # Complete description of the project 
 
@@ -317,6 +317,97 @@ CAUTION: the EEPROM-chip on the Arduino is capable of 10.000 writes per storage-
 
 The parameters will be stored to the same location all the time - a load-leveling-algorithm would be too much code for too less benefit. The Arduino-function EEPROM.put() itself only writes bytes,
 that really have changed - so only changed values wear out EEPROM-bytes, unchanged parts don't.
+
+## ProgMode
+
+The ProgMode and the parameter-menu can be used alternatively over the same serial interface.
+The parameter menu has to be at the base level (debug) for the ProgMode to operate.
+Because of the simple nature of the Serial-API and the restricted mem on the controller, the following basic interface is provided:
+
+### ProgMode-Command
+* a command is started by a '>'-character
+* the command itself is one character long, e.g. 'w' for "write parameter"
+* after the command may follow _one_ numerical value, e.g. the value to write
+* the whole command ends with the CR-character
+
+### Prog-Mode-Acknowledgement: 
+Every command is parsed, checked and executed. After that an acknowledge is sent:
+* the acknowledge begins with a '<' character
+* then the command-char follows (to identify the acknowledge)
+* depending on the command, a numerical cmd-result or the requested value is sent
+* values range 0/1 for bool, -9999...+9999 for INT and xx.yyy as FLOAT results
+* because an INT is defined up to 9999, possible result-codes starting from 10000 (result OK)
+
+| acknowledges (PE=ProgmodeError) | Value | 
+| ---   | --- |
+|  PE_OK              |   10000 |
+|  PE_INVALID_PARAM   |   10001 |
+|  PE_INVALID_VALUE   |   10002 |
+|  PE_VALUE_FAULT    |    10003 |
+|  PE_CMD_FAULT      |    10004 |
+
+### Command and Acknowledgement
+Cmd    |function                     |returns (>= 10000 -> NOK) |
+-------|-----------------------------|---------------------- |
+| `>m`| get magic number             | `<m...   <magic number>` all values are valid, no fault-codes!|
+| `>n`  | get number of parameters   | `<n...   (<number of params>)` |
+| `>p...` | parameter number set     | `<p...   (PE_OK,PE_INVALID_PARAM)`|
+| `>t`    | get type of parameter    | `<t...   (<type>: 0=bool,1=int,2=float or PE_INVALID_PARAM)`|
+| `>d`    | get description of parameter  | `<d...   (<name of parameter> or PE_INVALID_PARAM)` |
+| `>r`    | read value                    | `<r...   (<value> or PE_INVALID_PARAM`|
+| `>w...` | write value                   | `<w...   (PE_OK,PE_INVALID_PARAM,PE_INVALID_VALUE "not in [-10000..+10000]")`|
+| `>l`    | load params from EEPROM       | `<l10000 (PE_OK)`|
+| `>s `   | save params to EEPROM         | `<s10000 (PE_OK)`|
+| `>i `   | invalidate magic number       | `<i10000 (PE_OK)`|
+| `>c `   | clear EEPROM                  | `<c10000 (PE_OK)`|
+
+To work with a parameter, first you have to address the parameter with the `p`-command. The following commands that work on parameters use the address set by the last `p`-command.
+### ProgMode example
+```
+    cmd:    ack:        description:
+    >p3     <p10000     address parameter 3 -> result OK
+    >t      <t1         get type of parameter -> type is 1=INT
+    >r      <r42        read value -> parameter has value 42
+```
+
+### ProgMode Workflow
+A suggested workflow would be:
+```
+  >m        if no acknowledge after 500ms, the SpaceMouse is not in base/debug-menu
+            - we can try to send a 'q'-character followed by CR three times to get back in menu-system
+              and send some (up to three) 'm'-commands afterwards to see, if we get in sync with the ProgMode
+  >m        <m1964120905            magic number of EEPROM-data, identifies the data set-version
+  now we are connected and know about the version.
+
+  >n        <n33                    gets the number of parameters
+  now we know about the number of parameters.
+
+  get all parameters with name, type and value:
+  >p1       <10000                  adress parm 1 (ack: OK)
+  >d        <dDEADZONE              description=name of the parameter is "DEADZONE"
+  >t        <t1                     parameter is of type 1 = INT
+  >r        <r16                    parameter has the value 16
+
+  >p2       <10000                  adress parm 2 (ack: OK)
+  >d        <dTRANSX_SENSITIVITY    description=name of the parameter is "TRANSX_SENSITIVITY"
+  >t        <t2                     parameter is of type 2 = FLOAT
+  >r        <r2.500                 parameter has the value 2.5
+  repeat up to param nr.33
+
+  write a new value to a parameter on the device:
+  >p16      <p10000                 adress param 16 (ack OK)
+  >w1       <w10000                 value 1 written to the parameter 16 (ack OK)
+
+  save all parameters to EEPROM as device bootup-configuration:
+  >s        <s10000                 save parameters to EEPROM (ack OK)
+```
+
+With this workflow we are independent from the number and order of the parameters.  A simple list-style program would automatically grow, if the number of parameters grows.
+
+on the base/debug-menu you can manually test the ProgMode by simply typing in the ProgCmds
+  and you will see the acknowledges on your terminal.
+  
+  ATTENTION: the manually typed in commands are executed and do their work! A `>c` with CR will  really clear the EEPROM of the device!
 
 
 ## PRIO-Z-EXCLUSIVE
