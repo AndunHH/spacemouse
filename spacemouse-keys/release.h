@@ -1,1 +1,1 @@
-#define FW_RELEASE "2.3.01"
+#define FW_RELEASE "3.0.0"
