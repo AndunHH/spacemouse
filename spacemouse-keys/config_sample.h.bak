@@ -16,7 +16,7 @@
 */
 
 
-/* Calibration Instructions
+/* Calibration instructions
 ============================
 Follow this file from top to bottom to calibrate your space mouse.
 You can find some pictures for the calibration process here:
@@ -189,9 +189,9 @@ NEW: you can use a parameter menu on the serial interface,
 #define SENS_PTZ    15.00 // RJS:15.0  HJS:8.00  // sensitivity for positive translation z
 #define SENS_NTZ    7.00  // RJS:7.00  HJS:6.00  // sensitivity for negative translation z
 #define GATE_NTZ    0.01  // RJS:0.01  HJS:8.00  // gate value, which negative z movements will be ignored (like an additional deadzone for -z).
-#define GATE_RX     1     // RJS:1     HJS:2     // Value under which rotX values will be forced to zero
-#define GATE_RY     1     // RJS:1     HJS:2     // Value under which roty values will be forced to zero
-#define GATE_RZ     1     // RJS:1     HJS:2     // Value under which rotz values will be forced to zero
+#define GATE_RX     1     // RJS:1     HJS:2  // Value under which rotX values will be forced to zero
+#define GATE_RY     1     // RJS:1     HJS:2  // Value under which roty values will be forced to zero
+#define GATE_RZ     1     // RJS:1     HJS:2  // Value under which rotz values will be forced to zero
 #define SENS_RX     0.75  // RJS:0.75  HJS:1.50
 #define SENS_RY     0.75  // RJS:0.75  HJS:1.50
 #define SENS_RZ     2.00  // RJS:2.00  HJS:3.00
@@ -255,7 +255,7 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 #define SWITCHXY 0  // change to 1 to switch X and Y axis
 
 // ------------------------------------------------------------------------------------
-// Joystick drift compensation
+// Hallsensor drift compensation
 //   Compensates drifting zero-position (drifting electronics, unprecise mechanics)
 //   All values may be edited in the parameter-menu.
 //
@@ -265,10 +265,10 @@ The suggestion in the comments for "3Dc" are often needed on windows PCs with 3d
 //   if they were not violated, we consider the SpaceMouse is not touched, so we do:
 //     > take the mean-value of the next COMP_NR raw-values for each joystick-axis
 //     > calculate offsets for each axis to bring the axis mean-value to the axis center-value (re-center the joysticks)
-#define COMP_EN      1   // enable the compensation
-#define COMP_NR     50   // number of points to build the mean-value
-#define COMP_WAIT  200   // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
-#define COMP_MDIFF   4   // [incr] maximum range of raw-values to be considered as only drift
+#define COMP_EN   1     // enable the compensation
+#define COMP_NR   50    // number of points to build the mean-value
+#define COMP_WAIT 200   // [ms] time to wait and monitor before compensating (smaller value=>faster re-centering, but may cut off small moves)
+#define COMP_MDIFF  4    // [incr] maximum range of raw-values to be considered as only drift
 #define COMP_CDIFF  50   // [incr] maximum distance from the center-value to be only drift (never compensates above this offset)
 
 /* Exclusive mode
@@ -298,7 +298,7 @@ or as kill-keys (described below).
 */
 
 //How many classic keys are there in total? (0=no keys, feature disabled)
-#define NUMKEYS 0
+#define NUMKEYS 0 // 0
 
 // Define the PINS for the classic keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
@@ -310,7 +310,7 @@ or as kill-keys (described below).
 */
 
 // How many keys reported? Classical + ROTARY_KEYS in total.
-#define NUMHIDKEYS 0
+#define NUMHIDKEYS 0 // 0
 
 // In order to define which key is assigned to which button, elements of the following list must be entered in the BUTTONLIST below
 #define SM_MENU     0 // Key "Menu"

@@ -45,19 +45,20 @@ int userInput(double& value){ // returns: 0=nothing  1=new value  2=aborted  3=i
   #endif
 
   do{
-    if(Serial.available()){
+  if(Serial.available()){
       state = 0;
-      char next = toLowerCase(Serial.peek());
-      if(isDigit(next) || next == '-'){                             // A number or sign is entered:
-        double v = Serial.parseFloat();                             //   take that float
-        if(Serial.available()){                                     //   check what the next letter is
-          char next = toLowerCase(Serial.read());                   //     get it and check:
-          if(next == 'q' || next == 27)     {state = 2;}            //     'q' or ESC       -> "aborted"
-          else if(next ==  13 || next == 10){state = 1;}            //     CR + LF          -> "new value"
-          else                              {state = 4;}            //     everything else  -> "undefined"
-        }else                               {state = 3;}            //   parseFloat()-Timeout -> "timed out"
-        if(state == 1){value = v;}                                  //   if valid float: use new value
-      }
+    char next = toLowerCase(Serial.peek());
+    if(isDigit(next) || next == '-'){                             // A number or sign is entered:
+      double v = Serial.parseFloat();                             //   take that float
+      if(Serial.available()){                                     //   check what the next letter is
+        char next = toLowerCase(Serial.read());                   //     get it and check:
+        if(next == 'q' || next == 27)     {state = 2;}            //     'q' or ESC       -> "aborted"
+        else if(next ==  13 || next == 10){state = 1;}            //     CR + LF          -> "new value"
+        else                              {state = 4;}            //     everything else  -> "undefined"
+      }else                               {state = 3;}            //   parseFloat()-Timeout -> "timed out"
+      if(state == 1){value = v;}                                  //   if valid float: use new value
+    }
+
       #if ENABLE_PROGMODE > 0
       else if(next == '>'                       ){progMode = true;                 progRuns = true; Serial.read();} // '>' begins progmode (inits value to 0)
       else if(progMode && !cmdDone && next =='p'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'p' set parameter-number
@@ -71,12 +72,11 @@ int userInput(double& value){ // returns: 0=nothing  1=new value  2=aborted  3=i
       else if(progMode && !cmdDone && next =='m'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'm' get magic number
       else if(progMode && !cmdDone && next =='n'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'n' get number of parameters
       else if(progMode && !cmdDone && next =='i'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'i' invalidate magic-number
-      #endif
+
       else if(next == 'q' || next == 27){state = 2; Serial.read();} // 'q' oder ESC           -> "aborted"
       else if(next ==  13 || next == 10){state = 5; Serial.read();} // CR und LF ausblenden   -> "nothing"
       else                              {state = 4; Serial.read();} // alles andere           -> "undefined"
 
-      #if ENABLE_PROGMODE > 0
       //--- progMode: handle values and CR/LF, test for complete telegram
       if(progMode){
         if     ((state == 1) &&  valDone){                    valDone = false; crlfDone = true;} // value+CR/LF received but not expected

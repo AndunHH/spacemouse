@@ -165,11 +165,11 @@ int calcMinMax(int* centered) {    // report internal state as function-result t
     #ifdef HALLEFFECT
       // Calculate and print the ranges for each HALL sensor
       int range[8];
-      //int max = -1023;
-      //int min = +1023;
+      int max = -1023;
+      int min = +1023;
       for (uint8_t i = 0; i < 8; i++) {
-        //if(maxValue[i] > max) {max = maxValue[i];}
-        //if(minValue[i] < min) {min = minValue[i];}
+        max = (maxValue[i] > max) ? maxValue[i] : max;
+        min = (minValue[i] < min) ? minValue[i] : min;
         range[i] = maxValue[i] - minValue[i];
       }
       Serial.print(F("Ranges are: ")); printArray(range, 8);

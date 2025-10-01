@@ -15,7 +15,7 @@
 */
 
 
-/* Calibration instructions
+/* Calibration Instructions
 ============================
 Follow this file from top to bottom to calibrate your space mouse.
 You can find some pictures for the calibration process here:
@@ -230,8 +230,8 @@ Recommendation after tuning: MODFUNC 3
 */
 
 #define MODFUNC       0     // Used as default value as long as the data hasn't been saved in the EEPROM
-#define MOD_A 1.15  // exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
-#define MOD_B  1.15  // factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
+#define MOD_A         1.15  // exponent "a", recommended: 1.0 ... 3.0  [anything from linear to x^3]  -> bigger value flattens the curve more near zero (on MODFUNC 1 and 3)
+#define MOD_B         1.15  // factor "b",   recommended: 1.0 ... 1.57 [tan(0..1) up to tan(0..pi/2)] -> bigger value increases the curve more away from zero (on MODFUNC 3)
 
 /* Sixth Calibration: Direction
 ================================
@@ -285,7 +285,7 @@ It choose to send the one with the biggest absolute value.
 #define EXCLUSIVE   0
 #define EXCL_HYST   5
 
-/* PRIO-Z-EXCLUSIVE MODE:
+/* Prio-Z-Exclusive mode
 =========================
 If prio-z-exclusive-mode is on, rotations are only calculated, if no z-move is detected
 PRIO-Z-EXCLUSIVE is not recommended for hall-effect sensor systems and therefore set off in this config. Check out config_sample.h for more infos, to see what's done there for resistive joysticks.

@@ -139,3 +139,75 @@ new parameter-structures
   10. check the parameters with "list parameters"
   11. modify the parameters as needed with "edit parameters"
   12. store the parameters to the EEPROM with "write to EEPROM"
+
+V2.3:
+======
+- ONLY bug-fixing:
+
+# spacemouse-keys.ino
+  - Z132ff:
+      // setup Serial for debugging
+      //>>>SN: Serial.begin(115200); // irrelevant for Arduino Micro-platform, the baudrate is set by the connected PC
+      Serial.setTimeout(30000);  // the serial interface will wait for new menu number for max.30s
+      //>>>SN: I misunderstood this, it actually blocks bootup -> remove: while(!Serial){delay(500);}
+
+# SpaceMouseHID.cpp
+  - Z271: in case ST_SENDTRANS the IF that counts the trans-zero-values tests uses a rot-value
+			// if only zeros where send, increment zero counter, otherwise reset it
+			if (x == 0 && y == 0 && rz == 0)
+                              ^^^^^^^has to be z == 0
+# parameterMenu.cpp
+  - Z47ff: position of #ifdef / #endif corrected for compilation without ProgMode.
+    Whole DO-WHILE-loop with the corrections:
+  do{
+    if(Serial.available()){
+      state = 0;
+      char next = toLowerCase(Serial.peek());
+      if(isDigit(next) || next == '-'){                             // eine Ziffer oder Vorzeichen ist eingegeben:
+        double v = Serial.parseFloat();                             //   Zahl übernehmen, Funktion ausführen
+        if(Serial.available()){                                     //   ein Zeichen hat die Zahl begrenzt:
+          char next = toLowerCase(Serial.read());                   //     Zeichen holen und prüfen:
+          if(next == 'q' || next == 27)     {state = 2;}            //     'q' oder ESC       -> "aborted"
+          else if(next ==  13 || next == 10){state = 1;}            //     CR und LF          -> "new value"
+          else                              {state = 4;}            //     alles andere       -> "undefined"
+        }else                               {state = 3;}            //   parseFloat()-Timeout -> "timed out"
+        if(state == 1){value = v;}                                  //   bei gültiger Zahleneingabe: Zahlen-Wert übernehmen
+      }
+#if ENABLE_PROGMODE > 0
+      else if(next == '>'                       ){progMode = true;                 progRuns = true; Serial.read();} // '>' beginnt progmode (inits value to 0)
+      else if(progMode && !cmdDone && next =='p'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'p' set parameter-number
+      else if(progMode && !cmdDone && next =='t'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   't' get parameter-type
+      else if(progMode && !cmdDone && next =='d'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'd' get parameter-description
+      else if(progMode && !cmdDone && next =='r'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'r' read parameter-value
+      else if(progMode && !cmdDone && next =='w'){cmdDone  = true;                 prog.cmd = next; Serial.read();} //   'w' write parameter-value
+      else if(progMode && !cmdDone && next =='l'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'l' load params from EEPRROM
+      else if(progMode && !cmdDone && next =='s'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   's' save params to EEPROM
+      else if(progMode && !cmdDone && next =='c'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'c' clear EEPROM
+      else if(progMode && !cmdDone && next =='m'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'm' get magic number
+      else if(progMode && !cmdDone && next =='n'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'n' get number of parameters
+      else if(progMode && !cmdDone && next =='i'){cmdDone  = true; valDone = true; prog.cmd = next; Serial.read();} //   'i' invalidate magic-number
+#endif
+      else if(next == 'q' || next == 27){state = 2; Serial.read();} // 'q' oder ESC           -> "aborted"
+      else if(next ==  13 || next == 10){state = 5; Serial.read();} // CR und LF ausblenden   -> "nothing"
+      else                              {state = 4; Serial.read();} // alles andere           -> "undefined"
+
+#if ENABLE_PROGMODE > 0
+      //--- progMode: handle values and CR/LF, test for complete telegram
+      if(progMode){
+        if     ((state == 1) &&  valDone){                    valDone = false; crlfDone = true;} // value+CR/LF received but not expected
+        else if((state == 1) && !valDone){prog.value = value; valDone = true;  crlfDone = true;} // value+CR/LF received as expected
+        else if( state == 5             ){                                     crlfDone = true;} // CR/LF received
+        else if( state == 4             ){                    cmdDone = false;                 } // invalidate cmd-signal to get cmd-fault
+
+        // test received telegram and end if done or telegram-format is wrong
+        if     ( cmdDone &&  valDone && crlfDone){                              progRuns = false;} // telegram OK (cmd+value+CR/LF or cmd+CR/LF)
+        else if( cmdDone && !valDone && crlfDone){prog.retval = PE_VALUE_FAULT; progRuns = false;} // no value / superflux value
+        else if(!cmdDone             && crlfDone){prog.retval = PE_CMD_FAULT;   progRuns = false;} // no cmd
+
+        state = 10;                                                 // received prog-command
+      }
+#endif
+      if(state == 5){state = 0;}                                    // for the parameter-menu a CR/LF is interpreted as "nothing"
+    }
+  }while(progRuns);
+

@@ -66,40 +66,40 @@ ParamStorage parStorage;
 
 ParamData par = { .values      = &parStorage,
                   .description = {
-                    {PARAM_TYPE_BOOL,  "",            NULL                              }, // param 0 is unused
-                    {PARAM_TYPE_INT,   "DEADZONE",    &parStorage.deadzone              }, //       1
-                    {PARAM_TYPE_FLOAT, "SENS_TX",     &parStorage.transX_sensitivity    }, //       2
-                    {PARAM_TYPE_FLOAT, "SENS_TY",     &parStorage.transY_sensitivity    }, //       3
-                    {PARAM_TYPE_FLOAT, "SENS_PTZ",    &parStorage.pos_transZ_sensitivity}, //       4
-                    {PARAM_TYPE_FLOAT, "SENS_NTZ",    &parStorage.neg_transZ_sensitivity}, //       5
-                    {PARAM_TYPE_FLOAT, "GATE_NTZ",    &parStorage.gate_neg_transZ       }, //       6
-                    {PARAM_TYPE_INT,   "GATE_RX",     &parStorage.gate_rotX             }, //       7
-                    {PARAM_TYPE_INT,   "GATE_RY",     &parStorage.gate_rotY             }, //       8
-                    {PARAM_TYPE_INT,   "GATE_RZ",     &parStorage.gate_rotZ             }, //       9
-                    {PARAM_TYPE_FLOAT, "SENS_RX",     &parStorage.rotX_sensitivity      }, //      10
-                    {PARAM_TYPE_FLOAT, "SENS_RY",     &parStorage.rotY_sensitivity      }, //      11
-                    {PARAM_TYPE_FLOAT, "SENS_RZ",     &parStorage.rotZ_sensitivity      }, //      12
-                    {PARAM_TYPE_INT,   "MODFUNC",     &parStorage.modFunc               }, //      13
-                    {PARAM_TYPE_FLOAT, "MOD_A",       &parStorage.slope_at_zero         }, //      14
-                    {PARAM_TYPE_FLOAT, "MOD_B",       &parStorage.slope_at_end          }, //      15
-                    {PARAM_TYPE_BOOL,  "INVX",        &parStorage.invX                  }, //      16
-                    {PARAM_TYPE_BOOL,  "INVY",        &parStorage.invY                  }, //      17
-                    {PARAM_TYPE_BOOL,  "INVZ",        &parStorage.invZ                  }, //      18
-                    {PARAM_TYPE_BOOL,  "INVRX",       &parStorage.invRX                 }, //      19
-                    {PARAM_TYPE_BOOL,  "INVRY",       &parStorage.invRY                 }, //      20
-                    {PARAM_TYPE_BOOL,  "INVRZ",       &parStorage.invRZ                 }, //      21
-                    {PARAM_TYPE_BOOL,  "SWITCHXY",    &parStorage.switchXY              }, //      22
-                    {PARAM_TYPE_BOOL,  "SWITCHYZ",    &parStorage.switchYZ              }, //      23
-                    {PARAM_TYPE_BOOL,  "EXCLUSIVE",   &parStorage.exclusiveMode         }, //      24
-                    {PARAM_TYPE_INT,   "EXCL_HYST",   &parStorage.exclusiveHysteresis   }, //      25
-                    {PARAM_TYPE_BOOL,  "EXCL_PRIOZ",  &parStorage.prioZexclusiveMode    }, //      26
-                    {PARAM_TYPE_BOOL,  "COMP_EN",     &parStorage.compEnabled           }, //      27
-                    {PARAM_TYPE_INT,   "COMP_NR",     &parStorage.compNoOfPoints        }, //      28
-                    {PARAM_TYPE_INT,   "COMP_WAIT",   &parStorage.compWaitTime          }, //      29
-                    {PARAM_TYPE_INT,   "COMP_MDIFF",  &parStorage.compMinMaxDiff        }, //      30
-                    {PARAM_TYPE_INT,   "COMP_CDIFF",  &parStorage.compCenterDiff        }, //      31
-                    {PARAM_TYPE_INT,   "RAXIS_ECH",   &parStorage.rotAxisEchos          }, //      32
-                    {PARAM_TYPE_INT,   "RAXIS_STR",   &parStorage.rotAxisSimStrength    }  //      33
+                    {PARAM_TYPE_BOOL,  "",                       NULL                              }, // param 0 is unused
+                    {PARAM_TYPE_INT,   "DEADZONE",               &parStorage.deadzone              }, //       1
+                    {PARAM_TYPE_FLOAT, "SENS_TX",                &parStorage.transX_sensitivity    }, //       2
+                    {PARAM_TYPE_FLOAT, "SENS_TY",                &parStorage.transY_sensitivity    }, //       3
+                    {PARAM_TYPE_FLOAT, "SENS_PTZ",               &parStorage.pos_transZ_sensitivity}, //       4
+                    {PARAM_TYPE_FLOAT, "SENS_NTZ",               &parStorage.neg_transZ_sensitivity}, //       5
+                    {PARAM_TYPE_FLOAT, "GATE_NTZ",               &parStorage.gate_neg_transZ       }, //       6
+                    {PARAM_TYPE_INT,   "GATE_RX",                &parStorage.gate_rotX             }, //       7
+                    {PARAM_TYPE_INT,   "GATE_RY",                &parStorage.gate_rotY             }, //       8
+                    {PARAM_TYPE_INT,   "GATE_RZ",                &parStorage.gate_rotZ             }, //       9
+                    {PARAM_TYPE_FLOAT, "SENS_RX",                &parStorage.rotX_sensitivity      }, //      10
+                    {PARAM_TYPE_FLOAT, "SENS_RY",                &parStorage.rotY_sensitivity      }, //      11
+                    {PARAM_TYPE_FLOAT, "SENS_RZ",                &parStorage.rotZ_sensitivity      }, //      12
+                    {PARAM_TYPE_INT,   "MODFUNC",                &parStorage.modFunc               }, //      13
+                    {PARAM_TYPE_FLOAT, "MOD_A",                  &parStorage.slope_at_zero         }, //      14
+                    {PARAM_TYPE_FLOAT, "MOD_B",                  &parStorage.slope_at_end          }, //      15
+                    {PARAM_TYPE_BOOL,  "INVX",                   &parStorage.invX                  }, //      16
+                    {PARAM_TYPE_BOOL,  "INVY",                   &parStorage.invY                  }, //      17
+                    {PARAM_TYPE_BOOL,  "INVZ",                   &parStorage.invZ                  }, //      18
+                    {PARAM_TYPE_BOOL,  "INVRX",                  &parStorage.invRX                 }, //      19
+                    {PARAM_TYPE_BOOL,  "INVRY",                  &parStorage.invRY                 }, //      20
+                    {PARAM_TYPE_BOOL,  "INVRZ",                  &parStorage.invRZ                 }, //      21
+                    {PARAM_TYPE_BOOL,  "SWITCHXY",               &parStorage.switchXY              }, //      22
+                    {PARAM_TYPE_BOOL,  "SWITCHYZ",               &parStorage.switchYZ              }, //      23
+                    {PARAM_TYPE_BOOL,  "EXCLUSIVE",              &parStorage.exclusiveMode         }, //      24
+                    {PARAM_TYPE_INT,   "EXCL_HYST",              &parStorage.exclusiveHysteresis   }, //      25
+                    {PARAM_TYPE_BOOL,  "EXCL_PRIOZ",             &parStorage.prioZexclusiveMode    }, //      26
+                    {PARAM_TYPE_BOOL,  "COMP_EN",                &parStorage.compEnabled           }, //      27
+                    {PARAM_TYPE_INT,   "COMP_NR",                &parStorage.compNoOfPoints        }, //      28
+                    {PARAM_TYPE_INT,   "COMP_WAIT",              &parStorage.compWaitTime          }, //      29
+                    {PARAM_TYPE_INT,   "COMP_MDIFF",             &parStorage.compMinMaxDiff        }, //      30
+                    {PARAM_TYPE_INT,   "COMP_CDIFF",             &parStorage.compCenterDiff        }, //      31
+                    {PARAM_TYPE_INT,   "RAXIS_ECH",              &parStorage.rotAxisEchos          }, //      32
+                    {PARAM_TYPE_INT,   "RAXIS_STR",              &parStorage.rotAxisSimStrength    }  //      33
                   }
                 };
 
@@ -112,10 +112,6 @@ uint8_t keyOut[NUMKEYS];
 // state of the key, which stays 1 as long as the key is pressed
 uint8_t keyState[NUMKEYS];
 
-
-/**
- * @brief Setup the SpaceMouse, called by system-start
- */
 void setup() {
   // Get parameters from EEPROM
   #if PARAM_IN_EEPROM > 0
@@ -133,9 +129,10 @@ void setup() {
   setAnalogReferenceVoltage(0);
   #endif
 
-  // setup Serial for debugging
-  // Serial.begin(115200); // irrelevant for Arduino Micro-platform because the baudrate is set by the connected PC
+  // Begin Serial for debugging
+  Serial.begin(115200);
   Serial.setTimeout(30000);  // the serial interface will wait for new menu number for max.30s
+  while(!Serial){delay(500);}
 
   // Read idle/centre positions for joysticks.
   // zero the joystick position 500 times (takes approx. 480 ms)
@@ -157,10 +154,6 @@ void setup() {
   #endif
 }
 
-
-/**
- * @brief Main-loop of the SpaceMouse, called cyclic by system
- */
 void loop() {
   // the debug mode can be set during runtime via the serial interface. See config.h for a description of the different debug modes.
   static int  debug     = STARTDEBUG;
@@ -252,7 +245,7 @@ void loop() {
   }
 
   //--- Calculate drift compensation offsets
-  if((par.values->compEnabled == 1) && (debug != 20)){  // only when not in debug 20 = find min/max values
+  if((par.values->compEnabled == 1) && (debug != 20)){  // only when not in debug 20 = find min/max vlaues
     compensateDrifts(rawReads, centerPoints, offsets, par);
   }else{
     for(int i = 0; i < 8; i++){offsets[i] = 0;}
@@ -375,7 +368,6 @@ void loop() {
 
 } //end loop()
 
-
 #ifdef LEDpin
 /// @brief Turn on or off a simple led. The pin is defined by LEDpin in config.h. If the LED needs to be inverted, define LEDinvert in config.h
 /// @param light turn on or off
@@ -394,7 +386,6 @@ void lightSimpleLED(boolean light){
   }
 }
 #endif
-
 
 #ifdef HALLEFFECT
 /**
