@@ -1,0 +1,18 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "cSpell.words": [
+        "adafruit",
+        "Andun",
+        "Connexion",
+        "Ergonomouse",
+        "González",
+        "Kempy",
+        "mamatt",
+        "neopixel",
+        "Onshape",
+        "spacemouse",
+        "spacenav"
+    ],
+    "editor.formatOnSave": true,
+    "C_Cpp.clang_format_style": "file" // tells VS Code to use the .clang-format in repo
+}
