@@ -6,7 +6,7 @@ config*.h
 
 //this file should be included:
 !config_sample*.h
-
+!.vscode/settings.json
 
 README_tmp.html
 README.pdf
