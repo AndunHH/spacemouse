@@ -19,6 +19,6 @@ This file is created manually be calling `testConfigCompileSize.py`.
 | e_test_ergoMouse.h | test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder | 27346 | 95.4 | 1633 | 63.8 | Yes |
 | f_test_hall_effect.h | test file for hall effect joy sticks with nothing else | 17644 | 61.5 | 1193 | 46.6 | Yes |
 | g_paramEeprom.h | Test PARAM_IN_EEPROM + PROGMODE | 21660 | 75.5 | 1241 | 48.5 | Yes |
-| [OK] All builds successful |  |  |  |  |  |  |
+| Summary | [OK] All builds successful. |  | Max: 99.4 |  | Max: 64.2 | [OK] |
 
-**Report generated on:** 2025-10-01 21:11:47
+**Report generated on:** 2025-10-01 21:28:06

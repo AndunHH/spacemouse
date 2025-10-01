@@ -89,6 +89,9 @@ def run_automation():
     results = []
     all_success = True
 
+    max_flash_pct = 0
+    max_ram_pct = 0
+
     for config_file in configs:
         print(f'\n{BUILD_MARK} Building with {config_file}...')
 
@@ -99,6 +102,12 @@ def run_automation():
 
         output, success = run_platformio_capture_output(BUILD_ARGS)
         flash, ram, flash_pct, ram_pct = parse_build_output(output)
+
+        # track maxima
+        if flash_pct is not None and flash_pct > max_flash_pct:
+            max_flash_pct = flash_pct
+        if ram_pct is not None and ram_pct > max_ram_pct:
+            max_ram_pct = ram_pct
 
         if success:
             print(f"{OK_MARK} Build succeeded: Flash={flash} bytes ({flash_pct}%), RAM={ram} bytes ({ram_pct}%)")
@@ -122,16 +131,16 @@ def run_automation():
     # Sort alphabetically by Config name
     results.sort(key=lambda x: x['Config'])
 
-    # Add summary row (always at bottom)
-    summary_line = f"{OK_MARK} All builds successful" if all_success else f"{FAIL_MARK} Some builds failed"
+    # Add summary row with maxima
+    summary_line = f"{OK_MARK} All builds successful." if all_success else f"{FAIL_MARK} Some builds failed."
     results.append({
-        'Config': summary_line,
-        'Description': '',
+        'Config': 'Summary',
+        'Description': summary_line,
         'Flash (bytes)': '',
-        'Flash (%)': '',
+        'Flash (%)': f"Max: {max_flash_pct}",
         'RAM (bytes)': '',
-        'RAM (%)': '',
-        'Build Success': ''
+        'RAM (%)': f"Max: {max_ram_pct}",
+        'Build Success': f"{OK_MARK}" if all_success else f"{FAIL_MARK}"
     })
 
     # Write CSV
@@ -159,4 +168,4 @@ def run_automation():
 
 
 if __name__ == '__main__':
-    run_automation()
+  run_automation()
