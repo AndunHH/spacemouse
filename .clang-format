@@ -7,3 +7,4 @@ AlignAfterOpenBracket: Align
 AlignOperands: true
 SpacesBeforeTrailingComments: 1
 ColumnLimit: 100             # optional, helps keep code readable
+SortIncludes: false 
