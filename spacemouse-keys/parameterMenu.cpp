@@ -470,7 +470,7 @@ void getParametersFromEEPROM(ParamData &par) {
   if (magicNumber == MAGIC_NUMBER) {
     EEPROM.get(BASE_ADDRESS_PAR, *par.values);
   } else {
-    Serial.println(F("wrong magic number, no parameters in EEPROM"));
+    Serial.println(F("Wrong magic!")); // No params in EEPROM are assumed
   }
 }
 
