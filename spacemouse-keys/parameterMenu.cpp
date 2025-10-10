@@ -11,13 +11,23 @@
   >p...   parameter number                <p...   (PE_OK,PE_INVALID_PARAM)
   >r      read value                      <r...   (<value> or PE_INVALID_PARAM
   >w...   write value                     <w...   (PE_OK,PE_INVALID_PARAM,PE_INVALID_VALUE "not in
-  [-10000..+10000]") >l      load params from EEPROM         <l0     (PE_OK) >s      save params to
-  EEPROM           <s0     (PE_OK) >c      clear EEPROM                    <c0     (PE_OK) >m get
-  magic number                <m...   (<magic number>: all values are valid, no fault-codes!) >n get
-  number of parameters        <n...   (<number of params>) >i      invalidate magic number <i0
-  (PE_OK) >t      get type of parameter           <t...   (<type>: 0=bool,1=int,2=float or
-  PE_INVALID_PARAM) >d      get description of parameter    <d...   (<name of parameter> or
-  PE_INVALID_PARAM)
+  [-10000..+10000]")
+
+  >l      load params from EEPROM         <l0     (PE_OK)
+
+  >s      save params to   EEPROM   <s0     (PE_OK)
+
+  >c      clear EEPROM <c0     (PE_OK)
+
+  >m   get magic number <m... (<magic   number>: all values are valid, no fault-codes!)
+
+  >n   get number of parameters   <n...   (<number   of params>)
+
+  >i   invalidate magic number <i0   (PE_OK)
+
+  >t   get type of parameter   <t...   (<type>:  1=bool,2=int,3=float or PE_INVALID_PARAM)
+
+  >d   get description of parameter    <d...   (<name of  parameter> or PE_INVALID_PARAM)
 */
 
 #if ENABLE_PROGMODE > 0

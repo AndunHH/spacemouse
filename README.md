@@ -352,7 +352,7 @@ Cmd    |function                     |returns (>= 10000 -> NOK) |
 | `>m`| get magic number             | `<m...   <magic number>` all values are valid, no fault-codes!|
 | `>n`  | get number of parameters   | `<n...   (<number of params>)` |
 | `>p...` | parameter number set     | `<p...   (PE_OK,PE_INVALID_PARAM)`|
-| `>t`    | get type of parameter    | `<t...   (<type>: 0=bool,1=int,2=float or PE_INVALID_PARAM)`|
+| `>t`    | get type of parameter    | `<t...   (<type>: 1=bool,2=int,3=float or PE_INVALID_PARAM)`|
 | `>d`    | get description of parameter  | `<d...   (<name of parameter> or PE_INVALID_PARAM)` |
 | `>r`    | read value                    | `<r...   (<value> or PE_INVALID_PARAM`|
 | `>w...` | write value                   | `<w...   (PE_OK,PE_INVALID_PARAM,PE_INVALID_VALUE "not in [-10000..+10000]")`|
