@@ -4,6 +4,7 @@ config*.h
 .pio
 .vscode/*
 .idea
+.venv
 
 //this file should be included:
 !config_sample*.h
