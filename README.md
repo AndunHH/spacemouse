@@ -10,6 +10,10 @@ This repository is NOT affiliated with 3Dconnexion. We just reverse-engineered t
 
 Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for the newest releases and updates!
 
+- [Version 3.0](https://github.com/AndunHH/spacemouse/releases/tag/v3.0.0): 
+  - [Shortened config parameters](#shortened-config-parameters) reducing program size
+  - [ProgMode over Serial](#progmode-over-serial) allows setting parameters remotely over a defined language.
+  - Check the release page [3.0](https://github.com/AndunHH/spacemouse/releases/tag/v3.0.0), because this major release needs a slight adjustment of your config file!
 - [Version 2.1](https://github.com/AndunHH/spacemouse/releases/tag/v2.1.2): 
   - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
   - Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
@@ -22,18 +26,18 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
   - [Drift-compensation for hall-joysticks](#drift-compensation-for-hall-joysticks) to stop movements when not touched
   - New [modifier function](#modifier-function) to have better control over the form of the curve
   - CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
-- [Version 1.1](https://github.com/AndunHH/spacemouse/releases/tag/v1.1.0): Support of [Hall Effect Sensors](#hall-effect-sensors)
 
 
-## Upcoming Work
+<!--## Upcoming Work
 For the next release, already to be found in master:
+-->
 
 ### Shortened config parameters
 To reduce the program size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters. As a conversion is necessary, this is named release version 3.
 
 As this may be annoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
 
-### ProgMode over Serial, optimized storage of parameters, progmem usage reduced
+### ProgMode over Serial
 New ProgMode and reducing program-memory usage:
 
 - developed a [ProgMode](#progmode) for "Set settings over serial interface and save them"
