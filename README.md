@@ -161,7 +161,7 @@ Troubleshooting for uploading is explained in detail here:
 
 
 # Calibrate your hardware
-After compiling and uploading the program to your hardware, you can connect via the serial monitor. Hit enter and use the [serial menu](#serial-interface-menu) to select the proper debug outputs. 
+After compiling and uploading the program to your hardware, you can connect via the serial monitor. Hit enter and use the [serial menu](#serial-interface-menu) to select the proper debug outputs. Make sure that your Line Ending is set to "CRLF" in PlatformIO / "Both NL & CR" in Arduino IDE (if this is not set, the command will timeout after 30s and present you the menu again).
 
 Read and follow the instructions throughout the config.h file and write down your results. The initial parameters are hardware dependent and you need to recompile for the changes to take effect. The later parameters for sensitivities can be tuned via the menu and saved to the [EEPROM](#storing-parameters-in-the-eeprom) (and exported back to config.h)
 
