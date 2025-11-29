@@ -29,11 +29,11 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
   - CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
 
 
-<!--## Upcoming Work
+## Upcoming Work
 For the next release, already to be found in master:
--->
+- Python API to interact witht he progMode. Check out [SpaceMouseAPI.py](progModePy/SpaceMouseAPI.py)
 
-### Shortened config parameters
+## Shortened config parameters
 To reduce the program size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters. As a conversion is necessary, this is named release version 3.
 
 As this may be annoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
