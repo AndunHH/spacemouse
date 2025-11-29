@@ -12,8 +12,9 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
 
 - [Version 3.0](https://github.com/AndunHH/spacemouse/releases/tag/v3.0.0): 
   - [Shortened config parameters](#shortened-config-parameters) reducing program size
-  - [ProgMode over Serial](#progmode-over-serial) allows setting parameters remotely over a defined language.
+  - [ProgMode](#progmode) allows setting parameters remotely over a defined language.
   - Check the release page [3.0](https://github.com/AndunHH/spacemouse/releases/tag/v3.0.0), because this major release needs a slight adjustment of your config file!
+  - inserted a hysteresis into the exclusive mode to prevent immediate switching back and forth between Trans- and Rot-mod: `EXCL_HYST`, see [Exclusive Mode](#exclusive-mode).
 - [Version 2.1](https://github.com/AndunHH/spacemouse/releases/tag/v2.1.2): 
   - The [modifier function](#modifier-function) has a html page, where you can visualize the effect of the chosen parameters.
   - Changing **Sensitivity and Direction on Windows** in the 3Dx Settings works. Update to `3DxWare: 10.9.7.709, 3DxWinCore: 17.9.7.21845`. Tested on Win 11 24H2.
@@ -28,29 +29,14 @@ Check-out the [Release Page](https://github.com/AndunHH/spacemouse/releases) for
   - CalcMinMax: no need to reset/reboot after use, you can now rerun it without reboot
 
 
-<!--## Upcoming Work
+## Upcoming Work
 For the next release, already to be found in master:
--->
+- Python API to interact witht he progMode. Check out [SpaceMouseAPI.py](progModePy/SpaceMouseAPI.py)
 
-### Shortened config parameters
+## Shortened config parameters
 To reduce the program size, the parameters in the config.h have been shortened. Therefore your old config.h will not work out of the box, but you need to rename the parameters. As a conversion is necessary, this is named release version 3.
 
 As this may be annoying, this is supported by this script: [ParameterRenamingV3.py](ParameterRenamingV3.py)
-
-### ProgMode over Serial
-New ProgMode and reducing program-memory usage:
-
-- developed a [ProgMode](#progmode) for "Set settings over serial interface and save them"
-- modified the existing parameter-menu system:
-  - restructured the parameter-data to have their descriptions (name/type) and values at one place
-  - no need to edit the parameters-functions anymore
-  - but the RAM-usage is gone up...
-    ...if someone knows how to set up and use a pointer to a string in ProgMem - that would help...
-- more code-improvements to free up more program memory
-- analyzed and optimized the HES code
-- inserted a hysteresis into the exclusive mode to prevent
-  immediate switching back and forth between Trans- and Rot-mode
-  - new parameter "EXCL_HYST", a value of 0 turns it off (old behavior)
 
 # Complete description of the project 
 
@@ -463,7 +449,11 @@ When the biggest input is a rotation: All translations are set to zero.
 
 This function is the sister of the kill-key feature, where you press a key to decide wether only translations or rotations are transmitted.
 
-Thanks to @mamatt in #73 for this suggestion which were released in Version 0.9.
+[Thanks to @mamatt in #73 for this suggestion which were released in Version 0.9.]
+
+Additionally a hysteresis is configurable into the exclusive mode to prevent immediate switching back and forth between Trans- and Rot-mode: `EXCL_HYST`. A value of 0 turns it off (old behavior). 
+
+[Thanks to @StefanNouza in Version 3.0]
 
 Check also the [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE).
 
