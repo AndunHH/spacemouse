@@ -190,6 +190,8 @@ Changing sensitivity and direction on Windows in the 3Dx Settings works. Tested 
 ## spacenav for linux users
 Checkout https://wiki.freecad.org/3Dconnexion_input_devices and https://github.com/FreeSpacenav/spacenavd.
 
+If you have problems with stuttering values, please check the advanced USB HID settings at the bottom of the config.h, especially the `ADV_HID_JIGGLE`.
+
 Onshape is not jet supported by spacenav directly but there is a simple wrapper here: https://github.com/mamatt/space2onshape 
 
 # Software Main Idea
