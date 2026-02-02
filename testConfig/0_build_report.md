@@ -13,6 +13,8 @@ This file is created manually be calling `testConfigCompileSize.py`.
 | b_test_resistiveJoystick.h | test file for resistive joystick with modification function enabled | 17424 | 60.8 | 1191 | 46.5 | Yes |
 | c1_test_LED.h | test file for resistive joystick with LED support | 17830 | 62.2 | 1191 | 46.5 | Yes |
 | c2_test_LEDring.h | test file for resistive joystick with led ring support | 20958 | 73.1 | 1399 | 54.6 | Yes |
+| config_sample.h | Config File for << JOYSTICK SPACEMOUSE >> | 21638 | 75.5 | 1241 | 48.5 | Yes |
+| config_sample_hall_effect.h | Config File for << HALL-EFFECT SPACEMOUSE >> | 23344 | 81.4 | 1320 | 51.6 | Yes |
 | d2_test_encoder_key.h | test file for resistive joystick with encoder and key support (one key is replaced by encoder) | 21050 | 73.4 | 1354 | 52.9 | Yes |
 | d_test_encoder.h | test file for resistive joystick with encoder added. | 19532 | 68.1 | 1265 | 49.4 | Yes |
 | e2_ergoMouse_progmode.h | test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring | 28464 | 99.3 | 1644 | 64.2 | Yes |
@@ -21,4 +23,4 @@ This file is created manually be calling `testConfigCompileSize.py`.
 | g_paramEeprom.h | Test PARAM_IN_EEPROM + PROGMODE | 21638 | 75.5 | 1241 | 48.5 | Yes |
 | Summary | [OK] All builds successful. |  | Max: 99.3 |  | Max: 64.2 | [OK] |
 
-**Report generated on:** 2025-10-10 22:09:02
+**Report generated on:** 2026-02-02 19:40:43

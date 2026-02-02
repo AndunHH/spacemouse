@@ -85,17 +85,39 @@ def get_config_description(config_path):
     return first_line.lstrip("/ ").strip()
 
 def run_automation():
-    configs = [f for f in os.listdir(CONFIG_DIR) if f.endswith('.h')]
+    # Gather all .h files from the testConfig folder (as full relative paths)
+    configs = [os.path.join(CONFIG_DIR, f) for f in os.listdir(CONFIG_DIR) if f.endswith('.h')]
+
+    # Add the two sample configs (hardcoded) to the list of tested files
+    extra_samples = ['spacemouse-keys/config_sample.h', 'spacemouse-keys/config_sample_hall_effect.h']
+    for s in extra_samples:
+        if s not in configs:
+            configs.append(s)
+
     results = []
     all_success = True
 
     max_flash_pct = 0
     max_ram_pct = 0
 
-    for config_file in configs:
+    for config_path in configs:
+        config_file = os.path.basename(config_path)
         print(f'\n{BUILD_MARK} Building with {config_file}...')
 
-        config_path = os.path.join(CONFIG_DIR, config_file)
+        if not os.path.exists(config_path):
+            all_success = False
+            print(f"{FAIL_MARK} Config file not found: {config_path}. Skipping.")
+            results.append({
+                'Config': config_file,
+                'Description': 'File not found',
+                'Flash (bytes)': 'N/A',
+                'Flash (%)': 'N/A',
+                'RAM (bytes)': 'N/A',
+                'RAM (%)': 'N/A',
+                'Build Success': 'No'
+            })
+            continue
+
         shutil.copyfile(config_path, CONFIG_TARGET)
 
         description = get_config_description(config_path)
