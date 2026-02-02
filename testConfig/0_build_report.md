@@ -23,4 +23,4 @@ This file is created manually be calling `testConfigCompileSize.py`.
 | g_paramEeprom.h | Test PARAM_IN_EEPROM + PROGMODE | 21638 | 75.5 | 1241 | 48.5 | Yes |
 | Summary | [OK] All builds successful. |  | Max: 99.3 |  | Max: 64.2 | [OK] |
 
-**Report generated on:** 2026-02-02 19:37:49
+**Report generated on:** 2026-02-02 19:40:43
