@@ -110,7 +110,7 @@
 #define DEBUG_LINE_END "\r"
 
 #define VelocityDeadzoneForLED 15
-#define LEDpin 5
+#define LEDpin 3
 #define LEDRING 24
 
 #define LEDclockOffset 2
