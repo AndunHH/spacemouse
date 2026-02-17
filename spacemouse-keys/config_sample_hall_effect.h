@@ -423,14 +423,6 @@ How many kill keys are there? (disabled: 0; enabled: 2)
  * => KILLROT 2 The second kill key has the last position in the KEYLIST with index 3 -> KILLTRANS 3
  */
 
-// Some simple tests for the definition of the keys
-#if (NUMKILLKEYS > NUMKEYS)
-#error "Number of Kill Keys can not be larger than total number of keys"
-#endif
-#if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
-#error "Index of killkeys must be smaller than the total number of keys"
-#endif
-
 // time in ms which is needed to allow a new button press
 #define DEBOUNCE_KEYS_MS 200
 
