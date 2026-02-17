@@ -342,7 +342,7 @@ with an encoder) or as kill-keys (described below).
 
 // Define the PINS for the classic keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
-#define KEYLIST {0, 1, 2}
+#define KEYLIST {15, 14, 16}
 
 /* Report KEYS over USB HID to the PC
  -------------------------------------

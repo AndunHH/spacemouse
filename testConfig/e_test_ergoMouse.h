@@ -1,4 +1,5 @@
-// test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring support, keys and encoder
+// test file for ergonomouse: resitive joystick. params in eeprom. modifier function, led ring
+// support, keys and encoder
 
 #ifndef CONFIG_h
 #define CONFIG_h
@@ -10,36 +11,34 @@
 #define STARTDEBUG 0
 #undef HALLEFFECT
 
-#define PINLIST \
-  { A0,   A1,   A2,   A3,   A6,   A7,   A8,   A9 }
+#define PINLIST {A0, A1, A2, A3, A6, A7, A8, A9}
 
-#define INVERTLIST \
-  {  0,    0,    0,    0,    0,    0,    0,    0 }
+#define INVERTLIST {0, 0, 0, 0, 0, 0, 0, 0}
 
 #define DEADZONE 15
 
 #define MINVALS {-400, -400, -400, -400, -400, -400, -400, -400}
 #define MAXVALS {+175, +175, +175, +175, +175, +175, +175, +175}
 
-#define SENS_TX     0.80
-#define SENS_TY     0.99
+#define SENS_TX 0.80
+#define SENS_TY 0.99
 #define SENS_PTZ 2.5
 #define SENS_NTZ 1.5
-#define GATE_NTZ        15
-#define GATE_RX              15
-#define GATE_RY              15
-#define GATE_RZ              15
-#define SENS_RX       1.2
-#define SENS_RY       1.2
-#define SENS_RZ       0.90
+#define GATE_NTZ 15
+#define GATE_RX 15
+#define GATE_RY 15
+#define GATE_RZ 15
+#define SENS_RX 1.2
+#define SENS_RY 1.2
+#define SENS_RZ 0.90
 
-#define MODFUNC       3
+#define MODFUNC 3
 #define MOD_A 1.15
-#define MOD_B  1.15
+#define MOD_B 1.15
 
-#define INVX  0
-#define INVY  1
-#define INVZ  1
+#define INVX 0
+#define INVY 1
+#define INVZ 1
 #define INVRX 0
 #define INVRY 1
 #define INVRZ 1
@@ -47,19 +46,18 @@
 #define SWITCHYZ 0
 #define SWITCHXY 0
 
-#define COMP_EN       1
-#define COMP_NR  50
-#define COMP_WAIT     200
-#define COMP_MDIFF  4
-#define COMP_CDIFF   50
+#define COMP_EN 1
+#define COMP_NR 50
+#define COMP_WAIT 200
+#define COMP_MDIFF 4
+#define COMP_CDIFF 50
 
-#define EXCLUSIVE   1
-#define EXCL_HYST   5
+#define EXCLUSIVE 1
+#define EXCL_HYST 5
 #define EXCL_PRIOZ 1
 
 #define NUMKEYS 7
-#define KEYLIST \
-    {16,14,15,2,10,7,5}
+#define KEYLIST {16, 14, 15, 2, 10, 7, 5}
 
 #define NUMHIDKEYS 5
 
@@ -94,8 +92,8 @@
 
 #define DEBOUNCE_KEYS_MS 200
 
-#define ENCODER_CLK 2
-#define ENCODER_DT 3
+#define ENCODER_CLK 0
+#define ENCODER_DT 1
 
 #define ROTARY_AXIS 5
 #define RAXIS_ECH 200

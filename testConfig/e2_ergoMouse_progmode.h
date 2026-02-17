@@ -94,8 +94,8 @@
 
 #define DEBOUNCE_KEYS_MS 200
 
-#define ENCODER_CLK 2
-#define ENCODER_DT 3
+#define ENCODER_CLK 0
+#define ENCODER_DT 1
 
 #define ROTARY_AXIS 5
 #define RAXIS_ECH 200

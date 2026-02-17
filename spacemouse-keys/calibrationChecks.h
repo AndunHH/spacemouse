@@ -29,15 +29,27 @@ constexpr int _keyListCompile[] = KEYLIST;
 static_assert(sizeof(_keyListCompile) / sizeof(_keyListCompile[0]) == NUMKEYS,
               "KEYLIST element count does not match NUMKEYS definition in config.h");
 
-// Check that LEDpin is not in KEYLIST to avoid pin conflicts
-#ifdef LEDpin
 constexpr bool _isValueInArray(const int *arr, int size, int idx, int value) {
   return (idx >= size)         ? false
          : (arr[idx] == value) ? true
                                : _isValueInArray(arr, size, idx + 1, value);
 }
+// Check that LEDpin is not in KEYLIST to avoid pin conflicts
+#ifdef LEDpin
 static_assert(!_isValueInArray(_keyListCompile, NUMKEYS, 0, LEDpin),
               "LEDpin conflicts with a pin in KEYLIST in config.h");
+#endif
+
+// Check that ENCODER_CLK is not in KEYLIST to avoid pin conflicts
+#ifdef ENCODER_CLK
+static_assert(!_isValueInArray(_keyListCompile, NUMKEYS, 0, ENCODER_CLK),
+              "ENCODER_CLK conflicts with a pin in KEYLIST in config.h");
+#endif
+
+// Check that ENCODER_DT is not in KEYLIST to avoid pin conflicts
+#ifdef ENCODER_DT
+static_assert(!_isValueInArray(_keyListCompile, NUMKEYS, 0, ENCODER_DT),
+              "ENCODER_DT conflicts with a pin in KEYLIST in config.h");
 #endif
 #endif
 
@@ -46,4 +58,4 @@ static_assert(!_isValueInArray(_keyListCompile, NUMKEYS, 0, LEDpin),
 #error "ROTARY_AXIS must be between 0 and 6 (0=disabled, 1-6=axis choice)"
 #endif
 
-#endif  // CALIBRATION_CHECKS_h
+#endif // CALIBRATION_CHECKS_h
