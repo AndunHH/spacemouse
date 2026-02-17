@@ -92,7 +92,7 @@ Other implementations, hardware or mechanic variants are linked below.
 - With all features enabled, the pro micro is nearly at the limits of it's flash. Reducing the flash size might be necessary in the future...
 - The html page explaining the modifier function would benefit from an additional plot zooming in on zero.
 
-Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read some build reports:
+Purchasing the [electronics](#electronics-and-pin-assignment-with-joysticks) and [printing some parts](#printed-parts-and-hardware) is not scope of this repository. We start with the software. Feel free to read some build reports:
 - In the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build) based on four joysticks
  
 ## Macro-Pad for CAD users
