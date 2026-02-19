@@ -94,7 +94,7 @@
 #define ENCODER_CLK 2
 #define ENCODER_DT 3
 
-#define ROTARY_AXIS 5
+#define ROTARY_AXIS 0
 #define RAXIS_ECH 200
 #define RAXIS_STR 200
 

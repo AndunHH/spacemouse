@@ -465,6 +465,9 @@ Recommended strength = 200
 ===============
 Use the encoder and emulate a key stroke by turning the encoder.
 ROTARY_KEYS 1 = enabled, 0 = disabled
+Only the ROTARY_KEYS or the ROTARY_AXIS can be enabled, not both at the same time.
+The encoder shall either directly control a movement (ROTARY_AXIS) or emulate a key stroke
+(ROTARY_KEYS), but not both at the same time.
 */
 #define ROTARY_KEYS 0
 // which key from the BUTTONLIST shall be emulated?

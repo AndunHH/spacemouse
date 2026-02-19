@@ -83,13 +83,6 @@
 #define KILLROT 2
 #define KILLTRANS 3
 
-#if (NUMKILLKEYS > NUMKEYS)
-#error "Number of Kill Keys can not be larger than total number of keys"
-#endif
-#if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
-#error "Index of killkeys must be smaller than the total number of keys"
-#endif
-
 #define DEBOUNCE_KEYS_MS 200
 
 #define ENCODER_CLK 0
@@ -99,7 +92,7 @@
 #define RAXIS_ECH 200
 #define RAXIS_STR 200
 
-#define ROTARY_KEYS 2
+#define ROTARY_KEYS 0
 #define ROTARY_KEY_IDX_A 2
 #define ROTARY_KEY_IDX_B 3
 #define ROTARY_KEY_STRENGTH 19

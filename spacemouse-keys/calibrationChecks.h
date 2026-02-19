@@ -58,4 +58,9 @@ static_assert(!_isValueInArray(_keyListCompile, NUMKEYS, 0, ENCODER_DT),
 #error "ROTARY_AXIS must be between 0 and 6 (0=disabled, 1-6=axis choice)"
 #endif
 
+// Ensure ROTARY_AXIS and ROTARY_KEYS are not both enabled at the same time
+#if defined(ROTARY_AXIS) && (ROTARY_AXIS > 0) && defined(ROTARY_KEYS) && (ROTARY_KEYS > 0)
+#error "Only one of ROTARY_AXIS and ROTARY_KEYS may be enabled at the same time"
+#endif
+
 #endif // CALIBRATION_CHECKS_h
