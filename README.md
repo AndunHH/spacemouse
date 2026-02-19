@@ -465,10 +465,10 @@ Additionally a hysteresis is configurable into the exclusive mode to prevent imm
 Check also the [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE).
 
 ## Rotary Keys
+When you are using the mouse with an encoder wheel, you can enable the feature: Rotary Keys. 
 
-When you are using the mouse with an encoder wheel, there is a new feature: Rotary Keys. 
-
-When you enable this feature in the config, see _ROTARY_KEYS_, the encoder is not treated as an axis or movement but repeatedly triggers a button. This can be done to e.g. hit the volume+ button while turning the wheel clockwise.
+When you enable this feature in the config, see `ROTARY_KEYS`, the encoder is not treated as an axis or movement but repeatedly triggers a button. This can be done to e.g. hit the volume+ button while turning the wheel clockwise.
+Attention: The keys defined by `ROTARY_KEYS` can no longer be triggered by usually pressing them. Up to now, we are overriding their values with the encoder.
 
 Note: We are still using the emulated USB HID protocoll for the CAD mouse. Therefore, you need to define the pressed button in the config.h and than configure some actions on your PC driver. We are not emulating a standard keyboard. 
 
