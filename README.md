@@ -66,7 +66,7 @@ Other implementations, hardware or mechanic variants are linked below.
 - Source code for an Arduino Pro Micro
 - Read eight analog inputs and calculate the kinematics (either based on four joysticks or eight linear hall effect sensors) with advanced [modifier function](#modifier-function).
 - Emulation of the USB identification and the HID interface to behave like an original space mouse
-- Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values
+- Advanced USB settings for linux users: Implemented jiggling or declaring the HID reports as relative or absolute values, see [spacenav](#spacenav-for-linux-users)
 - Semi-Automatic calibration methods to find the correct pin outs and measurement ranges
 - Debug outputs can be requested over the serial interface from a [menu](#serial-interface-menu) for debug outputs
 - Changing and evaluation of parameters without recompiling and download: editing and handling the parameters on the controller via the serial (debug-)connection
@@ -92,7 +92,7 @@ Other implementations, hardware or mechanic variants are linked below.
 - With all features enabled, the pro micro is nearly at the limits of it's flash. Reducing the flash size might be necessary in the future...
 - The html page explaining the modifier function would benefit from an additional plot zooming in on zero.
 
-Purchasing the [electronics](#electronics) and [printing some parts](#printed-parts) is not scope of this repository. We start with the software. Feel free to read some build reports:
+Purchasing the [electronics](#electronics-and-pin-assignment-with-joysticks) and [printing some parts](#printed-parts-and-hardware) is not scope of this repository. We start with the software. Feel free to read some build reports:
 - In the Wiki: [Building an Ergonomouse](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build) based on four joysticks
  
 ## Macro-Pad for CAD users
@@ -153,7 +153,7 @@ Read and follow the instructions throughout the config.h file and write down you
 
 This calibration is supported by various debug outputs. All debug outputs are described at the top of your config_sample.h.
 
-1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics) section below.
+1. Check and correct your pin out -> Refer to the pictures in the [Electronics](#electronics-and-pin-assignment-with-joysticks) section below.
 2. Tune dead zone to avoid jittering
 3. Getting min and max values for your joysticks
 	- There is a semi-automatic approach, which returns you the minimum and maximum values seen within 15s.
@@ -224,6 +224,11 @@ Here are some links for the joystick and the newer, more precise hall-effect + m
 
 The spacemouse is connected to an arduino Pro Micro 16 Mhz. Check out the wiring diagram by [TeachingTech](https://www.printables.com/de/model/864950-open-source-spacemouse-space-mushroom-remix/) or with this added keys and the added neopixel ring.
 ![WiringSpaceMouse](pictures/fritzing-electronics.png)
+
+Please be aware that only a limited amount of _ten_ (10!) digital inputs is available, that all optional features need to share. You'll need:
+- two pins for the encoder
+- one pin for a LED or the led ring
+- one pin per key (i.e. only seven in total, if encoder and LED are used!)
 
 The calculations in the program expect AX to be the vertical joystick in front of you and AY the horizontal in front of you. B, C and D are clockwise around the spacemouse.
 Maybe your joystick axis are named X and Y in an other orientation. That doesn't matter. Connect them and use the config.h file to put the pin the vertical joystick in front of you (=AX) to the first position. In teaching techs example, this is A1, even though his joystick is labeled "y". See also the [wiki](https://github.com/AndunHH/spacemouse/wiki/Ergonomouse-Build#calibration) for some additional pictures.
@@ -460,10 +465,10 @@ Additionally a hysteresis is configurable into the exclusive mode to prevent imm
 Check also the [prio-z-exclusive mode](#PRIO-Z-EXCLUSIVE).
 
 ## Rotary Keys
+When you are using the mouse with an encoder wheel, you can enable the feature: Rotary Keys. 
 
-When you are using the mouse with an encoder wheel, there is a new feature: Rotary Keys. 
-
-When you enable this feature in the config, see _ROTARY_KEYS_, the encoder is not treated as an axis or movement but repeatedly triggers a button. This can be done to e.g. hit the volume+ button while turning the wheel clockwise.
+When you enable this feature in the config, see `ROTARY_KEYS`, the encoder is not treated as an axis or movement but repeatedly triggers a button. This can be done to e.g. hit the volume+ button while turning the wheel clockwise.
+Attention: The keys defined by `ROTARY_KEYS` can no longer be triggered by usually pressing them. Up to now, we are overriding their values with the encoder.
 
 Note: We are still using the emulated USB HID protocoll for the CAD mouse. Therefore, you need to define the pressed button in the config.h and than configure some actions on your PC driver. We are not emulating a standard keyboard. 
 

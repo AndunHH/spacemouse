@@ -342,7 +342,7 @@ with an encoder) or as kill-keys (described below).
 
 // Define the PINS for the classic keys on the Arduino
 // The first pins from KEYLIST may be reported via HID
-#define KEYLIST {0, 1, 2}
+#define KEYLIST {15, 14, 16}
 
 /* Report KEYS over USB HID to the PC
  -------------------------------------
@@ -423,14 +423,6 @@ How many kill keys are there? (disabled: 0; enabled: 2)
  * => KILLROT 2 The second kill key has the last position in the KEYLIST with index 3 -> KILLTRANS 3
  */
 
-// Some simple tests for the definition of the keys
-#if (NUMKILLKEYS > NUMKEYS)
-#error "Number of Kill Keys can not be larger than total number of keys"
-#endif
-#if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
-#error "Index of killkeys must be smaller than the total number of keys"
-#endif
-
 // time in ms which is needed to allow a new button press
 #define DEBOUNCE_KEYS_MS 200
 
@@ -474,11 +466,14 @@ Recommended strength = 200
 
 /* ROTARY_KEYS
 ===============
-Use the encoder and emulate a key stroke by turning the encoder.
+Use the encoder and replace a key stroke by turning the encoder.
 ROTARY_KEYS 1 = enabled, 0 = disabled
+Only the ROTARY_KEYS or the ROTARY_AXIS can be enabled, not both at the same time.
+The encoder shall either directly control a movement (ROTARY_AXIS) or emulate a key stroke
+(ROTARY_KEYS), but not both at the same time.
 */
 #define ROTARY_KEYS 0
-// which key from the BUTTONLIST shall be emulated?
+// which key from the BUTTONLIST shall be replaced?
 // First direction  (0 = first element from BUTTONLIST, 1 = second element, etc.)
 #define ROTARY_KEY_IDX_A 2
 // counter direction

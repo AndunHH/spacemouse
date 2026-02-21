@@ -85,23 +85,16 @@
 #define KILLROT 2
 #define KILLTRANS 3
 
-#if (NUMKILLKEYS > NUMKEYS)
-#error "Number of Kill Keys can not be larger than total number of keys"
-#endif
-#if (NUMKILLKEYS > 0 && ((KILLROT > NUMKEYS) || (KILLTRANS > NUMKEYS)))
-#error "Index of killkeys must be smaller than the total number of keys"
-#endif
-
 #define DEBOUNCE_KEYS_MS 200
 
-#define ENCODER_CLK 2
-#define ENCODER_DT 3
+#define ENCODER_CLK 0
+#define ENCODER_DT 1
 
-#define ROTARY_AXIS 5
+#define ROTARY_AXIS 2
 #define RAXIS_ECH 200
 #define RAXIS_STR 200
 
-#define ROTARY_KEYS 2
+#define ROTARY_KEYS 0
 #define ROTARY_KEY_IDX_A 2
 #define ROTARY_KEY_IDX_B 3
 #define ROTARY_KEY_STRENGTH 19
@@ -110,7 +103,7 @@
 #define DEBUG_LINE_END "\r"
 
 #define VelocityDeadzoneForLED 15
-#define LEDpin 5
+#define LEDpin 3
 #define LEDRING 24
 
 #define LEDclockOffset 2
