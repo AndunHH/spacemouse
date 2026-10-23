@@ -492,6 +492,7 @@ Here are some other projects with regard to space mice. The arrow indicates what
 * [Space Fox](https://github.com/pepijndevos/spacefox) -> Joystick based on potentiometers
 * [Orbion The OpenSource 3D Space Mouse](https://github.com/FaqT0tum/Orbion_3D_Space_Mouse) -> Mouse and Keyboard
 * [Space mouse with linear hall effect sensors](https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors) resp. [the github repo](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse) -> space mouse with hall effect sensors
+* [Spacepilot Bridge](https://github.com/dewi-ny-je/spacepilot-bridge) A bridge from e.g. old devices to map there HID to the up-to-date protocol of space mouses.
 
 # License
 Because TeachingTech published his source code on Printables under this license, it also applies here:
